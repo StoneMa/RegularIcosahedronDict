@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os
 import numpy as np
 from numpy import linalg
 from model import Model
@@ -9,6 +8,15 @@ from regular_icosahedron import RegularIcosahedron
 
 
 class Map2D(object):
+    """
+
+    三次元モデルから距離マップを取得するクラス
+
+    三次元モデルの重心から、正二十面体グリッド頂点までの線分を定義し、
+    線分とモデル表面との交点までの距離を保存したマップを作る
+
+    """
+
     def __init__(self, model_path, grid_path, n_div_recursion, scale_grid):
 
         # 3Dモデル
@@ -85,6 +93,14 @@ class Map2D(object):
         return None
 
     def dist(self):
+        """
+
+        距離マップを得る
+
+        :rtype: np.ndarray
+        :return: 距離マップ
+
+        """
 
         distances = np.empty(shape=(len(self.grid.vertices),))
 

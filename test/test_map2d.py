@@ -8,6 +8,24 @@ from src.map2d import Map2D
 def test_tomas_moller(model_path="../res/stanford_bunny.obj",
                       grid_path="../res/regular_icosahedron.obj",
                       n_div_recursion=0, scale_grid=2):
+    """
+
+    Model::tomas_moller()のテスト
+
+    :type model_path: str
+    :param model_path: モデルデータへのパス
+
+    :type grid_path: str
+    :param grid_path: グリッドデータへのパス
+
+    :type n_div_recursion: int
+    :param n_div_recursion: グリッド（正二十面体）の分割数
+
+    :type scale_grid: int
+    :param scale_grid: グリッド（正二十面体）のスケール
+
+    """
+
     map = Map2D(model_path=model_path, grid_path=grid_path,
                 n_div_recursion=n_div_recursion, scale_grid=scale_grid)
 

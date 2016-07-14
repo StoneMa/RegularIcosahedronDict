@@ -21,6 +21,14 @@ class Model(object):
 
     @staticmethod
     def center(model):
+        """
+
+        モデルの重心が座標軸の原点となるように、全ての頂点座標を平行移動
+
+        :type model: Model
+        :param model: Modelオブジェクト
+
+        """
         if not isinstance(model, Model):
             raise TypeError("Model::center()")
 
@@ -29,6 +37,14 @@ class Model(object):
 
     @staticmethod
     def normal(model):
+        """
+
+        重心から頂点までの距離が最大1となるように、全ての頂点座標を正規化する
+
+        :type model: Model
+        :param model: Modelオブジェクト
+
+        """
         if not isinstance(model, Model):
             raise TypeError("Model::normal()")
 
@@ -40,6 +56,17 @@ class Model(object):
 
     @staticmethod
     def scale(model, r):
+        """
+
+        モデルの重心から頂点までの距離をr倍する
+
+        :type model: Model
+        :param model: Modelオブジェクト
+
+        :type r: int
+        :param r: 距離倍率
+
+        """
         if not isinstance(model, Model):
             raise TypeError("Model::scale()")
 
