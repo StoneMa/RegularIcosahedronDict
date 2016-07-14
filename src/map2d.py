@@ -14,7 +14,9 @@ class Map2D(object):
         # 3Dモデル
         self.model = Map2D.__load(model_path, Model)
         # 正二十面体グリッド
-        self.grid = Map2D.__load(grid_path, RegularIcosahedron)
+        self.grid = RegularIcosahedron.division(n_div_recursion,
+                                                Map2D.__load(grid_path,
+                                                             RegularIcosahedron))
 
         # モデルを座標系の中心に置き、正規化する
         Model.center(self.model)
@@ -29,10 +31,6 @@ class Map2D(object):
         if np.linalg.norm(self.grid.vertices, axis=1).min() < np.linalg.norm(
                 self.model.vertices, axis=1).max():
             raise NotImplementedError()
-
-        # 指定回数グリッドを分割
-        for i in xrange(n_div_recursion):
-            RegularIcosahedron.division(self.grid)
 
     @staticmethod
     def __load(path, cls):
@@ -50,6 +48,7 @@ class Map2D(object):
 
     def tomas_moller(self, origin, end, v0, v1, v2):
         """
+
         Tomas-Mollerのアルゴリズム
         線分が三角形の交点を返す
         交差しない場合、Noneを返す
@@ -73,6 +72,7 @@ class Map2D(object):
 
         :rtype: np.ndarray
         :return: 交点ベクトル
+
         """
         edge1 = v1 - v0
         edge2 = v2 - v0

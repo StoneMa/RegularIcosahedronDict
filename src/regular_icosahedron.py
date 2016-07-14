@@ -24,18 +24,87 @@ class RegularIcosahedron(Model):
 
     @staticmethod
     def load_obj(obj_file):
+        """
+
+        RegularIcosahedronオブジェクトとして.objファイルを読み込み、頂点情報のみを取得
+
+        :type obj_file : str
+        :param obj_file: ファイルパス
+
+        :rtype : RegularIcosahedron
+        :return: RegularIcosahedronオブジェクト
+
+        """
         model = Model.load_obj(obj_file)
         return RegularIcosahedron(model.vertices, model.normals, model.faces,
                                   model.file_type)
 
     @staticmethod
     def load_off(off_file):
+        """
+
+        RegularIcosahedronオブジェクトとして.offファイルを読み込み、頂点情報のみを取得
+
+        :type off_file : str
+        :param off_file: ファイルパス
+
+        :rtype : RegularIcosahedron
+        :return: RegularIcosahedronオブジェクト
+
+        """
         model = Model.load_off(off_file)
         return RegularIcosahedron(model.vertices, model.normals, model.faces,
                                   model.file_type)
 
     @staticmethod
-    def division(regular_icosahedron):
+    def division(n, regular_icosahedron):
+        """
+
+        面をn分割したRegularIcosahedronオブジェクトを返戻する
+        返戻されるRegularIcosahedronの頂点情報は z成分→角度 の優先度でソートされる
+        ただし、面情報は破棄される
+
+        :type n: int
+        :param n: 面の分割数
+
+        :type regular_icosahedron: RegularIcosahedron
+        :param regular_icosahedron: RegularIcosahedronオブジェクト
+
+        :rtype: RegularIcosahedron
+        :return: 頂点情報のみの分割後RegularIcosahedronオブジェクト
+
+        """
+
+        # 面をn分割
+        for i in xrange(n):
+            RegularIcosahedron.__division_ignore_order(regular_icosahedron)
+
+        # 重複した頂点を排除
+        vertices = list(set(map(tuple, regular_icosahedron.vertices)))
+
+        # z成分→角度でインデックスをソート
+        dtype = [('z', float), ('angle', float)]
+        values = [(z, np.arctan2(x, y)) for x, y, z in vertices]
+        angle_z = np.array(values, dtype=dtype)
+
+        # ソート済み頂点配列
+        arg_vertices = np.argsort(angle_z, axis=0, order=('z', 'angle'))
+
+        return RegularIcosahedron(np.array(vertices)[arg_vertices][::-1], None,
+                                  None, regular_icosahedron.file_type)
+
+    @staticmethod
+    def __division_ignore_order(regular_icosahedron):
+        """
+
+        RegularIcosahedronの三角面を４つに分割する
+        返戻される頂点リストは順序を考慮していない
+        面情報も順序を考慮してしないが、正三角形を構成する３点の順序は保持される
+
+        :type regular_icosahedron: RegularIcosahedron
+        :param regular_icosahedron: RegularIcosahedronオブジェクト
+
+        """
         if not isinstance(regular_icosahedron, RegularIcosahedron):
             raise TypeError("RegularIcosahedron::division()")
 
@@ -68,9 +137,7 @@ class RegularIcosahedron(Model):
 if __name__ == '__main__':
     ico = RegularIcosahedron.load_obj("../res/regular_icosahedron.obj")
     print "ico.vertices : ", ico.vertices.shape
-    RegularIcosahedron.division(ico)
+    ico = RegularIcosahedron.division(3, ico)
     print "ico.vertices : ", ico.vertices.shape
-    RegularIcosahedron.division(ico)
-    print "ico.vertices : ", ico.vertices.shape
-
-    ico.save("../res/ico.obj")
+    print ico.vertices
+    ico.save("ico4.obj")

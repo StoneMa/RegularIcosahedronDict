@@ -156,8 +156,10 @@ class Model(object):
         with open(obj_file, "w") as f:
             # OBJファイル先頭行コメント
             f.write("# OBJ file format with ext .obj\n")
-            f.write("# vertex count = {}\n# face count = {}\n".format(
-                len(self.vertices), len(self.faces)))
+            f.write("# vertex count = {}\n".format(len(self.vertices)))
+
+            if self.faces is not None:
+                f.write("# face count = {}\n".format(len(self.faces)))
 
             # 頂点情報
             for x, y, z in self.vertices:
@@ -165,8 +167,9 @@ class Model(object):
 
             # 面情報
             # objファイルの面情報インデックスは１始まりなので、+1する
-            for p1, p2, p3 in self.faces:
-                f.write("f {0} {1} {2}\n".format(p1 + 1, p2 + 1, p3 + 1))
+            if self.faces is not None:
+                for p1, p2, p3 in self.faces:
+                    f.write("f {0} {1} {2}\n".format(p1 + 1, p2 + 1, p3 + 1))
 
                 # 法線情報(NotImplemented)
 
