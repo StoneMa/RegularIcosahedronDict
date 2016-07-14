@@ -49,13 +49,41 @@ class Model(object):
         model.vertices += v_average
 
     @staticmethod
-    def load_off(off_file):
+    def load(path):
         """
+
+        ファイルパスの拡張子を識別してファイル読み込みを行い、Modelオブジェクトを返す
+
+        :type path: str
+        :param path: ファイルパス
+
+        :rtype: Model
+        :return: Modelオブジェクト
+
+        """
+        ext = os.path.splitext(path)[1]
+
+        if ext == ".obj":
+            model = Model.__load_obj(path)
+        elif ext == ".off":
+            model = Model.__load_off(path)
+        else:
+            raise IOError("Map2D::__init__() : failed to load {}.".format(path))
+
+        return model
+
+    @staticmethod
+    def __load_off(off_file):
+        """
+
         .off形式のファイルを読み込み、頂点座標のみを取得
+
         :type off_file: str
         :param off_file: .offファイル名
+
         :rtype : Model
         :return : Modelオブジェクト
+
         """
 
         vertices = None
@@ -84,13 +112,17 @@ class Model(object):
         return Model(vertices, np.array([]), faces, Model.FILE_TYPE_OFF)
 
     @staticmethod
-    def load_obj(obj_file):
+    def __load_obj(obj_file):
         """
+
         .objファイルを読み込み、頂点情報のみを取得
+
         :type obj_file : str
         :param obj_file: ファイルパス
+
         :rtype : Model
         :return: Modelオブジェクト
+
         """
 
         with open(obj_file) as f:
@@ -117,9 +149,12 @@ class Model(object):
 
     def __save_off(self, off_file):
         """
+
         Modelオブジェクトの内容を.off形式で保存
+
         :type off_file: str
         :param off_file: .offファイルパス
+
         """
         name, ext = os.path.splitext(off_file)
         if ext != ".off" or ext == "":
@@ -145,9 +180,12 @@ class Model(object):
 
     def __save_obj(self, obj_file):
         """
+
         Modelオブジェクトの内容を.obj形式で保存
+
         :type obj_file: str
         :param obj_file: .objファイルパス
+
         """
         name, ext = os.path.splitext(obj_file)
         if ext != ".obj" or ext == "":
@@ -171,16 +209,16 @@ class Model(object):
                 for p1, p2, p3 in self.faces:
                     f.write("f {0} {1} {2}\n".format(p1 + 1, p2 + 1, p3 + 1))
 
-                # 法線情報(NotImplemented)
+                    # 法線情報(NotImplemented)
 
 
 if __name__ == '__main__':
     # parse off
-    off_model = Model.load_off("../res/stanford_bunny.off")
+    off_model = Model.load("../res/stanford_bunny.off")
     print ".off vertices : ", off_model.vertices.shape
     print ".off faces : ", off_model.faces.shape
     # parse obj
-    obj_model = Model.load_obj("../res/stanford_bunny.obj")
+    obj_model = Model.load("../res/stanford_bunny.obj")
     print ".obj vertices : ", obj_model.vertices.shape
     print ".off normals: ", obj_model.normals.shape
     print ".obj faces : ", obj_model.faces.shape

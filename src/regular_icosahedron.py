@@ -23,36 +23,19 @@ class RegularIcosahedron(Model):
                                                  file_type)
 
     @staticmethod
-    def load_obj(obj_file):
+    def load(path):
         """
 
-        RegularIcosahedronオブジェクトとして.objファイルを読み込み、頂点情報のみを取得
+        ファイルパスの拡張子を識別して読み込みを行い、RegularIcosahedronオブジェクトを返す
 
-        :type obj_file : str
-        :param obj_file: ファイルパス
+        :type path: str
+        :param path: ファイルパス
 
-        :rtype : RegularIcosahedron
+        :rtype: RegularIcosahedron
         :return: RegularIcosahedronオブジェクト
 
         """
-        model = Model.load_obj(obj_file)
-        return RegularIcosahedron(model.vertices, model.normals, model.faces,
-                                  model.file_type)
-
-    @staticmethod
-    def load_off(off_file):
-        """
-
-        RegularIcosahedronオブジェクトとして.offファイルを読み込み、頂点情報のみを取得
-
-        :type off_file : str
-        :param off_file: ファイルパス
-
-        :rtype : RegularIcosahedron
-        :return: RegularIcosahedronオブジェクト
-
-        """
-        model = Model.load_off(off_file)
+        model = Model.load(path)
         return RegularIcosahedron(model.vertices, model.normals, model.faces,
                                   model.file_type)
 
@@ -135,7 +118,7 @@ class RegularIcosahedron(Model):
 
 
 if __name__ == '__main__':
-    ico = RegularIcosahedron.load_obj("../res/regular_icosahedron.obj")
+    ico = RegularIcosahedron.load("../res/regular_icosahedron.obj")
     print "ico.vertices : ", ico.vertices.shape
     ico = RegularIcosahedron.division(3, ico)
     print "ico.vertices : ", ico.vertices.shape

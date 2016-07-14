@@ -12,11 +12,11 @@ class Map2D(object):
     def __init__(self, model_path, grid_path, n_div_recursion, scale_grid):
 
         # 3Dモデル
-        self.model = Map2D.__load(model_path, Model)
+        self.model = Model.load(model_path)
         # 正二十面体グリッド
         self.grid = RegularIcosahedron.division(n_div_recursion,
-                                                Map2D.__load(grid_path,
-                                                             RegularIcosahedron))
+                                                RegularIcosahedron.load(
+                                                    grid_path))
 
         # モデルを座標系の中心に置き、正規化する
         Model.center(self.model)
@@ -31,20 +31,6 @@ class Map2D(object):
         if np.linalg.norm(self.grid.vertices, axis=1).min() < np.linalg.norm(
                 self.model.vertices, axis=1).max():
             raise NotImplementedError()
-
-    @staticmethod
-    def __load(path, cls):
-        ext = os.path.splitext(path)[1]
-
-        if ext == ".obj":
-            model = cls.load_obj(path)
-        elif ext == ".off":
-            model = cls.load_off(path)
-        else:
-            raise IOError(
-                "Map2D::__init__() : failed to load {}.".format(cls.__name__))
-
-        return model
 
     def tomas_moller(self, origin, end, v0, v1, v2):
         """
