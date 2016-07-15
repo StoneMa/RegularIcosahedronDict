@@ -125,8 +125,3 @@ class Map2D(object):
         return distances
 
 
-if __name__ == '__main__':
-    map2d = Map2D(model_path="../res/stanford_bunny.obj",
-                  grid_path="../res/regular_icosahedron.obj",
-                  n_div_recursion=0, scale_grid=2)
-    print map2d.dist()
