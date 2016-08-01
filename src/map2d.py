@@ -199,8 +199,9 @@ class Map2D(object):
         dstmファイル形式の距離マップを読み込み、入れ子リスト構造で返す
 
         :type file_path: str
-        :param file_path: 読み込む
-        :return:
+        :param file_path: 読み込むファイルのパス
+        :rtype : list(list)
+        :return: 入れ子リスト構造の距離マップ
         """
 
         # 拡張子チェック
