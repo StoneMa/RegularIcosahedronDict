@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import pprint
 import numpy as np
 from src.map2d import Map2D
 
@@ -61,11 +62,13 @@ def test_dist(n, model_path="../res/stanford_bunny.obj",
     print "\nTest Map2D::dist() ..."
 
     for i in xrange(n):
-        print "n_div_recursion = {}: ".format(i)
-        map_div = Map2D(model_path=model_path, grid_path=grid_path,
-                        n_div_recursion=i, scale_grid=scale_grid).dist()
-        print "shape : {}".format(map_div.shape)
-        print "array :\n {}".format(map_div)
+        print "\nn_div_recursion = {}: ".format(i)
+        map_div = Map2D(model_path=model_path,
+                        grid_path=grid_path,
+                        n_div_recursion=i,
+                        scale_grid=scale_grid).dist(is_sorted_by_z=True)
+        print "array :"
+        pprint.pprint(map_div)
 
 
 if __name__ == '__main__':

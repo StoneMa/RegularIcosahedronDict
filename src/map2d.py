@@ -21,7 +21,7 @@ class Map2D(object):
 
         # 3Dモデル
         self.model = Model.load(model_path)
-        # 正二十面体グリッド
+        # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         self.grid = RegularIcosahedron.division(n_div_recursion,
                                                 RegularIcosahedron.load(
                                                     grid_path))
@@ -92,11 +92,26 @@ class Map2D(object):
 
         return None
 
-    def dist(self):
+    def dist(self, is_sorted_by_z):
         """
 
         距離マップを得る
 
+        is_sorted_by_z=Trueで距離マップはリストの入れ子構造になる
+        z成分が同じである頂点座標の距離情報は同一のリストに入り、
+        各リストはz成分の大きさでソートされる
+
+        ex.
+        [
+        z=1 → [a1]
+        z=0.33 → [b1, b2, ... ,b5]
+        z=-0.33 → [c1, c2, ... ,c5]
+        z=-1 → [d1]
+        ]
+        (上記リスト内の各要素は距離を表す)
+
+        :type is_sorted_by_z: bool
+        :param is_sorted_by_z: 距離情報をリストの入れ子構造にするかどうか
         :rtype: np.ndarray
         :return: 距離マップ
 
@@ -122,6 +137,19 @@ class Map2D(object):
                     distances[idx_dist] = linalg.norm(p)
                     break
 
+        if is_sorted_by_z:
+            parents = []
+            children = []
+            z = self.grid.vertices[0][2]
+            for i, v_grid in enumerate(self.grid.vertices):
+                vz = v_grid[2]
+                if z != vz:
+                    parents.append(children)
+                    children = []
+                children.append(distances[i])
+                z = vz
+            else:
+                parents.append(children)
+            distances = parents
+
         return distances
-
-

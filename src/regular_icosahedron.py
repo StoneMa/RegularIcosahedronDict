@@ -65,9 +65,11 @@ class RegularIcosahedron(Model):
         # 重複した頂点を排除
         vertices = list(set(map(tuple, regular_icosahedron.vertices)))
 
-        # z成分→角度でインデックスをソート
-        dtype = [('z', float), ('angle', float)]
+        # z成分とxyのなす角度のペアのリスト
         values = [(z, np.arctan2(x, y)) for x, y, z in vertices]
+
+        # z成分→角度の優先度でインデックスをソート
+        dtype = [('z', float), ('angle', float)]
         angle_z = np.array(values, dtype=dtype)
 
         # ソート済み頂点配列
