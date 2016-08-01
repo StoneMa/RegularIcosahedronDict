@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
+import struct
 import numpy as np
 from numpy import linalg
 from model import Model
@@ -151,5 +153,79 @@ class Map2D(object):
             else:
                 parents.append(children)
             distances = parents
+
+        return distances
+
+    @staticmethod
+    def save_dstm(file_path, distances):
+
+        """
+
+        dstmファイル形式で距離マップを保存する
+
+        :type file_path: str
+        :param file_path: 保存するファイルのパス
+        :type distances: list(list)
+        :param distances: 入れ子構造の距離マップ
+
+        """
+
+        # distances型チェック
+        assert isinstance(distances, list)
+
+        # 拡張子チェック
+        f_name, ext = os.path.splitext(file_path)
+        if ext != '.dstm':
+            file_path = f_name + '.dstm'
+
+        with open(file_path, mode='wb') as f:
+
+            f.writelines("# DSTM\n")
+            f.writelines("# N_COLUMN\n")
+
+            for dists in distances:
+                f.writelines(str(len(dists)) + "\n")
+
+            f.writelines("# DATA(DOUBLE)\n")
+
+            for dists in distances:
+                for d in dists:
+                    f.write(struct.pack('f', d))
+
+    @staticmethod
+    def load_dstm(file_path):
+        """
+
+        dstmファイル形式の距離マップを読み込み、入れ子リスト構造で返す
+
+        :type file_path: str
+        :param file_path: 読み込む
+        :return:
+        """
+
+        # 拡張子チェック
+        f_name, ext = os.path.splitext(file_path)
+        if ext != '.dstm':
+            file_path = f_name + '.dstm'
+
+        distances = []
+        n_column = []
+
+        with open(file_path, mode='rb') as f:
+
+            assert f.readline() == '# DSTM\n'
+            assert f.readline() == '# N_COLUMN\n'
+
+            while True:
+                line = f.readline()
+                if line == '# DATA(DOUBLE)\n':
+                    break
+                n_column.append(int(line))
+
+            for nc in n_column:
+                column = []
+                for i in xrange(nc):
+                    column.append(struct.unpack('f', f.read(4))[0])
+                distances.append(column)
 
         return distances

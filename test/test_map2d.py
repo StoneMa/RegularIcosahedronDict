@@ -70,6 +70,12 @@ def test_dist(n, model_path="../res/stanford_bunny.obj",
         print "array :"
         pprint.pprint(map_div)
 
+        # I/O
+        dstm_name = "./" + str(i) + ".dstm"
+        Map2D.save_dstm(dstm_name, map_div)
+        dstm = Map2D.load_dstm(dstm_name)
+        pprint.pprint(dstm)
+
 
 if __name__ == '__main__':
     test_tomas_moller()
