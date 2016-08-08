@@ -54,6 +54,12 @@ class IcoGrid(object):
 
         self.faces = faces
 
+    def __str__(self):
+        str = super(IcoGrid, self).__str__() + " -> \n"
+        for face in self.faces:
+            str += face.__str__() + "\n"
+        return str
+
     class Face(object):
         """
         グリッド面
