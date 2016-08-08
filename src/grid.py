@@ -88,6 +88,12 @@ class IcoGrid(object):
             # 平面上のグリッド頂点集合
             self.points = [point_top, point_left, point_right]
 
+        def __str__(self):
+            str = super(IcoGrid.Face, self).__str__() + " -> \n"
+            for p in self.points:
+                str += p.__str__() + "\n"
+            return str
+
     class Point(object):
         """
         グリッド頂点
