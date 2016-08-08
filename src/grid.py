@@ -5,7 +5,7 @@
 import os
 
 
-class IcoGrid(object):
+class Grid(object):
     """
     距離マップ生成用グリッドクラス
     """
@@ -37,14 +37,14 @@ class IcoGrid(object):
                 xyz_left = vertices[fv[1]]
                 xyz_right = vertices[fv[2]]
 
-                p_top = IcoGrid.Point(xyz_top[0], xyz_top[1], xyz_top[2],
-                                      alpha=0, beta=0)
-                p_left = IcoGrid.Point(xyz_left[0], xyz_left[1], xyz_left[2],
-                                       alpha=1, beta=0)
-                p_right = IcoGrid.Point(xyz_right[0], xyz_right[1],
-                                        xyz_right[2], alpha=0, beta=1)
+                p_top = Grid.GridPoint(xyz_top[0], xyz_top[1], xyz_top[2],
+                                       alpha=0, beta=0)
+                p_left = Grid.GridPoint(xyz_left[0], xyz_left[1], xyz_left[2],
+                                        alpha=1, beta=0)
+                p_right = Grid.GridPoint(xyz_right[0], xyz_right[1],
+                                         xyz_right[2], alpha=0, beta=1)
 
-                faces.append(IcoGrid.Face(i, p_top, p_left, p_right))
+                faces.append(Grid.GridFace(i, p_top, p_left, p_right))
 
             for face, af in zip(faces, adjacent_faces):
                 id_left, id_right, id_bottom = af
@@ -54,13 +54,20 @@ class IcoGrid(object):
 
         self.faces = faces
 
+    def divide_face(self, n_div):
+        for face in self.faces:
+            new_points = []
+            for sum_length in xrange(n_div):
+                alpha = sum_length
+                beta = 0
+
     def __str__(self):
-        str = super(IcoGrid, self).__str__() + " -> \n"
+        str = super(Grid, self).__str__() + " -> \n"
         for face in self.faces:
             str += face.__str__() + "\n"
         return str
 
-    class Face(object):
+    class GridFace(object):
         """
         グリッド面
         """
@@ -70,17 +77,17 @@ class IcoGrid(object):
             self.face_id = face_id
 
             # ３頂点
-            assert isinstance(point_top, IcoGrid.Point)
-            assert isinstance(point_left, IcoGrid.Point)
-            assert isinstance(point_right, IcoGrid.Point)
+            assert isinstance(point_top, Grid.GridPoint)
+            assert isinstance(point_left, Grid.GridPoint)
+            assert isinstance(point_right, Grid.GridPoint)
             self.point_top = point_top
             self.point_left = point_left
             self.point_right = point_right
 
             # 隣接３平面
-            assert isinstance(left_face, IcoGrid.Face) or left_face is None
-            assert isinstance(right_face, IcoGrid.Face) or right_face is None
-            assert isinstance(bottom_face, IcoGrid.Face) or bottom_face is None
+            assert isinstance(left_face, Grid.GridFace) or left_face is None
+            assert isinstance(right_face, Grid.GridFace) or right_face is None
+            assert isinstance(bottom_face, Grid.GridFace) or bottom_face is None
             self.left_face = left_face
             self.right_face = right_face
             self.bottom_face = bottom_face
@@ -89,7 +96,7 @@ class IcoGrid(object):
             self.points = [point_top, point_left, point_right]
 
         def __str__(self):
-            str = super(IcoGrid.Face, self).__str__()
+            str = super(Grid.GridFace, self).__str__()
             str += " -> Face ID : {}\n".format(self.face_id)
             for p in self.points:
                 str += p.__str__() + "\n"
@@ -98,7 +105,7 @@ class IcoGrid(object):
                 self.bottom_face.face_id)
             return str
 
-    class Point(object):
+    class GridPoint(object):
         """
         グリッド頂点
         """
@@ -111,7 +118,7 @@ class IcoGrid(object):
             self.beta = beta
 
         def __str__(self):
-            return super(IcoGrid.Point, self).__str__() + \
+            return super(Grid.GridPoint, self).__str__() + \
                    " -> x : {0:<13}, y : {1:<13}, z : {2:<13}, alpha : {3}, beta : {4}".format(
                        self.x, self.y, self.z, self.alpha, self.beta)
 
