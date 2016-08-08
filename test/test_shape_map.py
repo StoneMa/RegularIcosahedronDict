@@ -3,7 +3,7 @@
 
 import pprint
 import numpy as np
-from src.map2d import Map2D
+from src.shape_map import ShapeMap
 
 
 def test_tomas_moller(model_path="../res/stanford_bunny.obj",
@@ -29,8 +29,8 @@ def test_tomas_moller(model_path="../res/stanford_bunny.obj",
 
     print "\nTest Map2D::tomas_moller() ..."
 
-    map = Map2D(model_path=model_path, grid_path=grid_path,
-                n_div_recursion=n_div_recursion, scale_grid=scale_grid)
+    map = ShapeMap(model_path=model_path, grid_path=grid_path,
+                   n_div_recursion=n_div_recursion, scale_grid=scale_grid)
 
     v0 = np.array([0., 0., 0.])
     v1 = np.array([1., 0., 1.])
@@ -63,17 +63,17 @@ def test_dist(n, model_path="../res/stanford_bunny.obj",
 
     for i in xrange(n):
         print "\nn_div_recursion = {}: ".format(i)
-        map_div = Map2D(model_path=model_path,
-                        grid_path=grid_path,
-                        n_div_recursion=i,
-                        scale_grid=scale_grid).dist(is_sorted_by_z=True)
+        map_div = ShapeMap(model_path=model_path,
+                           grid_path=grid_path,
+                           n_div_recursion=i,
+                           scale_grid=scale_grid).dist(is_sorted_by_z=True)
         print "array :"
         pprint.pprint(map_div)
 
         # I/O
         dstm_name = "./" + str(i) + ".dstm"
-        Map2D.save_dstm(dstm_name, map_div)
-        dstm = Map2D.load_dstm(dstm_name)
+        ShapeMap.save_dstm(dstm_name, map_div)
+        dstm = ShapeMap.load_dstm(dstm_name)
         pprint.pprint(dstm)
 
 

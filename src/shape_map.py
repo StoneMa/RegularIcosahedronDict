@@ -9,7 +9,7 @@ from model import Model
 from regular_icosahedron import RegularIcosahedron
 
 
-class Map2D(object):
+class ShapeMap(object):
     """
 
     三次元モデルから距離マップを取得するクラス
