@@ -107,13 +107,32 @@ class IcoGrid(object):
             self.beta = beta
 
         def __str__(self):
-            str = super(IcoGrid.Point, self).__str__()
-            str += " -> x : {}, y : {}, z : {}, alpha : {}, beta : {}".format(
-                self.x, self.y, self.z, self.alpha, self.beta)
-            return str
+            return super(IcoGrid.Point, self).__str__() + \
+                   " -> x : {0:<13}, y : {1:<13}, z : {2:<13}, alpha : {3}, beta : {4}".format(
+                       self.x, self.y, self.z, self.alpha, self.beta)
 
+        def __eq__(self, other):
+            return self.x == other.x and \
+                   self.y == other.y and \
+                   self.z == other.z and \
+                   self.alpha == other.alpha and \
+                   self.beta == other.beta
 
-if __name__ == '__main__':
-    for face in IcoGrid('../res/new_regular_ico.grd').faces:
-        for p in face.points:
-            print p
+        def __ne__(self, other):
+            return not self.__eq__(other)
+
+        def __gt__(self, other):
+            if self.x != other.x or self.y != other.y or self.z != other.z:
+                raise NotImplementedError
+            return (self.alpha + self.beta) > (other.alpha + other.beta)
+
+        def __lt__(self, other):
+            if self.x != other.x or self.y != other.y or self.z != other.z:
+                raise NotImplementedError
+            return (self.alpha + self.beta) < (other.alpha + other.beta)
+
+        def __ge__(self, other):
+            return not self.__lt__(other)
+
+        def __le__(self, other):
+            return not self.__gt__(other)
