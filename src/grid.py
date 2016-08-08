@@ -89,9 +89,13 @@ class IcoGrid(object):
             self.points = [point_top, point_left, point_right]
 
         def __str__(self):
-            str = super(IcoGrid.Face, self).__str__() + " -> \n"
+            str = super(IcoGrid.Face, self).__str__()
+            str += " -> Face ID : {}\n".format(self.face_id)
             for p in self.points:
                 str += p.__str__() + "\n"
+            str += "Left Face : {}, Right Face : {}, Bottom Face : {}\n".format(
+                self.left_face.face_id, self.right_face.face_id,
+                self.bottom_face.face_id)
             return str
 
     class Point(object):
