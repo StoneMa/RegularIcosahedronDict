@@ -18,39 +18,43 @@ class Grid(object):
                 "IcoGrid::__init__ : file path is incorrect : {}".format(
                     grd_file))
 
-        faces = []
+        vertices = []
+        face_vertices = []
+        adjacent_faces = []
+
+        self.faces = []
 
         with open(grd_file) as f:
-            lines = filter(lambda x: len(x) > 0 and x[0] != "#",
-                           [line.strip().split() for line in f.readlines()])
 
-            vertices = [list(map(float, line[1:])) for line in lines if
-                        line[0] == 'v']
+            for line in f.readlines():
 
-            face_vertices = [list(map(int, line[1:])) for line in lines if
-                             line[0] == 'f']
+                line = line.strip().split()
 
-            adjacent_faces = [list(map(int, line[2:])) for line in lines if
-                              line[0] == 'af']
+                if len(line) == 0 or line[0] == '#':
+                    continue
 
-            for i, fv in enumerate(face_vertices):
-                xyz_top = vertices[fv[0]]
-                xyz_left = vertices[fv[1]]
-                xyz_right = vertices[fv[2]]
+                if line[0] == 'v':
+                    vertices.append(np.array(map(float, line[1:])))
 
-                p_top = Grid.GridPoint(xyz_top, alpha=0, beta=0)
-                p_left = Grid.GridPoint(xyz_left, alpha=1, beta=0)
-                p_right = Grid.GridPoint(xyz_right, alpha=0, beta=1)
+                if line[0] == 'f':
+                    face_vertices.append(np.array(map(int, line[1:])))
 
-                faces.append(Grid.GridFace(i, p_top, p_left, p_right))
+                if line[0] == 'af':
+                    adjacent_faces.append(np.array(map(int, line[2:])))
 
-            for face, af in zip(faces, adjacent_faces):
+            for face_id, fv in enumerate(face_vertices):
+                grid_face = Grid.GridFace(face_id,
+                                          Grid.GridPoint(vertices[fv[0]], 0, 0),
+                                          Grid.GridPoint(vertices[fv[1]], 1, 0),
+                                          Grid.GridPoint(vertices[fv[2]], 0, 1))
+
+                self.faces.append(grid_face)
+
+            for face, af in zip(self.faces, adjacent_faces):
                 id_left, id_right, id_bottom = af
-                face.left_face = faces[id_left]
-                face.right_face = faces[id_right]
-                face.bottom_face = faces[id_bottom]
-
-        self.faces = faces
+                face.left_face = self.faces[id_left]
+                face.right_face = self.faces[id_right]
+                face.bottom_face = self.faces[id_bottom]
 
     def divide_face(self, n_div):
 
