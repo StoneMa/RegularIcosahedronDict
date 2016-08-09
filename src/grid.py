@@ -52,6 +52,22 @@ class Grid(object):
 
         self.faces = faces
 
+    def divide_face(self, n_div):
+
+        for face in self.faces:
+            new_points = []
+            left_vector = face.point_left.xyz - face.point_top.xyz
+            right_vector = face.point_right.xyz - face.point_top.xyz
+
+            for sum_length in xrange(n_div + 1):
+                for i in xrange(sum_length + 1):
+                    alpha = sum_length - i
+                    beta = i
+                    new_xyz = left_vector * alpha / n_div + right_vector * beta / n_div
+                    new_points.append(Grid.GridPoint(new_xyz, alpha, beta))
+
+            face.points = new_points
+
     def __str__(self):
         str = super(Grid, self).__str__() + " -> \n"
         for face in self.faces:
