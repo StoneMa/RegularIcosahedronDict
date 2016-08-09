@@ -20,6 +20,10 @@ class TestGrid(unittest.TestCase):
 
         print self.grid
 
+    def test_divide_face(self):
+        self.grid.divide_face(4)
+        print self.grid
+
 
 if __name__ == '__main__':
     unittest.main()
