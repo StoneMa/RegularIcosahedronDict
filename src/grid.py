@@ -3,6 +3,7 @@
 
 
 import os
+import numpy as np
 
 
 class Grid(object):
@@ -37,12 +38,9 @@ class Grid(object):
                 xyz_left = vertices[fv[1]]
                 xyz_right = vertices[fv[2]]
 
-                p_top = Grid.GridPoint(xyz_top[0], xyz_top[1], xyz_top[2],
-                                       alpha=0, beta=0)
-                p_left = Grid.GridPoint(xyz_left[0], xyz_left[1], xyz_left[2],
-                                        alpha=1, beta=0)
-                p_right = Grid.GridPoint(xyz_right[0], xyz_right[1],
-                                         xyz_right[2], alpha=0, beta=1)
+                p_top = Grid.GridPoint(xyz_top, alpha=0, beta=0)
+                p_left = Grid.GridPoint(xyz_left, alpha=1, beta=0)
+                p_right = Grid.GridPoint(xyz_right, alpha=0, beta=1)
 
                 faces.append(Grid.GridFace(i, p_top, p_left, p_right))
 
@@ -53,13 +51,6 @@ class Grid(object):
                 face.bottom_face = faces[id_bottom]
 
         self.faces = faces
-
-    def divide_face(self, n_div):
-        for face in self.faces:
-            new_points = []
-            for sum_length in xrange(n_div):
-                alpha = sum_length
-                beta = 0
 
     def __str__(self):
         str = super(Grid, self).__str__() + " -> \n"
@@ -110,22 +101,23 @@ class Grid(object):
         グリッド頂点
         """
 
-        def __init__(self, x, y, z, alpha, beta):
-            self.x = x
-            self.y = y
-            self.z = z
+        def __init__(self, xyz, alpha, beta):
+            assert hasattr(xyz, "__getitem__") and len(xyz) == 3
+            self.xyz = np.asarray(xyz)
             self.alpha = alpha
             self.beta = beta
 
         def __str__(self):
+            self_x, self_y, self_z = self.xyz
             return super(Grid.GridPoint, self).__str__() + \
                    " -> x : {0:<13}, y : {1:<13}, z : {2:<13}, alpha : {3}, beta : {4}".format(
-                       self.x, self.y, self.z, self.alpha, self.beta)
+                       self_x, self_y, self_z, self.alpha, self.beta)
 
         def __eq__(self, other):
-            return self.x == other.x and \
-                   self.y == other.y and \
-                   self.z == other.z and \
+            self_x, self_y, self_z = self.xyz
+            return self_x == other.x and \
+                   self_y == other.y and \
+                   self_z == other.z and \
                    self.alpha == other.alpha and \
                    self.beta == other.beta
 
@@ -133,14 +125,24 @@ class Grid(object):
             return not self.__eq__(other)
 
         def __gt__(self, other):
-            if self.x != other.x or self.y != other.y or self.z != other.z:
-                raise NotImplementedError
-            return (self.alpha + self.beta) > (other.alpha + other.beta)
+            self_length = self.alpha + self.beta
+            other_length = other.alpha + other.beta
+            if self_length == other_length:
+                if self.alpha == other.alpha:
+                    return self.beta > other.beta
+                else:
+                    return self.alpha > other.alpha
+            return self_length > other_length
 
         def __lt__(self, other):
-            if self.x != other.x or self.y != other.y or self.z != other.z:
-                raise NotImplementedError
-            return (self.alpha + self.beta) < (other.alpha + other.beta)
+            self_length = self.alpha + self.beta
+            other_length = other.alpha + other.beta
+            if self_length == other_length:
+                if self.alpha == other.alpha:
+                    return self.beta < other.beta
+                else:
+                    return self.alpha < other.alpha
+            return self_length < other_length
 
         def __ge__(self, other):
             return not self.__lt__(other)
