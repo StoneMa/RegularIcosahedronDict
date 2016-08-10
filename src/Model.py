@@ -3,9 +3,10 @@
 
 import os
 import numpy as np
+from obj3d import Obj3d
 
 
-class Model(object):
+class Model(Obj3d):
     """
     3Dモデルの頂点情報のみを保持するクラス
     """
@@ -14,10 +15,7 @@ class Model(object):
     FILE_TYPE_OBJ = "OBJ"
 
     def __init__(self, vertices, normals, faces, file_type):
-        self.vertices = vertices
-        self.normals = normals
-        self.faces = faces
-        self.file_type = file_type
+        super(Model, self).__init__(vertices, normals, faces, file_type)
 
     @staticmethod
     def center(model):
