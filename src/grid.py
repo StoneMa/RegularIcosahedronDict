@@ -47,7 +47,6 @@ class Grid(object):
                                           Grid.GridPoint(vertices[fv[0]], 0, 0),
                                           Grid.GridPoint(vertices[fv[1]], 1, 0),
                                           Grid.GridPoint(vertices[fv[2]], 0, 1))
-
                 self.faces.append(grid_face)
 
             for face, af in zip(self.faces, adjacent_faces):
@@ -65,12 +64,33 @@ class Grid(object):
 
             for sum_length in xrange(n_div + 1):
                 for i in xrange(sum_length + 1):
-                    alpha = sum_length - i
-                    beta = i
-                    new_xyz = left_vector * alpha / n_div + right_vector * beta / n_div
+                    alpha = float(sum_length - i) / n_div
+                    beta = float(i) / n_div
+                    new_xyz = left_vector * alpha + right_vector * beta + face.point_top.xyz
                     new_points.append(Grid.GridPoint(new_xyz, alpha, beta))
 
             face.points = new_points
+
+    def save_obj(self, obj_file):
+
+        name, ext = os.path.splitext(obj_file)
+        if ext != ".obj" or ext == "":
+            obj_file = name + ".obj"
+
+        with open(obj_file, "w") as f:
+
+            # 頂点座標
+            vertices = np.array(
+                [p.xyz for face in self.faces for p in face.points])
+
+            # OBJファイル先頭行コメント
+            f.write("# OBJ file format with ext .obj\n")
+            f.write("# vertex count = {}\n".format(len(vertices)))
+            f.write("# face count = {}\n".format(len(self.faces)))
+
+            # 頂点情報
+            for x, y, z in vertices:
+                f.write("v {0:10f} {1:10f} {2:10f}\n".format(x, y, z))
 
     def __str__(self):
         str = super(Grid, self).__str__() + " -> \n"
