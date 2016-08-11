@@ -11,11 +11,16 @@ class Obj3d(object):
     3次元オブジェクトを表現するクラス
     """
 
-    FILE_TYPE = enum.Enum("FILE_TYPE", "OBJ OFF")
+    FILE_TYPE = enum.Enum("FILE_TYPE", "OBJ OFF GRD")
 
     def __init__(self, vertices, normals, faces, file_type):
 
         assert isinstance(file_type, Obj3d.FILE_TYPE)
+
+        if normals is None:
+            normals = []
+        if faces is None:
+            faces = []
 
         self.vertices = vertices
         self.normals = normals
@@ -144,13 +149,13 @@ class Obj3d(object):
 
     def save(self, file_name):
         if self.file_type.name == Obj3d.FILE_TYPE.OFF.name:
-            self.__save_off(file_name)
+            self._save_off(file_name)
         elif self.file_type.name == Obj3d.FILE_TYPE.OBJ.name:
-            self.__save_obj(file_name)
+            self._save_obj(file_name)
         else:
             raise NotImplementedError
 
-    def __save_off(self, off_file):
+    def _save_off(self, off_file):
         """
 
         Obj3dオブジェクトの内容を.off形式で保存
@@ -168,7 +173,8 @@ class Obj3d(object):
             f.write("OFF\n")
             # 頂点数 面数 法線数
             f.write(
-                "{0} {1} {2}\n\n".format(len(self.vertices), len(self.faces),
+                "{0} {1} {2}\n\n".format(len(self.vertices),
+                                         len(self.faces),
                                          len(self.normals)))
 
             # 頂点情報
@@ -181,7 +187,7 @@ class Obj3d(object):
 
                 # 法線情報(NotImplemented)
 
-    def __save_obj(self, obj_file):
+    def _save_obj(self, obj_file):
         """
 
         Modelオブジェクトの内容を.obj形式で保存

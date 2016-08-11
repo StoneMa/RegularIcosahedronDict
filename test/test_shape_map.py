@@ -29,7 +29,7 @@ def test_tomas_moller(model_path="../res/stanford_bunny.obj",
 
     print "\nTest Map2D::tomas_moller() ..."
 
-    map = ShapeMap(model_path=model_path, grid_path=grid_path,
+    map = ShapeMap(model_path=model_path, grd_path=grid_path,
                    n_div_recursion=n_div_recursion, scale_grid=scale_grid)
 
     v0 = np.array([0., 0., 0.])
@@ -57,26 +57,26 @@ def test_tomas_moller(model_path="../res/stanford_bunny.obj",
     test_penetration(np.array([1., 0., 0.]))  # [0.5  0.   0.5]
 
 
-def test_dist(n, model_path="../res/stanford_bunny.obj",
-              grid_path="../res/regular_icosahedron.obj", scale_grid=2):
-    print "\nTest Map2D::dist() ..."
-
-    for i in xrange(n):
-        print "\nn_div_recursion = {}: ".format(i)
-        map_div = ShapeMap(model_path=model_path,
-                           grid_path=grid_path,
-                           n_div_recursion=i,
-                           scale_grid=scale_grid).dist(is_sorted_by_z=True)
-        print "array :"
-        pprint.pprint(map_div)
-
-        # I/O
-        dstm_name = "./" + str(i) + ".dstm"
-        ShapeMap.save_dstm(dstm_name, map_div)
-        dstm = ShapeMap.load_dstm(dstm_name)
-        pprint.pprint(dstm)
+# def test_dist(n, model_path="../res/stanford_bunny.obj",
+#               grid_path="../res/regular_icosahedron.obj", scale_grid=2):
+#     print "\nTest Map2D::dist() ..."
+#
+#     for i in xrange(n):
+#         print "\nn_div_recursion = {}: ".format(i)
+#         map_div = ShapeMap(model_path=model_path,
+#                            grd_path=grid_path,
+#                            n_div_recursion=i,
+#                            scale_grid=scale_grid).dist(is_sorted_by_z=True)
+#         print "array :"
+#         pprint.pprint(map_div)
+#
+#         # I/O
+#         dstm_name = "./" + str(i) + ".dstm"
+#         ShapeMap.save_dstm(dstm_name, map_div)
+#         dstm = ShapeMap.load_dstm(dstm_name)
+#         pprint.pprint(dstm)
 
 
 if __name__ == '__main__':
     test_tomas_moller()
-    test_dist(3)
+    # test_dist(3)

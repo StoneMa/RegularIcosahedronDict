@@ -4,14 +4,24 @@
 
 import os
 import numpy as np
+from obj3d import Obj3d
 
 
-class Grid(object):
+class Grid(Obj3d):
     """
     距離マップ生成用グリッドクラス
+    face情報・normal情報は失われる
+    代わりに各グリッド面の情報FaceInfoが保持される
     """
 
-    def __init__(self, grd_file):
+    def __init__(self, vertices, face_info):
+
+        super(Grid, self).__init__(vertices, None, None, Obj3d.FILE_TYPE.GRD)
+
+        self.face_info = face_info
+
+    @staticmethod
+    def load(grd_file):
 
         if os.path.splitext(grd_file)[-1] != ".grd":
             raise IOError(
@@ -19,10 +29,10 @@ class Grid(object):
                     grd_file))
 
         vertices = []
-        face_vertices = []
+        faces = []
         adjacent_faces = []
 
-        self.faces = []
+        face_info = []
 
         with open(grd_file) as f:
 
@@ -37,118 +47,102 @@ class Grid(object):
                     vertices.append(np.array(map(float, line[1:])))
 
                 if line[0] == 'f':
-                    face_vertices.append(np.array(map(int, line[1:])))
+                    faces.append(np.array(map(int, line[1:])))
 
                 if line[0] == 'af':
                     adjacent_faces.append(np.array(map(int, line[2:])))
 
-            for face_id, fv in enumerate(face_vertices):
-                grid_face = Grid.GridFace(face_id,
-                                          Grid.GridPoint(vertices[fv[0]], 0, 0),
-                                          Grid.GridPoint(vertices[fv[1]], 1, 0),
-                                          Grid.GridPoint(vertices[fv[2]], 0, 1))
-                self.faces.append(grid_face)
+            for fid, fv in enumerate(faces):
+                face_info.append(
+                    Grid.FaceInfo(fid,
+                                  Grid.VertexInfo(fv[0], fid, 0, 0),
+                                  Grid.VertexInfo(fv[1], fid, 1, 0),
+                                  Grid.VertexInfo(fv[2], fid, 0, 1),
+                                  None, None, None))
 
-            for face, af in zip(self.faces, adjacent_faces):
-                id_left, id_right, id_bottom = af
-                face.left_face = self.faces[id_left]
-                face.right_face = self.faces[id_right]
-                face.bottom_face = self.faces[id_bottom]
+            for f_info in face_info:
+                f_info.left_face_info, \
+                f_info.right_face_info, \
+                f_info.bottom_face_info = adjacent_faces[f_info.face_id]
+
+        return Grid(vertices, face_info)
 
     def divide_face(self, n_div):
 
-        for face in self.faces:
-            new_points = []
-            left_vector = face.point_left.xyz - face.point_top.xyz
-            right_vector = face.point_right.xyz - face.point_top.xyz
+        new_vertices = []
+
+        for f_info in self.face_info:
+            top_vertex = self.vertices[f_info.top_vertex_info.vertex_idx]
+            left_vertex = self.vertices[f_info.left_vertex_info.vertex_idx]
+            right_vertex = self.vertices[f_info.right_vertex_info.vertex_idx]
+
+            left_vector = left_vertex - top_vertex
+            right_vector = right_vertex - top_vertex
+
+            new_vertex_info = []
 
             for sum_length in xrange(n_div + 1):
                 for i in xrange(sum_length + 1):
                     alpha = float(sum_length - i) / n_div
                     beta = float(i) / n_div
-                    new_xyz = left_vector * alpha + right_vector * beta + face.point_top.xyz
-                    new_points.append(Grid.GridPoint(new_xyz, alpha, beta))
+                    new_vertex = left_vector * alpha + right_vector * beta + top_vertex
+                    new_vertex_info.append(
+                        Grid.VertexInfo(len(new_vertices), f_info.face_id,
+                                        alpha, beta))
+                    new_vertices.append(new_vertex)
 
-            face.points = new_points
+            f_info.vertex_info = new_vertex_info
 
-    def save_obj(self, obj_file):
+        self.vertices = new_vertices
 
-        name, ext = os.path.splitext(obj_file)
-        if ext != ".obj" or ext == "":
-            obj_file = name + ".obj"
-
-        with open(obj_file, "w") as f:
-
-            # 頂点座標
-            vertices = np.array(
-                [p.xyz for face in self.faces for p in face.points])
-
-            # OBJファイル先頭行コメント
-            f.write("# OBJ file format with ext .obj\n")
-            f.write("# vertex count = {}\n".format(len(vertices)))
-            f.write("# face count = {}\n".format(len(self.faces)))
-
-            # 頂点情報
-            for x, y, z in vertices:
-                f.write("v {0:10f} {1:10f} {2:10f}\n".format(x, y, z))
+    def save(self, file_name):
+        name, ext = os.path.splitext(file_name)
+        if ext != ".off":
+            file_name = name + ".off"
+        self._save_off(file_name)
 
     def __str__(self):
         str = super(Grid, self).__str__() + " -> \n"
-        for face in self.faces:
-            str += face.__str__() + "\n"
+        for f_info in self.face_info:
+            str += f_info.__str__() + "\n"
         return str
 
-    class GridFace(object):
-        """
-        グリッド面
-        """
-
-        def __init__(self, face_id, point_top, point_left, point_right,
-                     left_face=None, right_face=None, bottom_face=None):
+    class FaceInfo(object):
+        def __init__(self, face_id,
+                     top_vertex_info, left_vertex_info, right_vertex_info,
+                     left_face_info, right_face_info, bottom_face_info):
             self.face_id = face_id
 
-            # ３頂点
-            assert isinstance(point_top, Grid.GridPoint)
-            assert isinstance(point_left, Grid.GridPoint)
-            assert isinstance(point_right, Grid.GridPoint)
-            self.point_top = point_top
-            self.point_left = point_left
-            self.point_right = point_right
+            self.top_vertex_info = top_vertex_info
+            self.left_vertex_info = left_vertex_info
+            self.right_vertex_info = right_vertex_info
 
-            # 隣接３平面
-            assert isinstance(left_face, Grid.GridFace) or left_face is None
-            assert isinstance(right_face, Grid.GridFace) or right_face is None
-            assert isinstance(bottom_face, Grid.GridFace) or bottom_face is None
-            self.left_face = left_face
-            self.right_face = right_face
-            self.bottom_face = bottom_face
+            self.vertex_info = [top_vertex_info,
+                                left_vertex_info,
+                                right_vertex_info]
 
-            # 平面上のグリッド頂点集合
-            self.points = [point_top, point_left, point_right]
+            self.left_face_info = left_face_info
+            self.right_face_info = right_face_info
+            self.bottom_face_info = bottom_face_info
 
         def __str__(self):
-            str = super(Grid.GridFace, self).__str__()
-            str += " -> Face ID : {}\n".format(self.face_id)
-            for p in self.points:
-                str += p.__str__() + "\n"
-            str += "Left Face : {}, Right Face : {}, Bottom Face : {}\n".format(
-                self.left_face.face_id, self.right_face.face_id,
-                self.bottom_face.face_id)
+            str = super(Grid.FaceInfo, self).__str__() + "\n"
+            for v_info in self.vertex_info:
+                str += v_info.__str__() + "\n"
             return str
 
-    class GridPoint(object):
+    class VertexInfo(object):
         """
-        グリッド頂点
+        グリッド頂点情報クラス
         """
 
-        def __init__(self, xyz, alpha, beta):
-            assert hasattr(xyz, "__getitem__") and len(xyz) == 3
-            self.xyz = np.asarray(xyz)
+        def __init__(self, vertex_idx, face_id, alpha, beta):
+            self.vertex_idx = vertex_idx
+            self.face_id = face_id
             self.alpha = alpha
             self.beta = beta
 
         def __str__(self):
-            self_x, self_y, self_z = self.xyz
-            return super(Grid.GridPoint, self).__str__() + \
-                   " -> x : {0:<13}, y : {1:<13}, z : {2:<13}, alpha : {3}, beta : {4}".format(
-                       self_x, self_y, self_z, self.alpha, self.beta)
+            return super(Grid.VertexInfo, self).__str__() + \
+                   " -> idx : {}, face ID : {} alpha : {}, beta : {}".format(
+                       self.vertex_idx, self.face_id, self.alpha, self.beta)
