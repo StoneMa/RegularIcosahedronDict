@@ -14,6 +14,8 @@ class Grid(Obj3d):
     代わりに各グリッド面の情報FaceInfoが保持される
     """
 
+    EPSILON = np.finfo(np.float).eps
+
     def __init__(self, vertices, face_info):
 
         super(Grid, self).__init__(vertices, None, None, Obj3d.FILE_TYPE.GRD)
@@ -69,7 +71,7 @@ class Grid(Obj3d):
 
     def divide_face(self, n_div):
 
-        new_vertices = []
+        new_vertices = np.empty(shape=(0, 3))
 
         for f_info in self.face_info:
             top_vertex = self.vertices[f_info.top_vertex_info.vertex_idx]
@@ -86,10 +88,22 @@ class Grid(Obj3d):
                     alpha = float(sum_length - i) / n_div
                     beta = float(i) / n_div
                     new_vertex = left_vector * alpha + right_vector * beta + top_vertex
+
+                    # 重複チェック
+                    check_duplicate = (
+                        np.abs(new_vertex - new_vertices) < Grid.EPSILON).all(
+                        axis=1)
+
+                    length_new_vertices = len(new_vertices)
+
+                    if length_new_vertices > 0 and check_duplicate.any():
+                        v_idx = int(np.argwhere(check_duplicate))
+                    else:
+                        v_idx = length_new_vertices
+                        new_vertices = np.vstack((new_vertices, new_vertex))
+
                     new_vertex_info.append(
-                        Grid.VertexInfo(len(new_vertices), f_info.face_id,
-                                        alpha, beta))
-                    new_vertices.append(new_vertex)
+                        Grid.VertexInfo(v_idx, f_info.face_id, alpha, beta))
 
             f_info.vertex_info = new_vertex_info
 
