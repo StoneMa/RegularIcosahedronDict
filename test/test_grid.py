@@ -18,24 +18,43 @@ class TestGrid(unittest.TestCase):
         """
 
         load()メソッドのテスト
-        インスタンスのfile_typeのみチェック
+        インスタンスのfile_typeとface_infoをチェック
 
         """
         grid = Grid.load(self.path_grid)
         self.assertEqual(grid.file_type.name, Grid.FILE_TYPE.GRD.name)
-
-    def test_grid_mem(self):
-        grid = Grid.load(self.path_grid)
         for face in grid.face_info:
             self.assertIsInstance(face, Grid.FaceInfo)
 
     def test_divide_face(self):
+        """
+
+        divide_face()メソッドのテスト
+        グリッド分割後のvertexの数をチェック
+
+        """
         grid = Grid.load(self.path_grid)
-        grid.divide_face(self.n_div)
-        print len(grid.vertices)
-        print grid
+        grid.divide_face(1)
+        self.assertEqual(len(grid.vertices), 12)
+
+        grid = Grid.load(self.path_grid)
+        grid.divide_face(2)
+        self.assertEqual(len(grid.vertices), 42)
+
+        grid = Grid.load(self.path_grid)
+        grid.divide_face(3)
+        self.assertEqual(len(grid.vertices), 92)
+
+        grid = Grid.load(self.path_grid)
+        grid.divide_face(4)
+        self.assertEqual(len(grid.vertices), 162)
 
     def test_save(self):
+        """
+
+        save()メソッドのテスト
+
+        """
         grid = Grid.load(self.path_grid)
         grid.divide_face(self.n_div)
         grid.file_type = Grid.FILE_TYPE.OBJ
