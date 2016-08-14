@@ -215,8 +215,8 @@ class Grid(Obj3d):
 
         def __str__(self):
             str = super(Grid.FaceInfo, self).__str__() + "\n" + \
-                  "face ID : {}".format(self.face_id) + "\n" + \
-                  "Left Face ID: {} \nRight Face ID : {}\nBottom Face ID : {}\n".format(
+                  "face ID : {:2}".format(self.face_id) + "\n" + \
+                  "Left Face ID: {:2} \nRight Face ID : {:2}\nBottom Face ID : {:2}\n".format(
                       self.left_face_info.face_id,
                       self.right_face_info.face_id,
                       self.bottom_face_info.face_id)

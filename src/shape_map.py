@@ -144,7 +144,6 @@ class ShapeMap(object):
         lower_distance = dist_map_from_info(lower_v_info)
         horizontal_distance = dist_map_from_info(horizontal_v_info)
 
-
         return upper_distance, lower_distance, horizontal_distance
 
 
@@ -156,4 +155,3 @@ if __name__ == '__main__':
 
     upper_distance, lower_distance, horizontal_distance = map.dist()
 
-    # pprint.pprint(map.dist())
