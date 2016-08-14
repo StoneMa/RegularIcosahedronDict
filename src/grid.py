@@ -16,11 +16,14 @@ class Grid(Obj3d):
 
     EPSILON = np.finfo(np.float).eps
 
+    INDEX_UNDEFINED = None
+
     def __init__(self, vertices, face_info):
 
         super(Grid, self).__init__(vertices, None, None, Obj3d.FILE_TYPE.GRD)
 
         self.face_info = face_info
+        self.n_div = 1
 
     @staticmethod
     def load(grd_file):
@@ -63,9 +66,10 @@ class Grid(Obj3d):
                                   None, None, None))
 
             for f_info in face_info:
-                f_info.left_face_info, \
-                f_info.right_face_info, \
-                f_info.bottom_face_info = adjacent_faces[f_info.face_id]
+                id_left, id_right, id_bottom = adjacent_faces[f_info.face_id]
+                f_info.left_face_info = face_info[id_left]
+                f_info.right_face_info = face_info[id_right]
+                f_info.bottom_face_info = face_info[id_bottom]
 
         return Grid(vertices, face_info)
 
@@ -85,9 +89,11 @@ class Grid(Obj3d):
 
             for sum_length in xrange(n_div + 1):
                 for i in xrange(sum_length + 1):
-                    alpha = float(sum_length - i) / n_div
-                    beta = float(i) / n_div
-                    new_vertex = left_vector * alpha + right_vector * beta + top_vertex
+                    alpha = sum_length - i
+                    beta = i
+                    new_vertex = left_vector * float(alpha) / n_div + \
+                                 right_vector * float(beta) / n_div + \
+                                 top_vertex
 
                     # 重複チェック
                     check_duplicate = (
@@ -108,6 +114,68 @@ class Grid(Obj3d):
             f_info.vertex_info = new_vertex_info
 
         self.vertices = new_vertices
+        self.n_div = n_div
+
+    def traverse(self, center_face_info, direction, n_face_traverse=10):
+
+        if direction == 'upper':
+            odd_face_info = 'right_face_info'
+            even_face_info = 'bottom_face_info'
+            get_init_row_size = lambda step: step
+            get_alpha_beta = lambda step, s, is_odd: \
+                (s, self.n_div - step) if is_odd else (self.n_div - step, s)
+        elif direction == 'lower':
+            odd_face_info = 'bottom_face_info'
+            even_face_info = 'left_face_info'
+            get_init_row_size = lambda step: step
+            get_alpha_beta = lambda step, s, is_odd: \
+                (self.n_div - step, s) if is_odd else (s, self.n_div - step)
+        elif direction == 'horizontal':
+            odd_face_info = 'right_face_info'
+            even_face_info = 'left_face_info'
+            get_init_row_size = lambda step: self.n_div - step
+            get_alpha_beta = lambda step, s, is_odd: \
+                (step - s, s) if is_odd else (s, step - s)
+        else:
+            raise NotImplementedError('specified direction is undefined.')
+
+        # 面一周分のリスト
+        traversed_face_info = []
+        tmp_face_info = center_face_info
+        for i in xrange(n_face_traverse):
+            traversed_face_info.append(tmp_face_info)
+            if i % 2 == 0:
+                tmp_face_info = getattr(tmp_face_info, odd_face_info)
+            else:
+                tmp_face_info = getattr(tmp_face_info, even_face_info)
+
+        vertex_indices = []
+
+        # 各行のインデックスを求める
+        for step in xrange(self.n_div + 1):
+
+            row = [Grid.INDEX_UNDEFINED] * get_init_row_size(step)
+
+            tmp_step = step
+
+            for tf_info_idx, tf_info in enumerate(traversed_face_info):
+                # 重複を防ぐため、面の行最後の頂点は見ない（次の隣接面の最初に捜査する）
+                for ts in xrange(tmp_step):
+                    alpha, beta = get_alpha_beta(tmp_step, ts,
+                                                 tf_info_idx % 2 == 0)
+
+                    row.append(tf_info.get_vertex_info(alpha, beta))
+
+                # 別の面に移ると面の上下が逆になるので、tmp_stepの値も反転する
+                tmp_step = self.n_div - tmp_step
+
+            # 距離マップの後ろにパディングを追加
+            row += [Grid.INDEX_UNDEFINED] * (
+                self.n_div - get_init_row_size(step))
+            # 一行分のインデックスをlistとして格納
+            vertex_indices.append(row)
+
+        return np.asarray(vertex_indices)
 
     def save(self, file_name):
         name, ext = os.path.splitext(file_name)
@@ -139,8 +207,19 @@ class Grid(Obj3d):
             self.right_face_info = right_face_info
             self.bottom_face_info = bottom_face_info
 
+        def get_vertex_info(self, alpha, beta):
+            for v_info in self.vertex_info:
+                if v_info.alpha == alpha and v_info.beta == beta:
+                    return v_info
+            return None
+
         def __str__(self):
-            str = super(Grid.FaceInfo, self).__str__() + "\n"
+            str = super(Grid.FaceInfo, self).__str__() + "\n" + \
+                  "face ID : {}".format(self.face_id) + "\n" + \
+                  "Left Face ID: {} \nRight Face ID : {}\nBottom Face ID : {}\n".format(
+                      self.left_face_info.face_id,
+                      self.right_face_info.face_id,
+                      self.bottom_face_info.face_id)
             for v_info in self.vertex_info:
                 str += v_info.__str__() + "\n"
             return str

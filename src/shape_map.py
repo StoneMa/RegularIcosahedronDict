@@ -3,6 +3,7 @@
 
 import os
 import struct
+import pprint
 import numpy as np
 from numpy import linalg
 from obj3d import Obj3d
@@ -19,19 +20,25 @@ class ShapeMap(object):
 
     """
 
+    DIST_UNDEFINED = -1
+
     def __init__(self, obj3d_path, grd_path, n_div, scale_grid):
 
         # 3Dモデル
         self.obj3d = Obj3d.load(obj3d_path)
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
-        self.grid = Grid.load(grd_path).divide_face(n_div)
+        self.grid = Grid.load(grd_path)
 
         # モデルを座標系の中心に置き、正規化する
         self.obj3d.center()
         self.obj3d.normal()
 
         # グリッドが３Dモデルを内部に完全に含むように拡張
+        self.grid.center()
         self.grid.scale(scale_grid)
+
+        # グリッドを分割
+        self.grid.divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
         # グリッドの中心から最も近い点のより中心からの距離より大きい場合はサポート外
@@ -44,7 +51,7 @@ class ShapeMap(object):
         """
 
         Tomas-Mollerのアルゴリズム
-        線分が三角形の交点を返す
+        線分と三角形の交点を返す
         交差しない場合、Noneを返す
 
         行列式を、外積/内積に置き換えている
@@ -92,139 +99,55 @@ class ShapeMap(object):
 
         return None
 
-    # def dist(self, is_sorted_by_z):
-    #     """
-    #
-    #     距離マップを得る
-    #
-    #     is_sorted_by_z=Trueで距離マップはリストの入れ子構造になる
-    #     z成分が同じである頂点座標の距離情報は同一のリストに入り、
-    #     各リストはz成分の大きさでソートされる
-    #
-    #     ex.
-    #     [
-    #     z=1 → [a1]
-    #     z=0.33 → [b1, b2, ... ,b5]
-    #     z=-0.33 → [c1, c2, ... ,c5]
-    #     z=-1 → [d1]
-    #     ]
-    #     (上記リスト内の各要素は距離を表す)
-    #
-    #     :type is_sorted_by_z: bool
-    #     :param is_sorted_by_z: 距離情報をリストの入れ子構造にするかどうか
-    #     :rtype: np.ndarray
-    #     :return: 距離マップ
-    #
-    #     """
-    #
-    #     distances = np.empty(shape=(len(self.grid.vertices),))
-    #
-    #     # 中心座標へのベクトル
-    #     v_center = np.mean(self.model.vertices, axis=0)
-    #
-    #     for idx_dist, v_grid in enumerate(self.grid.vertices):
-    #
-    #         v_grid_from_center = v_grid - v_center
-    #
-    #         for f_model in self.model.faces:
-    #
-    #             f0, f1, f2 = self.model.vertices[f_model]
-    #
-    #             # ベクトルの正負を正すため、逆順に頂点情報を入れる
-    #             p = self.tomas_moller(v_center, v_grid_from_center, f2, f1, f0)
-    #
-    #             if p is not None:
-    #                 distances[idx_dist] = linalg.norm(p)
-    #                 break
-    #
-    #     if is_sorted_by_z:
-    #         parents = []
-    #         children = []
-    #         z = self.grid.vertices[0][2]
-    #         for i, v_grid in enumerate(self.grid.vertices):
-    #             vz = v_grid[2]
-    #             if z != vz:
-    #                 parents.append(children)
-    #                 children = []
-    #             children.append(distances[i])
-    #             z = vz
-    #         else:
-    #             parents.append(children)
-    #         distances = parents
-    #
-    #     return distances
-    #
-    # @staticmethod
-    # def save_dstm(file_path, distances):
-    #
-    #     """
-    #
-    #     dstmファイル形式で距離マップを保存する
-    #
-    #     :type file_path: str
-    #     :param file_path: 保存するファイルのパス
-    #     :type distances: list(list)
-    #     :param distances: 入れ子構造の距離マップ
-    #
-    #     """
-    #
-    #     # distances型チェック
-    #     assert isinstance(distances, list)
-    #
-    #     # 拡張子チェック
-    #     f_name, ext = os.path.splitext(file_path)
-    #     if ext != '.dstm':
-    #         file_path = f_name + '.dstm'
-    #
-    #     with open(file_path, mode='wb') as f:
-    #
-    #         f.writelines("# DSTM\n")
-    #         f.writelines("# N_COLUMN\n")
-    #
-    #         for dists in distances:
-    #             f.writelines(str(len(dists)) + "\n")
-    #
-    #         f.writelines("# DATA(DOUBLE)\n")
-    #
-    #         for dists in distances:
-    #             for d in dists:
-    #                 f.write(struct.pack('f', d))
-    #
-    # @staticmethod
-    # def load_dstm(file_path):
-    #     """
-    #
-    #     dstmファイル形式の距離マップを読み込み、入れ子リスト構造で返す
-    #
-    #     :type file_path: str
-    #     :param file_path: 読み込むファイルのパス
-    #     :rtype : list(list)
-    #     :return: 入れ子リスト構造の距離マップ
-    #     """
-    #
-    #     # 拡張子チェック
-    #     f_name, ext = os.path.splitext(file_path)
-    #     if ext != '.dstm':
-    #         file_path = f_name + '.dstm'
-    #
-    #     distances = []
-    #     n_column = []
-    #
-    #     with open(file_path, mode='rb') as f:
-    #
-    #         assert f.readline() == '# DSTM\n'
-    #         assert f.readline() == '# N_COLUMN\n'
-    #
-    #         while True:
-    #             line = f.readline()
-    #             if line == '# DATA(DOUBLE)\n':
-    #                 break
-    #             n_column.append(int(line))
-    #
-    #         for nc in n_column:
-    #             column = []
-    #             for i in xrange(nc):
-    #                 column.append(struct.unpack('f', f.read(4))[0])
-    #             distances.append(column)
-    #
-    #     return distances
+    def dist(self):
+
+        grid_center = np.zeros(shape=(3,))
+
+        # 距離マップ インデックスはグリッドのverticesに対応する
+        distance = []
+
+        for v_grid in self.grid.vertices:
+            for fv_obj3d in self.obj3d.faces:
+                f0, f1, f2 = self.obj3d.vertices[fv_obj3d]
+                p_cross = self.tomas_moller(grid_center, v_grid, f0, f1, f2)
+                if p_cross is not None:
+                    dist = np.linalg.norm(p_cross - grid_center)
+                    distance.append(dist)
+                    break
+            else:
+                # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
+                distance.append(ShapeMap.DIST_UNDEFINED)
+
+        distance = np.array(distance)
+
+        # 距離が最大となるグリッド頂点の所属するFaceInfo
+        face_id_max_dist = [f_info
+                            for f_info in self.grid.face_info
+                            for v_info in f_info.vertex_info
+                            if v_info.vertex_idx == distance.argmax()][0]
+
+        upper_v_info = self.grid.traverse(face_id_max_dist, 'upper')
+        lower_v_info = self.grid.traverse(face_id_max_dist, 'lower')
+        horizontal_v_info = self.grid.traverse(face_id_max_dist,
+                                               'horizontal')
+
+        def dist_map_from_info(vertex_info):
+            return [[distance[v_info.vertex_idx]
+                     if v_info is not None
+                     else ShapeMap.DIST_UNDEFINED
+                     for v_info in row]
+                    for row in vertex_info]
+
+        upper_v_info = dist_map_from_info(upper_v_info)
+        lower_v_info = dist_map_from_info(lower_v_info)
+        horizontal_distance = dist_map_from_info(horizontal_v_info)
+
+        return upper_v_info, lower_v_info, horizontal_distance
+
+
+if __name__ == '__main__':
+    map = ShapeMap(obj3d_path="../res/stanford_bunny.obj",
+                   grd_path="../res/new_regular_ico.grd",
+                   n_div=2,
+                   scale_grid=2)
+    pprint.pprint(map.dist())
