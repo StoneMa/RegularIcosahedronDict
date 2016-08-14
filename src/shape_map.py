@@ -126,10 +126,12 @@ class ShapeMap(object):
                             for v_info in f_info.vertex_info
                             if v_info.vertex_idx == distance.argmax()][0]
 
-        upper_v_info = self.grid.traverse(face_id_max_dist, 'upper')
-        lower_v_info = self.grid.traverse(face_id_max_dist, 'lower')
-        horizontal_v_info = self.grid.traverse(face_id_max_dist,
-                                               'horizontal')
+        upper_v_info = self.grid.traverse(face_id_max_dist, 'upper',
+                                          n_face_traverse=8)
+        lower_v_info = self.grid.traverse(face_id_max_dist, 'lower',
+                                          n_face_traverse=8)
+        horizontal_v_info = self.grid.traverse(face_id_max_dist, 'horizontal',
+                                               n_face_traverse=10)
 
         def dist_map_from_info(vertex_info):
             return [[distance[v_info.vertex_idx]
@@ -138,16 +140,20 @@ class ShapeMap(object):
                      for v_info in row]
                     for row in vertex_info]
 
-        upper_v_info = dist_map_from_info(upper_v_info)
-        lower_v_info = dist_map_from_info(lower_v_info)
+        upper_distance = dist_map_from_info(upper_v_info)
+        lower_distance = dist_map_from_info(lower_v_info)
         horizontal_distance = dist_map_from_info(horizontal_v_info)
 
-        return upper_v_info, lower_v_info, horizontal_distance
+
+        return upper_distance, lower_distance, horizontal_distance
 
 
 if __name__ == '__main__':
     map = ShapeMap(obj3d_path="../res/stanford_bunny.obj",
                    grd_path="../res/new_regular_ico.grd",
-                   n_div=2,
+                   n_div=3,
                    scale_grid=2)
-    pprint.pprint(map.dist())
+
+    upper_distance, lower_distance, horizontal_distance = map.dist()
+
+    # pprint.pprint(map.dist())
