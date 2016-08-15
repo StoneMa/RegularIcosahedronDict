@@ -2,80 +2,60 @@
 # coding: utf-8
 
 import numpy as np
+import unittest
 from src.shape_map import ShapeMap
 
 
-def test_tomas_moller(model_path="../res/stanford_bunny.obj",
-                      grid_path="../res/regular_icosahedron.obj",
-                      n_div_recursion=0, scale_grid=2):
-    """
+class TestShapeMap(unittest.TestCase):
+    def setUp(self):
+        self.obj3d_path = "../res/stanford_bunny.obj"
+        self.grid_path = "../res/new_regular_ico.grd"
+        self.n_div = 0
+        self.scale_grid = 2
+        pass
 
-    Model::tomas_moller()のテスト
+    def tearDown(self):
+        pass
 
-    :type model_path: str
-    :param model_path: モデルデータへのパス
+    def test_tomas_moller(self):
+        """
 
-    :type grid_path: str
-    :param grid_path: グリッドデータへのパス
+        ShapeMap::tomas_moller()のテスト
 
-    :type n_div_recursion: int
-    :param n_div_recursion: グリッド（正二十面体）の分割数
+        """
 
-    :type scale_grid: int
-    :param scale_grid: グリッド（正二十面体）のスケール
+        print "\nTest Map2D::tomas_moller() ..."
 
-    """
+        map = ShapeMap(obj3d_path=self.obj3d_path, grd_path=self.grid_path,
+                       n_div=self.n_div, scale_grid=self.scale_grid)
 
-    print "\nTest Map2D::tomas_moller() ..."
+        v0 = np.array([0., 0., 0.])
+        v1 = np.array([1., 0., 1.])
+        v2 = np.array([0., 1., 1.])
+        origin = np.array([0., 0., 1.])
 
-    map = ShapeMap(model_path=model_path, grd_path=grid_path,
-                   n_div_recursion=n_div_recursion, scale_grid=scale_grid)
+        def assert_penetration(end, solution):
+            end = np.asarray(end)
+            solution = np.asarray(solution)
+            self.assertTrue((np.array(map.tomas_moller(origin, end, v0, v1, v2)) ==
+                             solution).all())
 
-    v0 = np.array([0., 0., 0.])
-    v1 = np.array([1., 0., 1.])
-    v2 = np.array([0., 1., 1.])
-    origin = np.array([0., 0., 1.])
+        # penetrate
+        assert_penetration([0.5, 0.5, 0], [0.25, 0.25, 0.5])
 
-    def test_penetration(end):
-        print map.tomas_moller(origin, end, v0, v1, v2)
+        # don't penetrate
+        assert_penetration([2., 2., 2.], None)
 
-    # penetrate
-    test_penetration(np.array([0.5, 0.5, 0]))  # [0.25  0.25  0.5 ]
+        # vertex check
+        assert_penetration([0., 0., 0.], [0., 0., 0.])
+        assert_penetration([1., 0., 1.], [1., 0., 1.])
+        assert_penetration([0., 1., 1.], [0., 1., 1.])
 
-    # don't penetrate
-    test_penetration(np.array([2., 2., 2.]))  # None
-
-    # vertex check
-    test_penetration(np.array([0., 0., 0.]))  # [0.  0.  0.]
-    test_penetration(np.array([1., 0., 1.]))  # [1.  0.  1.]
-    test_penetration(np.array([0., 1., 1.]))  # [0.  1.  1.]
-
-    # border check
-    test_penetration(np.array([1., 1., 1.]))  # [0.5  0.5  1. ]
-    test_penetration(np.array([0., 1., 0.]))  # [0.   0.5  0.5]
-    test_penetration(np.array([1., 0., 0.]))  # [0.5  0.   0.5]
-
-
-# def test_dist(n, model_path="../res/stanford_bunny.obj",
-#               grid_path="../res/regular_icosahedron.obj", scale_grid=2):
-#     print "\nTest Map2D::dist() ..."
-#
-#     for i in xrange(n):
-#         print "\nn_div_recursion = {}: ".format(i)
-#         map_div = ShapeMap(model_path=model_path,
-#                            grd_path=grid_path,
-#                            n_div_recursion=i,
-#                            scale_grid=scale_grid).dist(is_sorted_by_z=True)
-#         print "array :"
-#         pprint.pprint(map_div)
-#
-#         # I/O
-#         dstm_name = "./" + str(i) + ".dstm"
-#         ShapeMap.save_dstm(dstm_name, map_div)
-#         dstm = ShapeMap.load_dstm(dstm_name)
-#         pprint.pprint(dstm)
+        # border check
+        assert_penetration([1., 1., 1.], [0.5, 0.5, 1.])
+        assert_penetration([0., 1., 0.], [0., 0.5, 0.5])
+        assert_penetration([1., 0., 0.], [0.5, 0, 0.5])
 
 
 if __name__ == '__main__':
-    test_tomas_moller()
-    # test_dist(3)
+    unittest.main()
