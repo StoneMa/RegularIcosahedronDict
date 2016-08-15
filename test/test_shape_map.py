@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import pprint
 import numpy as np
 from src.shape_map import ShapeMap
 

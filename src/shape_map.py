@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import os
-import struct
-import pprint
 import numpy as np
 from numpy import linalg
 from obj3d import Obj3d
@@ -154,4 +151,3 @@ if __name__ == '__main__':
                    scale_grid=2)
 
     upper_distance, lower_distance, horizontal_distance = map.dist()
-
