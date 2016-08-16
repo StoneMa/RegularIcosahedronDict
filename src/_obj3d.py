@@ -41,7 +41,10 @@ class _Obj3d(object):
         :param is_nullable: Noneを許容するかどうか
         """
 
-        assert is_nullable or list_mem is not None
+        if is_nullable and list_mem is None:
+            return
+
+        assert list_mem is not None
 
         # xyzがリスト or Numpy Arrayであるかチェック
         if not isinstance(list_mem, np.ndarray):
