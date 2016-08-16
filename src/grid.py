@@ -75,6 +75,8 @@ class Grid(Obj3d):
 
     def divide_face(self, n_div):
 
+        assert n_div > 0
+
         new_vertices = np.empty(shape=(0, 3))
 
         for f_info in self.face_info:
