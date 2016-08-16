@@ -10,7 +10,7 @@ class TestShapeMap(unittest.TestCase):
     def setUp(self):
         self.obj3d_path = "../res/stanford_bunny.obj"
         self.grid_path = "../res/new_regular_ico.grd"
-        self.n_div = 0
+        self.n_div = 1
         self.scale_grid = 2
         pass
 
@@ -37,8 +37,8 @@ class TestShapeMap(unittest.TestCase):
         def assert_penetration(end, solution):
             end = np.asarray(end)
             solution = np.asarray(solution)
-            self.assertTrue((np.array(map.tomas_moller(origin, end, v0, v1, v2)) ==
-                             solution).all())
+            result = map.tomas_moller(origin, end, v0, v1, v2)
+            self.assertTrue((np.array(result) == solution).all())
 
         # penetrate
         assert_penetration([0.5, 0.5, 0], [0.25, 0.25, 0.5])
