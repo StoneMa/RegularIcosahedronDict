@@ -24,9 +24,9 @@ class _Obj3d(object):
         self.face_vertices = np.asarray(face_vertices)
 
         # 各配列はImmutable
-        self.vertices.flags.writable = False
-        self.normal_vertices.flags.writable = False
-        self.face_vertices.flags.writable = False
+        self.vertices.flags.writeable = False
+        self.normal_vertices.flags.writeable = False
+        self.face_vertices.flags.writeable = False
 
     @staticmethod
     def __check_array(list_mem, is_nullable=False):
