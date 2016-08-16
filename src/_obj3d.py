@@ -120,3 +120,21 @@ class _Obj3d(object):
         return _Obj3d(normalized_vertices + center_vertices,
                       self.normals_as_copy(),
                       self.faces_as_copy())
+
+    def scale(self, r):
+        """
+
+        頂点群の重心から各頂点までの距離をr倍する
+
+        :type r: float
+        :param r: 距離倍率
+
+        """
+
+        center_vertices = np.mean(self.vertices, axis=0)
+
+        centered_obj3d = self.center()
+
+        return _Obj3d(centered_obj3d.vertices_as_copy() * r + center_vertices,
+                      self.normals_as_copy(),
+                      self.faces_as_copy())
