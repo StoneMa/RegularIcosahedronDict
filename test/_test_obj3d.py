@@ -24,6 +24,19 @@ class _TestObj3d(unittest.TestCase):
 
         obj3d_npy = _Obj3d(vertices, normal_vertices, face_vertices)
 
+    def test_arrays_as_copy(self):
+        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+
+        self.assertNotEqual(id(self.vertices), id(obj3d.vertices))
+        self.assertNotEqual(id(self.normal_vertices), id(obj3d.normal_vertices))
+        self.assertNotEqual(id(self.face_vertices), id(obj3d.face_vertices))
+
+        self.assertNotEqual(id(self.vertices), id(obj3d.vertices_as_copy()))
+        self.assertNotEqual(id(self.normal_vertices),
+                            id(obj3d.normals_as_copy()))
+        self.assertNotEqual(id(self.face_vertices),
+                            id(obj3d.faces_as_copy()))
+
 
 if __name__ == '__main__':
     unittest.main()
