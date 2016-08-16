@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import numpy as np
+
 
 class _Obj3d(object):
     """
@@ -9,6 +11,55 @@ class _Obj3d(object):
 
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, vertices, normal_vertices=None, face_vertices=None):
+
+        # assertion
+        self.__check_array(vertices, is_nullable=False)
+        self.__check_array(normal_vertices, is_nullable=True)
+        self.__check_array(face_vertices, is_nullable=True)
+
+        # numpy配列として保持
+        self.vertices = np.asarray(vertices)
+        self.normal_vertices = np.asarray(normal_vertices)
+        self.face_vertices = np.asarray(face_vertices)
+
+        # 各配列はImmutable
+        self.vertices.flags.writable = False
+        self.normal_vertices.flags.writable = False
+        self.face_vertices.flags.writable = False
+
+    @staticmethod
+    def __check_array(list_mem, is_nullable=False):
+        """
+
+        メンバ配列がリスト又はNumpy配列であることをチェックする関数
+
+        :type list_mem: list or np.ndarray
+        :param list_mem: リスト又はNumpy配列
+
+        :type is_nullable: bool
+        :param is_nullable: Noneを許容するかどうか
+        """
+
+        assert is_nullable or list_mem is not None
+
+        # xyzがリスト or Numpy Arrayであるかチェック
+        if not isinstance(list_mem, np.ndarray):
+            # iterator
+            assert hasattr(list_mem, "__getitem__")
+            for xyz in list_mem:
+                assert hasattr(xyz, "__getitem__")
+                assert len(xyz) == 3
+                x, y, z = xyz
+                assert not hasattr(x, "__getitem__")
+                assert not hasattr(y, "__getitem__")
+                assert not hasattr(z, "__getitem__")
+        else:
+            # numpy array
+            for xyz in list_mem:
+                assert len(xyz) == 3
+                x, y, z = xyz
+                assert not isinstance(x, np.ndarray)
+                assert not isinstance(y, np.ndarray)
+                assert not isinstance(z, np.ndarray)
 
