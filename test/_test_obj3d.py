@@ -51,6 +51,19 @@ class _TestObj3d(unittest.TestCase):
         self.assertAlmostEqual(cy, epsilon)
         self.assertAlmostEqual(cz, epsilon)
 
+    def test_normal(self):
+        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+
+        center_vertices = np.mean(obj3d.vertices, axis=0)
+
+        normalized_obj3d = obj3d.normal()
+
+        epsilon = np.finfo(float).eps * 10
+
+        self.assertAlmostEqual(
+            np.linalg.norm(normalized_obj3d.vertices - center_vertices,
+                           axis=1).max(), 1., delta=epsilon)
+
 
 if __name__ == '__main__':
     unittest.main()
