@@ -63,3 +63,29 @@ class _Obj3d(object):
                 assert not isinstance(y, np.ndarray)
                 assert not isinstance(z, np.ndarray)
 
+    def vertices_as_copy(self):
+        """
+
+        頂点座標リストのコピーを返す
+
+        """
+
+        return np.array(self.vertices)
+
+    def normals_as_copy(self):
+        """
+
+        法線ベクトルを定義する頂点座標リストのコピーを返す
+
+        """
+
+        return np.array(self.normal_vertices)
+
+    def faces_as_copy(self):
+        """
+
+        面を定義する頂点座標リストのコピーを返す
+
+        """
+
+        return np.array(self.face_vertices)
