@@ -24,7 +24,7 @@ class ShapeMap(object):
         # 3Dモデル
         self.obj3d = Obj3d.load(obj3d_path)
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
-        self.grid = Grid.load(grd_path)
+        self.grid = Grid.load(grd_path, n_div)
 
         # モデルを座標系の中心に置き、正規化する
         self.obj3d.center()
@@ -33,9 +33,6 @@ class ShapeMap(object):
         # グリッドが３Dモデルを内部に完全に含むように拡張
         self.grid.center()
         self.grid.scale(scale_grid)
-
-        # グリッドを分割
-        self.grid.divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
         # グリッドの中心から最も近い点のより中心からの距離より大きい場合はサポート外

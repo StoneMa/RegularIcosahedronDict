@@ -18,15 +18,18 @@ class Grid(Obj3d):
 
     INDEX_UNDEFINED = None
 
-    def __init__(self, vertices, face_info):
+    def __init__(self, vertices, face_info, n_div):
 
         super(Grid, self).__init__(vertices, None, None, Obj3d.FILE_TYPE.GRD)
 
+        assert n_div > 0
+
         self.face_info = face_info
-        self.n_div = 1
+        self.n_div = n_div
+        self.__divide_face()
 
     @staticmethod
-    def load(grd_file):
+    def load(grd_file, n_div):
 
         if os.path.splitext(grd_file)[-1] != ".grd":
             raise IOError(
@@ -71,11 +74,9 @@ class Grid(Obj3d):
                 f_info.right_face_info = face_info[id_right]
                 f_info.bottom_face_info = face_info[id_bottom]
 
-        return Grid(vertices, face_info)
+        return Grid(vertices, face_info, n_div)
 
-    def divide_face(self, n_div):
-
-        assert n_div > 0
+    def __divide_face(self):
 
         new_vertices = np.empty(shape=(0, 3))
 
@@ -89,12 +90,12 @@ class Grid(Obj3d):
 
             new_vertex_info = []
 
-            for sum_length in xrange(n_div + 1):
+            for sum_length in xrange(self.n_div + 1):
                 for i in xrange(sum_length + 1):
                     alpha = sum_length - i
                     beta = i
-                    new_vertex = left_vector * float(alpha) / n_div + \
-                                 right_vector * float(beta) / n_div + \
+                    new_vertex = left_vector * float(alpha) / self.n_div + \
+                                 right_vector * float(beta) / self.n_div + \
                                  top_vertex
 
                     # 重複チェック
@@ -116,7 +117,6 @@ class Grid(Obj3d):
             f_info.vertex_info = new_vertex_info
 
         self.vertices = new_vertices
-        self.n_div = n_div
 
     def traverse(self, center_face_info, direction, n_face_traverse=10):
 
