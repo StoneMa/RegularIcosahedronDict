@@ -37,6 +37,20 @@ class _TestObj3d(unittest.TestCase):
         self.assertNotEqual(id(self.face_vertices),
                             id(obj3d.faces_as_copy()))
 
+    def test_center(self):
+        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+
+        centered_obj3d = obj3d.center()
+
+        center_vertices = np.mean(centered_obj3d.vertices, axis=0)
+
+        epsilon = np.finfo(float).eps * 10
+
+        cx, cy, cz = center_vertices
+        self.assertAlmostEqual(cx, epsilon)
+        self.assertAlmostEqual(cy, epsilon)
+        self.assertAlmostEqual(cz, epsilon)
+
 
 if __name__ == '__main__':
     unittest.main()
