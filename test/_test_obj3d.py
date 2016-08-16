@@ -8,21 +8,19 @@ from src._obj3d import _Obj3d
 
 class _TestObj3d(unittest.TestCase):
     def setUp(self):
-        pass
+        self.vertices = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        self.normal_vertices = [[0, 1, 2]]
+        self.face_vertices = [[0, 1, 2]]
 
     def tearDown(self):
         pass
 
     def test_init(self):
-        vertices = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-        normal_vertices = [[0, 1, 2]]
-        face_vertices = [[0, 1, 2]]
+        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
 
-        obj3d = _Obj3d(vertices, normal_vertices, face_vertices)
-
-        vertices = np.array(vertices)
-        normal_vertices = np.array(normal_vertices)
-        face_vertices = np.array(face_vertices)
+        vertices = np.array(self.vertices)
+        normal_vertices = np.array(self.normal_vertices)
+        face_vertices = np.array(self.face_vertices)
 
         obj3d_npy = _Obj3d(vertices, normal_vertices, face_vertices)
 
