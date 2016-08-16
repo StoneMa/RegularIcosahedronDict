@@ -101,3 +101,22 @@ class _Obj3d(object):
         return _Obj3d(self.vertices - center_vertices,
                       self.normals_as_copy(),
                       self.faces_as_copy())
+
+    def normal(self):
+        """
+
+        重心から頂点までの距離が最大1となるように、全ての頂点座標を正規化する
+
+        """
+
+        center_vertices = np.mean(self.vertices, axis=0)
+
+        centered_obj3d = self.center()
+
+        max_norm = np.max(np.linalg.norm(centered_obj3d.vertices, axis=1))
+
+        normalized_vertices = centered_obj3d.vertices / max_norm
+
+        return _Obj3d(normalized_vertices + center_vertices,
+                      self.normals_as_copy(),
+                      self.faces_as_copy())
