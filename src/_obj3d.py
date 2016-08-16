@@ -89,3 +89,15 @@ class _Obj3d(object):
         """
 
         return np.array(self.face_vertices)
+
+    def center(self):
+        """
+
+        頂点群の重心が座標軸の原点となるように、全ての頂点座標を平行移動
+
+        """
+
+        center_vertices = np.mean(self.vertices, axis=0)
+        return _Obj3d(self.vertices - center_vertices,
+                      self.normals_as_copy(),
+                      self.faces_as_copy())
