@@ -12,6 +12,8 @@ class _TestObj3d(unittest.TestCase):
         self.normal_vertices = [[0, 1, 2]]
         self.face_vertices = [[0, 1, 2]]
 
+        self.scale = 2
+
     def tearDown(self):
         pass
 
@@ -63,6 +65,22 @@ class _TestObj3d(unittest.TestCase):
         self.assertAlmostEqual(
             np.linalg.norm(normalized_obj3d.vertices - center_vertices,
                            axis=1).max(), 1., delta=epsilon)
+
+    def test_scale(self):
+        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+
+        scaled_obj3d = obj3d.scale(self.scale)
+
+        center_vertices = np.mean(obj3d.vertices, axis=0)
+
+        before_vertices = obj3d.vertices - center_vertices
+        after_vertices = scaled_obj3d.vertices - center_vertices
+
+        epsilon = np.finfo(float).eps * 10
+
+        self.assertTrue(
+            (after_vertices - epsilon < before_vertices * self.scale).all() and
+            (before_vertices * self.scale < after_vertices + epsilon).all())
 
 
 if __name__ == '__main__':
