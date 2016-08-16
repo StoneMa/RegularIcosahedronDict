@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
 import numpy as np
 
 
@@ -141,3 +142,82 @@ class _Obj3d(object):
         return _Obj3d(centered_obj3d.vertices_as_copy() * r + center_vertices,
                       self.normals_as_copy(),
                       self.faces_as_copy())
+
+    @staticmethod
+    def load(path):
+        """
+
+        ファイルパスの拡張子を識別してファイル読み込みを行い、Obj3dオブジェクトを返す
+
+        :type path: str
+        :param path: ファイルパス
+
+        """
+        ext = os.path.splitext(path)[1]
+
+        if ext == ".obj":
+            obj3d = _Obj3d.__load_obj(path)
+        elif ext == ".off":
+            obj3d = _Obj3d.__load_off(path)
+        else:
+            raise IOError("Obj3d::__init__() : failed to load {}.".format(path))
+
+        return obj3d
+
+    @staticmethod
+    def __load_off(off_file):
+        """
+
+        .off形式のファイルを読み込み、頂点座標のみを取得
+
+        :type off_file: str
+        :param off_file: .offファイル名
+
+        """
+
+        with open(off_file) as f:
+            # コメント・空行を除去
+            lines = filter(lambda x: x != '\n' and x[0] != "#", f.readlines())
+
+            # 一行目はファイルフォーマット名
+            if "OFF" not in lines.pop(0):
+                raise IOError("file must be \"off\" format file.")
+
+            # 頂点数、面数、辺数
+            n_vertices, n_faces, n_edges = map(int, lines.pop(0).split(' '))
+
+            # 頂点座標を取得
+            vertices = np.array([map(float, lines[i].split(' '))
+                                 for i in xrange(n_vertices)])
+
+            # 面を構成する頂点のインデックス
+            faces = np.array(
+                [map(int, lines[n_vertices + i][3:].rstrip().split(' '))
+                 for i in xrange(n_faces)])
+
+        return _Obj3d(vertices, None, faces)
+
+    @staticmethod
+    def __load_obj(obj_file):
+        """
+
+        .objファイルを読み込み、頂点情報のみを取得
+
+        :type obj_file : str
+        :param obj_file: ファイルパス
+
+        """
+
+        with open(obj_file) as f:
+            lines = filter(lambda x: x != "\n" and x[0] != "#",
+                           [line.strip().split() for line in f.readlines()])
+
+            vertices = np.array([list(map(float, line[1:])) for line in lines if
+                                 line[0] == 'v'])
+            normals = np.array([list(map(float, line[1:])) for line in lines if
+                                line[0] == 'vn'])
+            faces = np.array(
+                [list(map(lambda x: x - 1, map(int, line[1:]))) for line in
+                 lines if line[0] == 'f'])
+
+        return _Obj3d(vertices, normals, faces)
