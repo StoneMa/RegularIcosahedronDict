@@ -19,15 +19,11 @@ class _Obj3d(object):
         self.__check_array(normal_vertices, is_nullable=True)
         self.__check_array(face_vertices, is_nullable=True)
 
-        # numpy配列として保持
-        self.vertices = np.asarray(vertices)
-        self.normal_vertices = np.asarray(normal_vertices)
-        self.face_vertices = np.asarray(face_vertices)
+        # Immutableなnumpy配列として保持
+        self.vertices = _Obj3d.as_immutable_array(vertices)
+        self.normal_vertices = _Obj3d.as_immutable_array(normal_vertices)
+        self.face_vertices = _Obj3d.as_immutable_array(face_vertices)
 
-        # 各配列はImmutable
-        self.vertices.flags.writeable = False
-        self.normal_vertices.flags.writeable = False
-        self.face_vertices.flags.writeable = False
 
     @staticmethod
     def __check_array(list_mem, is_nullable=False):
@@ -67,12 +63,25 @@ class _Obj3d(object):
                 assert not isinstance(y, np.ndarray)
                 assert not isinstance(z, np.ndarray)
 
+    @staticmethod
+    def as_immutable_array(array):
+        if array is None:
+            return None
+
+        array = np.asarray(array)
+        array.flags.writeable = False
+
+        return array
+
     def vertices_as_copy(self):
         """
 
         頂点座標リストのコピーを返す
 
         """
+
+        if self.vertices is None:
+            return None
 
         return np.array(self.vertices)
 
@@ -83,6 +92,9 @@ class _Obj3d(object):
 
         """
 
+        if self.normal_vertices is None:
+            return None
+
         return np.array(self.normal_vertices)
 
     def faces_as_copy(self):
@@ -91,6 +103,9 @@ class _Obj3d(object):
         面を定義する頂点座標リストのコピーを返す
 
         """
+
+        if self.face_vertices is None:
+            return None
 
         return np.array(self.face_vertices)
 
