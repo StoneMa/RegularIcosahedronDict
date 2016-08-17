@@ -13,6 +13,18 @@ class _Obj3d(object):
     """
 
     def __init__(self, vertices, normal_vertices=None, face_vertices=None):
+        """
+
+        :type vertices : list or tuple or np.ndarray
+        :param vertices: 全頂点情報
+
+        :type normal_vertices: list or tuple or np.ndarray
+        :param normal_vertices: 各法線ベクトルを定義する頂点情報
+
+        :type face_vertices: list or tuple or np.ndarray
+        :param face_vertices: 各面を構成する頂点情報
+
+        """
 
         # assertion
         self.__check_array(vertices, is_nullable=False)
