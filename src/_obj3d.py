@@ -32,9 +32,9 @@ class _Obj3d(object):
         self.__check_array(face_vertices, is_nullable=True)
 
         # Immutableなnumpy配列として保持
-        self.vertices = _Obj3d.as_immutable_array(vertices)
-        self.normal_vertices = _Obj3d.as_immutable_array(normal_vertices)
-        self.face_vertices = _Obj3d.as_immutable_array(face_vertices)
+        self.vertices = _Obj3d.__as_immutable_array(vertices)
+        self.normal_vertices = _Obj3d.__as_immutable_array(normal_vertices)
+        self.face_vertices = _Obj3d.__as_immutable_array(face_vertices)
 
 
     @staticmethod
@@ -76,7 +76,7 @@ class _Obj3d(object):
                 assert not isinstance(z, np.ndarray)
 
     @staticmethod
-    def as_immutable_array(array):
+    def __as_immutable_array(array):
         if array is None:
             return None
 
