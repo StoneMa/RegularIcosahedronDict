@@ -115,6 +115,15 @@ class GridFace(object):
     def get_vertex_idx(self, alpha, beta):
         return self.__vertices_idx[(alpha, beta)]
 
+    def top_vertex_idx(self):
+        return self.get_vertex_idx(0, 0)
+
+    def left_vertex_idx(self):
+        return self.get_vertex_idx(1, 0)
+
+    def right_vertex_idx(self):
+        return self.get_vertex_idx(0, 1)
+
     def __str__(self):
         s = "[face ID : {}]\n".format(self.face_id) + \
             "left face : {}\nright face : {}\nbottom face : {}\n".format(
