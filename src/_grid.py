@@ -14,7 +14,7 @@ class Grid3d(_Obj3d):
     代わりに各グリッド面の情報GridFaceが保持される
     """
 
-    def __init__(self, vertices, grid_face, n_div):
+    def __init__(self, vertices, grid_faces, n_div):
         """
 
         :type vertices: list or tuple or np.ndarray
@@ -28,7 +28,7 @@ class Grid3d(_Obj3d):
 
         """
         super(Grid3d, self).__init__(vertices)
-        self.grid_faces = tuple(grid_face)
+        self.grid_faces = tuple(grid_faces)
         self.n_div = n_div
 
     @staticmethod
