@@ -3,6 +3,7 @@
 
 import os
 import numpy as np
+from collections import OrderedDict
 from src._obj3d import _Obj3d
 
 
@@ -102,7 +103,7 @@ class GridFace(object):
     def __init__(self, face_id, left_face, right_face, bottom_face):
         self.face_id = face_id
 
-        self.__vertices_idx = {}
+        self.__vertices_idx = OrderedDict()
 
         self.left_face = left_face
         self.right_face = right_face
