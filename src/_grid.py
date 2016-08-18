@@ -92,6 +92,70 @@ class Grid3d(_Obj3d):
 
         return Grid3d(vertices, grid_faces, n_div=1)
 
+    def divide_face(self, n_div, epsilon=np.finfo(float).eps):
+        """
+
+        指定数で面を分割したGrid3dオブジェクトを返す
+
+        :type n_div: int
+        :param n_div: 分割数
+
+        :type epsilon: float
+        :param epsilon: 浮動小数点座標を等号比較する時の許容誤差
+
+        :rtype : Grid3d
+        :return : 分割後のGrid3dオブジェクト
+
+        """
+
+        new_vertices = np.empty(shape=(0, 3))
+
+        new_grid_faces = []
+
+        for grid_face in self.grid_faces:
+
+            # グリッド面の三頂点
+            top_vertex = self.vertices[grid_face.top_vertex_idx()]
+            left_vertex = self.vertices[grid_face.left_vertex_idx()]
+            right_vertex = self.vertices[grid_face.right_vertex_idx()]
+
+            left_vector = left_vertex - top_vertex
+            right_vector = right_vertex - top_vertex
+
+            # 一旦GridFaceの頂点情報をクリア
+            new_face = GridFace(grid_face.face_id, None, None, None)
+
+            for sum_length in xrange(n_div + 1):
+                for i in xrange(sum_length + 1):
+                    alpha = sum_length - i
+                    beta = i
+                    new_vertex = left_vector * float(
+                        alpha) / n_div + right_vector * float(
+                        beta) / n_div + top_vertex
+
+                    # 重複チェック
+                    check_duplicate = (
+                        np.abs(new_vertex - new_vertices) < epsilon).all(axis=1)
+
+                    if len(new_vertices) > 0 and check_duplicate.any():
+                        v_idx = int(np.argwhere(check_duplicate))
+                    else:
+                        v_idx = len(new_vertices)
+                        new_vertices = np.vstack((new_vertices, new_vertex))
+
+                    # 新しく頂点情報を追加
+                    new_face.set_vertex_idx(v_idx, alpha, beta)
+
+            new_grid_faces.append(new_face)
+
+        # 新しいGridFaceのleft_face,right_face,bottom_faceをセットする
+        for new_face, old_face in zip(new_grid_faces, self.grid_faces):
+            new_face.left_face = new_grid_faces[old_face.left_face.face_id]
+            new_face.right_face = new_grid_faces[old_face.right_face.face_id]
+            new_face.bottom_face = new_grid_faces[old_face.bottom_face.face_id]
+
+        return Grid3d(new_vertices, new_grid_faces, n_div)
+
     def __str__(self):
         s = super(Grid3d, self).__str__() + "(n_div={}) : \n".format(self.n_div)
         for grid_face in self.grid_faces:
