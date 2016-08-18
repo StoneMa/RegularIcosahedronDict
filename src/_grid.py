@@ -188,6 +188,9 @@ class GridFace(object):
     def right_vertex_idx(self):
         return self.get_vertex_idx(0, 1)
 
+    def get_coordinates(self, vertex_idx):
+        return [k for k, v in self.__vertices_idx.items() if v == vertex_idx]
+
     def __str__(self):
         s = "[face ID : {}]\n".format(self.face_id) + \
             "left face : {}\nright face : {}\nbottom face : {}\n".format(
