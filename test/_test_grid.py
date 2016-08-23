@@ -59,6 +59,11 @@ class TestGrid3d(unittest.TestCase):
         assert_n_vertices(grid3d_div4, [5, 2, 1])
         self.assertEqual(len(grid3d_div4.vertices), 162)
 
+    def test_find_face_from_id(self):
+        grid3d = Grid3d.load(self.grid_path)
+        for i in xrange(20):
+            self.assertEqual(grid3d.find_face_from_id(i).face_id, i)
+
 
 if __name__ == '__main__':
     unittest.main()
