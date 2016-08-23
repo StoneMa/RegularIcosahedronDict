@@ -57,8 +57,8 @@ af 16 18 17
 
 # traverse order
 # horizon
-to 16 10 4 1 0 2 6 12 18 19
+to h 16 10 4 1 0 2 6 12 18 19
 # to lower right
-to 17 11 5 1 0 3 8 4
+to l 17 11 5 1 0 3 8 4
 # to upper right
-to 15 9 3 0 2 7 13
+to u 15 9 3 0 2 7 13
