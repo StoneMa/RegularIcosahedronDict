@@ -4,7 +4,6 @@
 import os
 import numpy as np
 from collections import OrderedDict
-from itertools import cycle
 from src._obj3d import _Obj3d
 
 
@@ -17,7 +16,11 @@ class Grid3d(_Obj3d):
 
     VERTEX_IDX_UNDEFINED = None
 
-    def __init__(self, vertices, grid_faces, n_div):
+    TRAVERSED_ORDER_HORIZON = "TRAVERSED_ORDER_HORIZON"
+    TRAVERSED_ORDER_TO_LOWER_RIGHT = "TRAVERSED_ORDER_TO_LOWER_RIGHT"
+    TRAVERSED_ORDER_TO_UPPER_RIGHT = "TRAVERSED_ORDER_TO_UPPER_RIGHT"
+
+    def __init__(self, vertices, grid_faces, n_div, traversed_order):
         """
 
         :type vertices: list or tuple or np.ndarray
@@ -33,6 +36,7 @@ class Grid3d(_Obj3d):
         super(Grid3d, self).__init__(vertices)
         self.grid_faces = tuple(grid_faces)
         self.n_div = n_div
+        self.traversed_order = traversed_order
 
     @staticmethod
     def load(grd_file):
@@ -55,6 +59,7 @@ class Grid3d(_Obj3d):
         vertices = []
         face_vertices = []
         adjacent_faces = []
+        traversed_order = {}
 
         with open(grd_file) as f:
 
@@ -68,32 +73,46 @@ class Grid3d(_Obj3d):
                 if line[0] == 'v':
                     vertices.append(map(float, line[1:]))
 
-                if line[0] == 'f':
+                elif line[0] == 'f':
                     face_vertices.append(map(int, line[1:]))
 
-                if line[0] == 'af':
+                elif line[0] == 'af':
                     adjacent_faces.append(map(int, line[1:]))
 
-            vertices = np.asarray(vertices)
+                elif line[0] == 'to':
+                    if line[1] == 'h':
+                        key = Grid3d.TRAVERSED_ORDER_HORIZON
+                    elif line[1] == 'l':
+                        key = Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT
+                    elif line[1] == 'u':
+                        key = Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT
 
-            grid_faces = np.array([GridFace(face_id, None, None, None)
-                                   for face_id, fv in enumerate(face_vertices)])
+                    traversed_order[key] = list(map(int, line[2:]))
 
-            for grid_face, fv, af in zip(grid_faces, face_vertices,
-                                         adjacent_faces):
-                # 面を構成する三頂点の追加
-                top_vertex_idx, left_vertex_idx, right_vertex_idx = fv
-                grid_face.set_vertex_idx(idx=top_vertex_idx, alpha=0, beta=0)
-                grid_face.set_vertex_idx(idx=left_vertex_idx, alpha=1, beta=0)
-                grid_face.set_vertex_idx(idx=right_vertex_idx, alpha=0, beta=1)
+                    vertices = np.asarray(vertices)
 
-                # 隣接する三つの面の追加
-                left_face, right_face, bottom_face = grid_faces[af]
-                grid_face.left_face = left_face
-                grid_face.right_face = right_face
-                grid_face.bottom_face = bottom_face
+                    grid_faces = np.array([GridFace(face_id, None, None, None)
+                                           for face_id, fv in
+                                           enumerate(face_vertices)])
 
-        return Grid3d(vertices, grid_faces, n_div=1)
+                    for grid_face, fv, af in zip(grid_faces, face_vertices,
+                                                 adjacent_faces):
+                        # 面を構成する三頂点の追加
+                        top_vertex_idx, left_vertex_idx, right_vertex_idx = fv
+                        grid_face.set_vertex_idx(idx=top_vertex_idx, alpha=0,
+                                                 beta=0)
+                        grid_face.set_vertex_idx(idx=left_vertex_idx, alpha=1,
+                                                 beta=0)
+                        grid_face.set_vertex_idx(idx=right_vertex_idx, alpha=0,
+                                                 beta=1)
+
+                        # 隣接する三つの面の追加
+                        left_face, right_face, bottom_face = grid_faces[af]
+                        grid_face.left_face = left_face
+                        grid_face.right_face = right_face
+                        grid_face.bottom_face = bottom_face
+
+        return Grid3d(vertices, grid_faces, 1, dict(traversed_order))
 
     def divide_face(self, n_div, epsilon=np.finfo(float).eps):
         """
@@ -160,7 +179,7 @@ class Grid3d(_Obj3d):
             new_face.bottom_face = self.find_face_from_id(
                 old_face.bottom_face.face_id)
 
-        return Grid3d(new_vertices, new_grid_faces, n_div)
+        return Grid3d(new_vertices, new_grid_faces, n_div, self.traversed_order)
 
     def find_face_from_id(self, face_id):
         """
@@ -180,6 +199,136 @@ class Grid3d(_Obj3d):
                 return grid_face
         else:
             raise IndexError
+
+    def traverse(self):
+        """
+
+        グリッドの各帯に対応する頂点インデックス配列を返す
+
+        :type center_grid_face: GridFace
+        :param center_grid_face: 帯の中心とするGridFace
+
+        :rtype: list of np.ndarray
+        :return: グリッドの各帯に対応する頂点インデックス配列
+
+        """
+
+        def get_horizon_alpha_array(row, is_face_upward):
+            if is_face_upward:
+                return xrange(row, -1, -1)
+            else:
+                return xrange(self.n_div - row + 1)
+
+        def get_lower_right_alpha_array(row, is_face_upward):
+            if is_face_upward:
+                return [row for i in xrange(self.n_div - row + 1)]
+            else:
+                return [self.n_div - row for i in xrange(row + 1)]
+
+        def get_upper_right_alpha_array(row, is_face_upward):
+            if is_face_upward:
+                return xrange(self.n_div - row, -1, -1)
+            else:
+                return xrange(row + 1)
+
+        def get_horizon_beta_array(row, is_face_upward):
+            if is_face_upward:
+                return xrange(row + 1)
+            else:
+                return xrange(self.n_div - row, -1, -1)
+
+        def get_lower_right_beta_array(row, is_face_upward):
+            if is_face_upward:
+                return xrange(self.n_div - row + 1)
+            else:
+                return xrange(row, -1, -1)
+
+        def get_upper_right_beta_array(row, is_face_upward):
+            if is_face_upward:
+                return [row for i in xrange(self.n_div - row + 1)]
+            else:
+                return [self.n_div - row for i in xrange(row + 1)]
+
+        horizon = self.__traverse(
+            traversed_order_key=Grid3d.TRAVERSED_ORDER_HORIZON,
+            get_init_row_size=lambda x: self.n_div - x,
+            get_alpha_array=get_horizon_alpha_array,
+            get_beta_array=get_horizon_beta_array)
+
+        to_lower_right = self.__traverse(
+            traversed_order_key=Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT,
+            get_init_row_size=lambda x: x,
+            get_alpha_array=get_lower_right_alpha_array,
+            get_beta_array=get_lower_right_beta_array)
+
+        to_uoper_right = self.__traverse(
+            traversed_order_key=Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT,
+            get_init_row_size=lambda x: self.n_div - x,
+            get_alpha_array=get_upper_right_alpha_array,
+            get_beta_array=get_upper_right_beta_array)
+
+        return horizon, to_lower_right, to_uoper_right
+
+    def __traverse(self, traversed_order_key, get_init_row_size,
+                   get_alpha_array, get_beta_array):
+        """
+
+        グリッド頂点を帯状に走査し、頂点インデックス配列を返す
+
+        :type center_grid_face: GridFace
+        :param center_grid_face: 帯の中心とするGridFace
+
+        :type first_grid_face_attr: str
+        :param first_grid_face_attr: 面走査時、一番目に移動する面のメンバ名
+
+        :type second_grid_face_attr: str
+        :param second_grid_face_attr: 面走査時、一番目に移動する面のメンバ名
+
+        :type get_init_row_size: int()
+        :param get_init_row_size: 各vertex_rowの初期サイズを返す関数
+
+        :type get_alpha_beta: tuple()
+        :param get_alpha_beta: alpha, betaの組を返す関数
+
+        :rtype : np.ndarray
+        :return: 頂点インデックス配列
+
+        """
+
+        # 面一周分のリスト
+        traversed_grid_faces = [self.find_face_from_id(face_id) for face_id in
+                                self.traversed_order[traversed_order_key]]
+
+        vertex_indices = []
+
+        # 指定した方向へ頂点走査を行う
+        # rowは、帯の行を表す
+        for row in xrange(self.n_div + 1):
+
+            # 各行の先頭に、頂点インデックス未定義要素が入る
+            indices_row = [Grid3d.VERTEX_IDX_UNDEFINED] * get_init_row_size(row)
+
+            for traversed_face_idx, traversed_face in enumerate(
+                    traversed_grid_faces):
+                is_triangle_upward = traversed_face_idx % 2 == 0
+                alpha_array = list(get_alpha_array(row, is_triangle_upward))
+                beta_array = list(get_beta_array(row, is_triangle_upward))
+                # 頂点の重複を防ぐため、最後の面以外では、最後の頂点は無視する
+                if traversed_face_idx < len(traversed_grid_faces) - 1:
+                    alpha_array = alpha_array[:len(alpha_array) - 1]
+                    beta_array = beta_array[:len(beta_array) - 1]
+                for alpha, beta in zip(alpha_array, beta_array):
+                    indices_row.append(
+                        traversed_face.get_vertex_idx(alpha, beta))
+
+            # 距離マップの後ろにパディングを追加
+            indices_row += [Grid3d.VERTEX_IDX_UNDEFINED] * (
+                self.n_div - get_init_row_size(row))
+            # 一行分のインデックスをlistとして格納
+            vertex_indices.append(indices_row)
+
+        return np.asarray(vertex_indices)
+
     def __str__(self):
         s = super(Grid3d, self).__str__() + "(n_div={}) : \n".format(self.n_div)
         for grid_face in self.grid_faces:

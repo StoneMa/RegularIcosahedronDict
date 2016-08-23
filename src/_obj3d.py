@@ -36,7 +36,6 @@ class _Obj3d(object):
         self.normal_vertices = _Obj3d.__as_immutable_array(normal_vertices)
         self.face_vertices = _Obj3d.__as_immutable_array(face_vertices)
 
-
     @staticmethod
     def __check_array(list_mem, is_nullable=False):
         """
