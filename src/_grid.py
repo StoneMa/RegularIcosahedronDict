@@ -4,6 +4,7 @@
 import os
 import numpy as np
 from collections import OrderedDict
+from itertools import cycle
 from src._obj3d import _Obj3d
 
 
@@ -13,6 +14,8 @@ class Grid3d(_Obj3d):
     face情報・normal情報は失われる
     代わりに各グリッド面の情報GridFaceが保持される
     """
+
+    VERTEX_IDX_UNDEFINED = None
 
     def __init__(self, vertices, grid_faces, n_div):
         """
@@ -78,14 +81,14 @@ class Grid3d(_Obj3d):
 
             for grid_face, fv, af in zip(grid_faces, face_vertices,
                                          adjacent_faces):
+                # 面を構成する三頂点の追加
                 top_vertex_idx, left_vertex_idx, right_vertex_idx = fv
-
                 grid_face.set_vertex_idx(idx=top_vertex_idx, alpha=0, beta=0)
                 grid_face.set_vertex_idx(idx=left_vertex_idx, alpha=1, beta=0)
                 grid_face.set_vertex_idx(idx=right_vertex_idx, alpha=0, beta=1)
 
+                # 隣接する三つの面の追加
                 left_face, right_face, bottom_face = grid_faces[af]
-
                 grid_face.left_face = left_face
                 grid_face.right_face = right_face
                 grid_face.bottom_face = bottom_face
@@ -150,12 +153,33 @@ class Grid3d(_Obj3d):
 
         # 新しいGridFaceのleft_face,right_face,bottom_faceをセットする
         for new_face, old_face in zip(new_grid_faces, self.grid_faces):
-            new_face.left_face = new_grid_faces[old_face.left_face.face_id]
-            new_face.right_face = new_grid_faces[old_face.right_face.face_id]
-            new_face.bottom_face = new_grid_faces[old_face.bottom_face.face_id]
+            new_face.left_face = self.find_face_from_id(
+                old_face.left_face.face_id)
+            new_face.right_face = self.find_face_from_id(
+                old_face.right_face.face_id)
+            new_face.bottom_face = self.find_face_from_id(
+                old_face.bottom_face.face_id)
 
         return Grid3d(new_vertices, new_grid_faces, n_div)
 
+    def find_face_from_id(self, face_id):
+        """
+
+        指定したface_idを持つGridFaceを返す
+        指定したface_idを持つGridFaceが見つからない場合、IndexErrorを投げる
+
+        :type face_id: int
+        :param face_id: 要求するGridFaceのID
+
+        :rtype: GridFace
+        :return: 指定したface_idを持つGridFace
+
+        """
+        for grid_face in self.grid_faces:
+            if grid_face.face_id == face_id:
+                return grid_face
+        else:
+            raise IndexError
     def __str__(self):
         s = super(Grid3d, self).__str__() + "(n_div={}) : \n".format(self.n_div)
         for grid_face in self.grid_faces:
