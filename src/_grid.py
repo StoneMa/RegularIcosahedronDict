@@ -329,6 +329,25 @@ class Grid3d(_Obj3d):
 
         return np.asarray(vertex_indices)
 
+    def grid_faces_as_copy(self):
+        new_grid_faces = [
+            GridFace(gf.face_id, None, None, None, gf.vertices_idx_as_copy())
+            for gf in self.grid_faces]
+
+        def find_face_from_id(face_id):
+            for new_grid_face in new_grid_faces:
+                if new_grid_face.face_id == face_id:
+                    return new_grid_face
+            else:
+                raise IndexError
+
+        for new_face, old_face in zip(new_grid_faces, self.grid_faces):
+            new_face.left_face = find_face_from_id(old_face.left_face.face_id)
+            new_face.right_face = find_face_from_id(old_face.right_face.face_id)
+            new_face.bottom_face = find_face_from_id(
+                old_face.bottom_face.face_id)
+
+        return new_grid_faces
     def __str__(self):
         s = super(Grid3d, self).__str__() + "(n_div={}) : \n".format(self.n_div)
         for grid_face in self.grid_faces:
