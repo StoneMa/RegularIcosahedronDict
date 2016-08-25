@@ -413,6 +413,8 @@ class GridFace(object):
     def get_coordinates(self, vertex_idx):
         return [k for k, v in self.vertices_idx.items() if v == vertex_idx]
 
+    def vertices_idx_as_copy(self):
+        return dict(self.vertices_idx)
 
     def __str__(self):
         s = "[face ID : {}]\n".format(self.face_id) + \
