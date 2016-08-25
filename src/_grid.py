@@ -383,20 +383,23 @@ class Grid3d(_Obj3d):
 
 
 class GridFace(object):
-    def __init__(self, face_id, left_face, right_face, bottom_face):
+    def __init__(self, face_id, left_face, right_face, bottom_face,
+                 vertices_idx=None):
         self.face_id = face_id
 
-        self.__vertices_idx = OrderedDict()
+        if vertices_idx is None:
+            vertices_idx = OrderedDict()
+        self.vertices_idx = vertices_idx
 
         self.left_face = left_face
         self.right_face = right_face
         self.bottom_face = bottom_face
 
     def set_vertex_idx(self, idx, alpha, beta):
-        self.__vertices_idx[(alpha, beta)] = idx
+        self.vertices_idx[(alpha, beta)] = idx
 
     def get_vertex_idx(self, alpha, beta):
-        return self.__vertices_idx[(alpha, beta)]
+        return self.vertices_idx[(alpha, beta)]
 
     def top_vertex_idx(self):
         return self.get_vertex_idx(0, 0)
@@ -408,7 +411,8 @@ class GridFace(object):
         return self.get_vertex_idx(0, 1)
 
     def get_coordinates(self, vertex_idx):
-        return [k for k, v in self.__vertices_idx.items() if v == vertex_idx]
+        return [k for k, v in self.vertices_idx.items() if v == vertex_idx]
+
 
     def __str__(self):
         s = "[face ID : {}]\n".format(self.face_id) + \
@@ -416,7 +420,7 @@ class GridFace(object):
                 self.left_face.face_id, self.right_face.face_id,
                 self.bottom_face.face_id) + \
             "vertex indices : (alpha, beta) -> [idx]\n"
-        for key, idx in self.__vertices_idx.items():
+        for key, idx in self.vertices_idx.items():
             alpha, beta = key
             s += "({0:^3},{1:^3}) -> {2:^2}\n".format(alpha, beta, idx)
         return s
