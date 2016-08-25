@@ -64,6 +64,10 @@ class TestGrid3d(unittest.TestCase):
         for i in xrange(20):
             self.assertEqual(grid3d.find_face_from_id(i).face_id, i)
 
+    def test_traverse(self):
+        grid3d = Grid3d.load(self.grid_path)
+        if self.is_print_enabled:
+            print grid3d.traverse()
 
 if __name__ == '__main__':
     unittest.main()
