@@ -229,7 +229,8 @@ class _Obj3d(object):
         elif ext == ".off":
             obj3d = _Obj3d.__load_off(path)
         else:
-            raise IOError("Obj3d::__init__() : failed to load {}.".format(path))
+            raise IOError(
+                "Obj3d::__init__() : failed to load {}.".format(path))
 
         return obj3d
 
@@ -246,7 +247,8 @@ class _Obj3d(object):
 
         with open(off_file) as f:
             # コメント・空行を除去
-            lines = filter(lambda x: x != '\n' and x[0] != "#", f.readlines())
+            lines = filter(lambda x: x != '\n' and x[0] != "#",
+                           f.readlines())
 
             # 一行目はファイルフォーマット名
             if "OFF" not in lines.pop(0):
