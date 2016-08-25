@@ -213,39 +213,39 @@ class _Obj3d(object):
                       self.normals_as_copy(), self.faces_as_copy())
 
     @staticmethod
-    def load(path):
+    def load(file_path):
         """
 
         ファイルパスの拡張子を識別してファイル読み込みを行い、Obj3dオブジェクトを返す
 
-        :type path: str
-        :param path: ファイルパス
+        :type file_path: str
+        :param file_path: ファイルパス
 
         """
-        ext = os.path.splitext(path)[1]
+        ext = os.path.splitext(file_path)[1]
 
         if ext == ".obj":
-            obj3d = _Obj3d.__load_obj(path)
+            obj3d = _Obj3d.__load_obj(file_path)
         elif ext == ".off":
-            obj3d = _Obj3d.__load_off(path)
+            obj3d = _Obj3d.__load_off(file_path)
         else:
             raise IOError(
-                "Obj3d::__init__() : failed to load {}.".format(path))
+                "Obj3d::__init__() : failed to load {}.".format(file_path))
 
         return obj3d
 
     @staticmethod
-    def __load_off(off_file):
+    def __load_off(off_file_path):
         """
 
         .off形式のファイルを読み込み、頂点座標のみを取得
 
-        :type off_file: str
-        :param off_file: .offファイル名
+        :type off_file_path: str
+        :param off_file_path: .offファイル名
 
         """
 
-        with open(off_file) as f:
+        with open(off_file_path) as f:
             # コメント・空行を除去
             lines = filter(lambda x: x != '\n' and x[0] != "#",
                            f.readlines())
@@ -269,17 +269,17 @@ class _Obj3d(object):
         return _Obj3d(vertices, None, faces)
 
     @staticmethod
-    def __load_obj(obj_file):
+    def __load_obj(obj_file_path):
         """
 
         .objファイルを読み込み、頂点情報のみを取得
 
-        :type obj_file : str
-        :param obj_file: ファイルパス
+        :type obj_file_path : str
+        :param obj_file_path: ファイルパス
 
         """
 
-        with open(obj_file) as f:
+        with open(obj_file_path) as f:
             lines = filter(lambda x: x != "\n" and x[0] != "#",
                            [line.strip().split() for line in f.readlines()])
 
@@ -295,38 +295,38 @@ class _Obj3d(object):
 
         return _Obj3d(vertices, normals, faces)
 
-    def save(self, path):
+    def save(self, file_path):
         """
 
         Obj3dオブジェクトの内容を指定した拡張子の形式で保存
 
-        :type path: str
-        :param path: 保存するファイルパス
+        :type file_path: str
+        :param file_path: 保存するファイルパス
 
         """
-        ext = os.path.splitext(path)[1]
+        ext = os.path.splitext(file_path)[1]
 
         if ext == ".obj":
-            self._save_obj(path)
+            self._save_obj(file_path)
         elif ext == ".off":
-            self._save_off(path)
+            self._save_off(file_path)
         else:
             raise NotImplementedError
 
-    def _save_off(self, off_file):
+    def _save_off(self, off_file_path):
         """
 
         Obj3dオブジェクトの内容を.off形式で保存
 
-        :type off_file: str
-        :param off_file: .offファイルパス
+        :type off_file_path: str
+        :param off_file_path: .offファイルパス
 
         """
-        name, ext = os.path.splitext(off_file)
+        name, ext = os.path.splitext(off_file_path)
         if ext != ".off" or ext == "":
-            off_file = name + ".off"
+            off_file_path = name + ".off"
 
-        with open(off_file, "w") as f:
+        with open(off_file_path, "w") as f:
             # OFFファイル先頭行
             f.write("OFF\n")
             # 頂点数 面数 法線数
@@ -348,20 +348,20 @@ class _Obj3d(object):
 
                     # 法線情報(NotImplemented)
 
-    def _save_obj(self, obj_file):
+    def _save_obj(self, obj_file_path):
         """
 
         Modelオブジェクトの内容を.obj形式で保存
 
-        :type obj_file: str
-        :param obj_file: .objファイルパス
+        :type obj_file_path: str
+        :param obj_file_path: .objファイルパス
 
         """
-        name, ext = os.path.splitext(obj_file)
+        name, ext = os.path.splitext(obj_file_path)
         if ext != ".obj" or ext == "":
-            obj_file = name + ".obj"
+            obj_file_path = name + ".obj"
 
-        with open(obj_file, "w") as f:
+        with open(obj_file_path, "w") as f:
             # OBJファイル先頭行コメント
             f.write("# OBJ file format with ext .obj\n")
             f.write("# vertex count = {}\n".format(len(self.vertices)))
