@@ -281,12 +281,47 @@ class _Obj3d(object):
             lines = filter(lambda x: x != "\n" and x[0] != "#",
                            [line.strip().split() for line in f.readlines()])
 
-            vertices = np.array([list(map(float, line[1:])) for line in lines if
-                                 line[0] == 'v'])
-            normals = np.array([list(map(float, line[1:])) for line in lines if
-                                line[0] == 'vn'])
+            vertices = np.array(
+                [list(map(float, line[1:])) for line in lines if
+                 line[0] == 'v'])
+            normals = np.array(
+                [list(map(float, line[1:])) for line in lines if
+                 line[0] == 'vn'])
             faces = np.array(
                 [list(map(lambda x: x - 1, map(int, line[1:]))) for line in
                  lines if line[0] == 'f'])
 
         return _Obj3d(vertices, normals, faces)
+
+    def save_obj(self, obj_file):
+        """
+
+        Modelオブジェクトの内容を.obj形式で保存
+
+        :type obj_file: str
+        :param obj_file: .objファイルパス
+
+        """
+        name, ext = os.path.splitext(obj_file)
+        if ext != ".obj" or ext == "":
+            obj_file = name + ".obj"
+
+        with open(obj_file, "w") as f:
+            # OBJファイル先頭行コメント
+            f.write("# OBJ file format with ext .obj\n")
+            f.write("# vertex count = {}\n".format(len(self.vertices)))
+
+            if self.face_vertices is not None:
+                f.write("# face count = {}\n".format(len(self.face_vertices)))
+
+            # 頂点情報
+            for x, y, z in self.vertices:
+                f.write("v {0} {1} {2}\n".format(x, y, z))
+
+            # 面情報
+            # objファイルの面情報インデックスは１始まりなので、+1する
+            if self.face_vertices is not None:
+                for p1, p2, p3 in self.face_vertices:
+                    f.write("f {0} {1} {2}\n".format(p1 + 1, p2 + 1, p3 + 1))
+
+                    # 法線情報(NotImplemented)
