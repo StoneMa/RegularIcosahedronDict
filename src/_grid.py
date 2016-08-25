@@ -329,6 +329,21 @@ class Grid3d(_Obj3d):
 
         return np.asarray(vertex_indices)
 
+    def center(self):
+        obj3d = super(Grid3d, self).center()
+        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                      self.traversed_order_as_copy())
+
+    def normal(self):
+        obj3d = super(Grid3d, self).normal()
+        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                      self.traversed_order_as_copy())
+
+    def scale(self, r):
+        obj3d = super(Grid3d, self).scale(r)
+        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                      self.traversed_order_as_copy())
+
     def grid_faces_as_copy(self):
         new_grid_faces = [
             GridFace(gf.face_id, None, None, None, gf.vertices_idx_as_copy())
