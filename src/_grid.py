@@ -344,6 +344,11 @@ class Grid3d(_Obj3d):
         return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
                       self.traversed_order_as_copy())
 
+    def rotate(self, theta, axis_vector):
+        obj3d = super(Grid3d, self).rotate(theta, axis_vector)
+        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                      self.traversed_order_as_copy())
+
     def grid_faces_as_copy(self):
         new_grid_faces = [
             GridFace(gf.face_id, None, None, None, gf.vertices_idx_as_copy())
