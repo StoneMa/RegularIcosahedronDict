@@ -169,6 +169,49 @@ class _Obj3d(object):
                       self.normals_as_copy(),
                       self.faces_as_copy())
 
+    def rotate(self, theta, axis_vector):
+        """
+
+        頂点群をaxis_vectorを軸として角度thetaだけ回転する
+
+        :type theta: float
+        :param theta: 回転角
+
+        :type axis_vector: np.ndarray
+        :param axis_vector: 軸ベクトル
+
+        :return:
+        """
+
+        assert isinstance(theta, float)
+        assert len(axis_vector) == 3
+        for elem in axis_vector:
+            assert isinstance(elem, (int, long, float))
+
+        # 軸成分
+        ax, ay, az = axis_vector / np.linalg.norm(axis_vector)
+
+        cos = np.cos(theta)
+        sin = np.sin(theta)
+
+        # 回転行列
+        r_mtr = np.array([[ax * ax * (1. - cos) + cos,
+                           ax * ay * (1. - cos) - az * sin,
+                           az * ax * (1. - cos) + ay * sin],
+                          [ax * ay * (1. - cos) + az * sin,
+                           ay * ay * (1. - cos) + cos,
+                           ay * az * (1. - cos) - ax * sin],
+                          [az * ax * (1. - cos) - ay * sin,
+                           ay * az * (1. - cos) + ax * sin,
+                           az * az * (1. - cos) + cos]])
+
+        center = np.mean(self.vertices, axis=0)
+
+        centered_vertices = self.vertices - center
+
+        return _Obj3d(np.dot(centered_vertices, r_mtr.T) + center,
+                      self.normals_as_copy(), self.faces_as_copy())
+
     @staticmethod
     def load(path):
         """
