@@ -3,8 +3,8 @@
 
 import numpy as np
 from numpy import linalg
-from obj3d import Obj3d
-from grid import Grid
+from _obj3d import _Obj3d
+from _grid import Grid3d, GridFace
 
 
 class ShapeMap(object):
@@ -22,17 +22,12 @@ class ShapeMap(object):
     def __init__(self, obj3d_path, grd_path, n_div, scale_grid):
 
         # 3Dモデル
-        self.obj3d = Obj3d.load(obj3d_path)
-        # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
-        self.grid = Grid.load(grd_path, n_div)
-
         # モデルを座標系の中心に置き、正規化する
-        self.obj3d.center()
-        self.obj3d.normal()
-
+        self.obj3d = _Obj3d.load(obj3d_path).center().normal()
+        # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
-        self.grid.center()
-        self.grid.scale(scale_grid)
+        self.grid = Grid3d.load(grd_path).center().scale(scale_grid) \
+            .divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
         # グリッドの中心から最も近い点のより中心からの距離より大きい場合はサポート外
@@ -93,52 +88,81 @@ class ShapeMap(object):
 
         return None
 
-    def dist(self):
+    def distance_map(self):
 
-        grid_center = np.zeros(shape=(3,))
+        def dist():
 
-        # 距離マップ インデックスはグリッドのverticesに対応する
-        distance = []
+            grid_center = np.zeros(shape=(3,))
 
-        for v_grid in self.grid.vertices:
-            for fv_obj3d in self.obj3d.faces:
-                f0, f1, f2 = self.obj3d.vertices[fv_obj3d]
-                p_cross = self.tomas_moller(grid_center, v_grid, f0, f1, f2)
-                if p_cross is not None:
-                    dist = np.linalg.norm(p_cross - grid_center)
-                    distance.append(dist)
-                    break
-            else:
-                # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
-                distance.append(ShapeMap.DIST_UNDEFINED)
+            # 距離マップ インデックスはグリッドのverticesに対応する
+            dists = np.empty(shape=(len(self.grid.vertices)))
+            # 交点リスト
+            cps = [None for i in xrange(len(dists))]
 
-        distance = np.array(distance)
+            for i, v_grid in enumerate(self.grid.vertices):
+                for fv_obj3d in self.obj3d.face_vertices:
+                    f0, f1, f2 = self.obj3d.vertices[fv_obj3d]
+                    p_cross = self.tomas_moller(grid_center, v_grid, f0, f1, f2)
+                    if p_cross is not None:
+                        dist = np.linalg.norm(p_cross - grid_center)
+                        dists[i] = dist
+                        cps[i] = p_cross
+                        break
+                else:
+                    # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
+                    dists[i] = ShapeMap.DIST_UNDEFINED
 
-        # 距離が最大となるグリッド頂点の所属するFaceInfo
-        face_id_max_dist = [f_info
-                            for f_info in self.grid.face_info
-                            for v_info in f_info.vertex_info
-                            if v_info.vertex_idx == distance.argmax()][0]
+            return dists, cps
 
-        upper_v_info = self.grid.traverse(face_id_max_dist, 'upper',
-                                          n_face_traverse=8)
-        lower_v_info = self.grid.traverse(face_id_max_dist, 'lower',
-                                          n_face_traverse=8)
-        horizontal_v_info = self.grid.traverse(face_id_max_dist, 'horizontal',
-                                               n_face_traverse=10)
+        # 一旦距離を取得
+        distance, cross_points = dist()
 
-        def dist_map_from_info(vertex_info):
-            return [[distance[v_info.vertex_idx]
-                     if v_info is not None
+        '''
+         グリッドの頂点Pとモデルの重心Gを結び、PGとモデル表面の交点をQとし、
+         GQが最大となるような交点をQ'としたとき、FaceID=0の面のtop_vertexがGPの延長上に
+         なるようにモデルを回転する処理
+        '''
+
+        # 重心との距離が最大となるモデル上の交点
+        max_dist_cp = cross_points[distance.argmax()]
+
+        if max_dist_cp is None:
+            raise IndexError
+
+        # face_id=0の面のtop_vertex
+        top_vertex_face_0 = \
+            self.grid.vertices[self.grid.find_face_from_id(0).top_vertex_idx()]
+
+        # 回転軸ベクトル（外積）
+        axis = np.cross(max_dist_cp, top_vertex_face_0)
+
+        # モデル上の交点とtop_vertexのなす角度
+        theta = np.arcsin(np.linalg.norm(axis) / (
+            np.linalg.norm(max_dist_cp) * np.linalg.norm(top_vertex_face_0)))
+
+        # モデルを回転
+        self.obj3d = self.obj3d.rotate(theta, axis)
+
+        # 再度距離を取得
+        distance, cross_points = dist()
+
+        # 頂点インデックスのマップを取得
+        horizon_idx_map, to_lower_right_idx_map, to_upper_right_idx_map = self.grid.traverse()
+
+        def dist_map_from_vertex_index_map(vertex_index_map):
+            return [[distance[v_idx]
+                     if v_idx is not Grid3d.VERTEX_IDX_UNDEFINED
                      else ShapeMap.DIST_UNDEFINED
-                     for v_info in row]
-                    for row in vertex_info]
+                     for v_idx in row]
+                    for row in vertex_index_map]
 
-        upper_distance = dist_map_from_info(upper_v_info)
-        lower_distance = dist_map_from_info(lower_v_info)
-        horizontal_distance = dist_map_from_info(horizontal_v_info)
+        horizon_dist_map = dist_map_from_vertex_index_map(horizon_idx_map)
+        to_lower_right_dist_map = dist_map_from_vertex_index_map(
+            to_lower_right_idx_map)
+        to_upper_right_dist_map = dist_map_from_vertex_index_map(
+            to_upper_right_idx_map)
 
-        return upper_distance, lower_distance, horizontal_distance
+        return horizon_dist_map, to_lower_right_dist_map, to_upper_right_dist_map
 
 
 if __name__ == '__main__':
@@ -147,4 +171,7 @@ if __name__ == '__main__':
                    n_div=3,
                    scale_grid=2)
 
-    upper_distance, lower_distance, horizontal_distance = map.dist()
+    horizon_dist_map, to_lower_right_dist_map, to_upper_right_dist_map = map.distance_map()
+    print horizon_dist_map
+    print to_lower_right_dist_map
+    print to_upper_right_dist_map
