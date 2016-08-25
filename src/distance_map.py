@@ -7,7 +7,7 @@ from _obj3d import _Obj3d
 from _grid import Grid3d, GridFace
 
 
-class ShapeMap(object):
+class DistanceMap(object):
     """
 
     三次元モデルから距離マップを取得するクラス
@@ -110,7 +110,7 @@ class ShapeMap(object):
                         break
                 else:
                     # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
-                    dists[i] = ShapeMap.DIST_UNDEFINED
+                    dists[i] = DistanceMap.DIST_UNDEFINED
 
             return dists, cps
 
@@ -152,7 +152,7 @@ class ShapeMap(object):
         def dist_map_from_vertex_index_map(vertex_index_map):
             return [[distance[v_idx]
                      if v_idx is not Grid3d.VERTEX_IDX_UNDEFINED
-                     else ShapeMap.DIST_UNDEFINED
+                     else DistanceMap.DIST_UNDEFINED
                      for v_idx in row]
                     for row in vertex_index_map]
 
@@ -166,10 +166,10 @@ class ShapeMap(object):
 
 
 if __name__ == '__main__':
-    map = ShapeMap(obj3d_path="../res/stanford_bunny.obj",
-                   grd_path="../res/new_regular_ico.grd",
-                   n_div=3,
-                   scale_grid=2)
+    map = DistanceMap(obj3d_path="../res/stanford_bunny.obj",
+                      grd_path="../res/new_regular_ico.grd",
+                      n_div=3,
+                      scale_grid=2)
 
     horizon_dist_map, to_lower_right_dist_map, to_upper_right_dist_map = map.distance_map()
     print horizon_dist_map

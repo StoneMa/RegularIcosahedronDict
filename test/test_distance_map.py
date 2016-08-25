@@ -3,7 +3,7 @@
 
 import numpy as np
 import unittest
-from src.shape_map import ShapeMap
+from src.distance_map import DistanceMap
 
 
 class TestShapeMap(unittest.TestCase):
@@ -26,8 +26,8 @@ class TestShapeMap(unittest.TestCase):
 
         print "\nTest Map2D::tomas_moller() ..."
 
-        map = ShapeMap(obj3d_path=self.obj3d_path, grd_path=self.grid_path,
-                       n_div=self.n_div, scale_grid=self.scale_grid)
+        map = DistanceMap(obj3d_path=self.obj3d_path, grd_path=self.grid_path,
+                          n_div=self.n_div, scale_grid=self.scale_grid)
 
         v0 = np.array([0., 0., 0.])
         v1 = np.array([1., 0., 1.])
