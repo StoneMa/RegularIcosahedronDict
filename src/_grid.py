@@ -112,7 +112,7 @@ class Grid3d(_Obj3d):
                         grid_face.right_face = right_face
                         grid_face.bottom_face = bottom_face
 
-        return Grid3d(vertices, grid_faces, 1, dict(traversed_order))
+        return Grid3d(vertices, grid_faces, 1, traversed_order)
 
     def divide_face(self, n_div, epsilon=np.finfo(float).eps):
         """
