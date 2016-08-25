@@ -348,6 +348,18 @@ class Grid3d(_Obj3d):
                 old_face.bottom_face.face_id)
 
         return new_grid_faces
+
+    def traversed_order_as_copy(self):
+        return {Grid3d.TRAVERSED_ORDER_HORIZON: \
+                    [f_id for f_id in self.traversed_order[
+                        Grid3d.TRAVERSED_ORDER_HORIZON]],
+                Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT: \
+                    [f_id for f_id in self.traversed_order[
+                        Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT]],
+                Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT: \
+                    [f_id for f_id in self.traversed_order[
+                        Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT]]}
+
     def __str__(self):
         s = super(Grid3d, self).__str__() + "(n_div={}) : \n".format(self.n_div)
         for grid_face in self.grid_faces:
