@@ -14,8 +14,10 @@ class _TestObj3d(unittest.TestCase):
 
         self.scale = 2
 
-        self.path_off = "../res/stanford_bunny.off"
-        self.path_obj = "../res/stanford_bunny.obj"
+        self.load_path_off = "../res/stanford_bunny.off"
+        self.load_path_obj = "../res/stanford_bunny.obj"
+        self.save_path_off = "../res/saved_stanford_bunny.off"
+        self.save_path_obj = "../res/saved_stanford_bunny.obj"
 
     def tearDown(self):
         pass
@@ -86,8 +88,16 @@ class _TestObj3d(unittest.TestCase):
             (before_vertices * self.scale < after_vertices + epsilon).all())
 
     def test_load(self):
-        obj3d_off = _Obj3d.load(self.path_off)
-        obj3d_obj = _Obj3d.load(self.path_obj)
+        obj3d_off = _Obj3d.load(self.load_path_off)
+        obj3d_obj = _Obj3d.load(self.load_path_obj)
+
+    def test_save(self):
+        _Obj3d.load(self.load_path_off).save(self.save_path_off)
+        _Obj3d.load(self.load_path_obj).save(self.save_path_obj)
+
+        obj3d_off = _Obj3d.load(self.save_path_off)
+        obj3d_obj = _Obj3d.load(self.save_path_obj)
+
 
 
 if __name__ == '__main__':

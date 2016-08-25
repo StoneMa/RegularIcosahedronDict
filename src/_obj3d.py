@@ -295,7 +295,60 @@ class _Obj3d(object):
 
         return _Obj3d(vertices, normals, faces)
 
-    def save_obj(self, obj_file):
+    def save(self, path):
+        """
+
+        Obj3dオブジェクトの内容を指定した拡張子の形式で保存
+
+        :type path: str
+        :param path: 保存するファイルパス
+
+        """
+        ext = os.path.splitext(path)[1]
+
+        if ext == ".obj":
+            self._save_obj(path)
+        elif ext == ".off":
+            self._save_off(path)
+        else:
+            raise NotImplementedError
+
+    def _save_off(self, off_file):
+        """
+
+        Obj3dオブジェクトの内容を.off形式で保存
+
+        :type off_file: str
+        :param off_file: .offファイルパス
+
+        """
+        name, ext = os.path.splitext(off_file)
+        if ext != ".off" or ext == "":
+            off_file = name + ".off"
+
+        with open(off_file, "w") as f:
+            # OFFファイル先頭行
+            f.write("OFF\n")
+            # 頂点数 面数 法線数
+            len_vertices = len(self.vertices)
+            len_fv = 0 if self.face_vertices is None else len(
+                self.face_vertices)
+            len_nv = 0 if self.normal_vertices is None else len(
+                self.face_vertices)
+            f.write("{0} {1} {2}\n\n".format(len_vertices, len_fv, len_nv))
+
+            # 頂点情報
+            for x, y, z in self.vertices:
+                f.write("{0} {1} {2}\n".format(x, y, z))
+
+            # 面情報
+            if self.face_vertices is not None:
+                for p1, p2, p3 in self.face_vertices:
+                    f.write("3  {0} {1} {2}\n".format(p1, p2, p3))
+
+                    # 法線情報(NotImplemented)
+
+    def _save_obj(self, obj_file):
         """
 
         Modelオブジェクトの内容を.obj形式で保存
