@@ -7,7 +7,7 @@ from collections import OrderedDict
 from src.obj3d import _Obj3d
 
 
-class Grid3d(_Obj3d):
+class IcosahedronGrid(_Obj3d):
     """
     距離マップ生成用グリッドクラス
     face情報・normal情報は失われる
@@ -33,7 +33,7 @@ class Grid3d(_Obj3d):
         :param n_div: Grid3dオブジェクトの各面の分割数
 
         """
-        super(Grid3d, self).__init__(vertices)
+        super(IcosahedronGrid, self).__init__(vertices)
         self.grid_faces = tuple(grid_faces)
         self.n_div = n_div
         self.traversed_order = traversed_order
@@ -47,7 +47,7 @@ class Grid3d(_Obj3d):
         :type grd_file: str
         :param grd_file: .grd形式のファイルパス
 
-        :rtype : Grid3d
+        :rtype : IcosahedronGrid
         :return : Grid3dオブジェクト
         """
 
@@ -81,17 +81,17 @@ class Grid3d(_Obj3d):
 
                 elif line[0] == 'to':
                     if line[1] == 'h':
-                        key = Grid3d.TRAVERSED_ORDER_HORIZON
+                        key = IcosahedronGrid.TRAVERSED_ORDER_HORIZON
                     elif line[1] == 'l':
-                        key = Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT
+                        key = IcosahedronGrid.TRAVERSED_ORDER_TO_LOWER_RIGHT
                     elif line[1] == 'u':
-                        key = Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT
+                        key = IcosahedronGrid.TRAVERSED_ORDER_TO_UPPER_RIGHT
 
                     traversed_order[key] = list(map(int, line[2:]))
 
                     vertices = np.asarray(vertices)
 
-                    grid_faces = np.array([GridFace(face_id, None, None, None)
+                    grid_faces = np.array([IcosahedronFace(face_id, None, None, None)
                                            for face_id, fv in
                                            enumerate(face_vertices)])
 
@@ -112,7 +112,7 @@ class Grid3d(_Obj3d):
                         grid_face.right_face = right_face
                         grid_face.bottom_face = bottom_face
 
-        return Grid3d(vertices, grid_faces, 1, traversed_order)
+        return IcosahedronGrid(vertices, grid_faces, 1, traversed_order)
 
     def divide_face(self, n_div, epsilon=np.finfo(float).eps):
         """
@@ -125,7 +125,7 @@ class Grid3d(_Obj3d):
         :type epsilon: float
         :param epsilon: 浮動小数点座標を等号比較する時の許容誤差
 
-        :rtype : Grid3d
+        :rtype : IcosahedronGrid
         :return : 分割後のGrid3dオブジェクト
 
         """
@@ -145,7 +145,7 @@ class Grid3d(_Obj3d):
             right_vector = right_vertex - top_vertex
 
             # 一旦GridFaceの頂点情報をクリア
-            new_face = GridFace(grid_face.face_id, None, None, None)
+            new_face = IcosahedronFace(grid_face.face_id, None, None, None)
 
             for sum_length in xrange(n_div + 1):
                 for i in xrange(sum_length + 1):
@@ -179,7 +179,7 @@ class Grid3d(_Obj3d):
             new_face.bottom_face = self.find_face_from_id(
                 old_face.bottom_face.face_id)
 
-        return Grid3d(new_vertices, new_grid_faces, n_div, self.traversed_order)
+        return IcosahedronGrid(new_vertices, new_grid_faces, n_div, self.traversed_order)
 
     def find_face_from_id(self, face_id):
         """
@@ -190,7 +190,7 @@ class Grid3d(_Obj3d):
         :type face_id: int
         :param face_id: 要求するGridFaceのID
 
-        :rtype: GridFace
+        :rtype: IcosahedronFace
         :return: 指定したface_idを持つGridFace
 
         """
@@ -205,7 +205,7 @@ class Grid3d(_Obj3d):
 
         グリッドの各帯に対応する頂点インデックス配列を返す
 
-        :type center_grid_face: GridFace
+        :type center_grid_face: IcosahedronFace
         :param center_grid_face: 帯の中心とするGridFace
 
         :rtype: list of np.ndarray
@@ -250,19 +250,19 @@ class Grid3d(_Obj3d):
                 return [self.n_div - row for i in xrange(row + 1)]
 
         horizon = self.__traverse(
-            traversed_order_key=Grid3d.TRAVERSED_ORDER_HORIZON,
+            traversed_order_key=IcosahedronGrid.TRAVERSED_ORDER_HORIZON,
             get_init_row_size=lambda x: self.n_div - x,
             get_alpha_array=get_horizon_alpha_array,
             get_beta_array=get_horizon_beta_array)
 
         to_lower_right = self.__traverse(
-            traversed_order_key=Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT,
+            traversed_order_key=IcosahedronGrid.TRAVERSED_ORDER_TO_LOWER_RIGHT,
             get_init_row_size=lambda x: x,
             get_alpha_array=get_lower_right_alpha_array,
             get_beta_array=get_lower_right_beta_array)
 
         to_uoper_right = self.__traverse(
-            traversed_order_key=Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT,
+            traversed_order_key=IcosahedronGrid.TRAVERSED_ORDER_TO_UPPER_RIGHT,
             get_init_row_size=lambda x: self.n_div - x,
             get_alpha_array=get_upper_right_alpha_array,
             get_beta_array=get_upper_right_beta_array)
@@ -275,7 +275,7 @@ class Grid3d(_Obj3d):
 
         グリッド頂点を帯状に走査し、頂点インデックス配列を返す
 
-        :type center_grid_face: GridFace
+        :type center_grid_face: IcosahedronFace
         :param center_grid_face: 帯の中心とするGridFace
 
         :type first_grid_face_attr: str
@@ -306,7 +306,7 @@ class Grid3d(_Obj3d):
         for row in xrange(self.n_div + 1):
 
             # 各行の先頭に、頂点インデックス未定義要素が入る
-            indices_row = [Grid3d.VERTEX_IDX_UNDEFINED] * get_init_row_size(row)
+            indices_row = [IcosahedronGrid.VERTEX_IDX_UNDEFINED] * get_init_row_size(row)
 
             for traversed_face_idx, traversed_face in enumerate(
                     traversed_grid_faces):
@@ -322,7 +322,7 @@ class Grid3d(_Obj3d):
                         traversed_face.get_vertex_idx(alpha, beta))
 
             # 距離マップの後ろにパディングを追加
-            indices_row += [Grid3d.VERTEX_IDX_UNDEFINED] * (
+            indices_row += [IcosahedronGrid.VERTEX_IDX_UNDEFINED] * (
                 self.n_div - get_init_row_size(row))
             # 一行分のインデックスをlistとして格納
             vertex_indices.append(indices_row)
@@ -330,28 +330,28 @@ class Grid3d(_Obj3d):
         return np.asarray(vertex_indices)
 
     def center(self):
-        obj3d = super(Grid3d, self).center()
-        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
-                      self.traversed_order_as_copy())
+        obj3d = super(IcosahedronGrid, self).center()
+        return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                               self.traversed_order_as_copy())
 
     def normal(self):
-        obj3d = super(Grid3d, self).normal()
-        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
-                      self.traversed_order_as_copy())
+        obj3d = super(IcosahedronGrid, self).normal()
+        return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                               self.traversed_order_as_copy())
 
     def scale(self, r):
-        obj3d = super(Grid3d, self).scale(r)
-        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
-                      self.traversed_order_as_copy())
+        obj3d = super(IcosahedronGrid, self).scale(r)
+        return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                               self.traversed_order_as_copy())
 
     def rotate(self, theta, axis_vector):
-        obj3d = super(Grid3d, self).rotate(theta, axis_vector)
-        return Grid3d(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
-                      self.traversed_order_as_copy())
+        obj3d = super(IcosahedronGrid, self).rotate(theta, axis_vector)
+        return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(), self.n_div,
+                               self.traversed_order_as_copy())
 
     def grid_faces_as_copy(self):
         new_grid_faces = [
-            GridFace(gf.face_id, None, None, None, gf.vertices_idx_as_copy())
+            IcosahedronFace(gf.face_id, None, None, None, gf.vertices_idx_as_copy())
             for gf in self.grid_faces]
 
         def find_face_from_id(face_id):
@@ -370,24 +370,24 @@ class Grid3d(_Obj3d):
         return new_grid_faces
 
     def traversed_order_as_copy(self):
-        return {Grid3d.TRAVERSED_ORDER_HORIZON: \
+        return {IcosahedronGrid.TRAVERSED_ORDER_HORIZON: \
                     [f_id for f_id in self.traversed_order[
-                        Grid3d.TRAVERSED_ORDER_HORIZON]],
-                Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT: \
+                        IcosahedronGrid.TRAVERSED_ORDER_HORIZON]],
+                IcosahedronGrid.TRAVERSED_ORDER_TO_LOWER_RIGHT: \
                     [f_id for f_id in self.traversed_order[
-                        Grid3d.TRAVERSED_ORDER_TO_LOWER_RIGHT]],
-                Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT: \
+                        IcosahedronGrid.TRAVERSED_ORDER_TO_LOWER_RIGHT]],
+                IcosahedronGrid.TRAVERSED_ORDER_TO_UPPER_RIGHT: \
                     [f_id for f_id in self.traversed_order[
-                        Grid3d.TRAVERSED_ORDER_TO_UPPER_RIGHT]]}
+                        IcosahedronGrid.TRAVERSED_ORDER_TO_UPPER_RIGHT]]}
 
     def __str__(self):
-        s = super(Grid3d, self).__str__() + "(n_div={}) : \n".format(self.n_div)
+        s = super(IcosahedronGrid, self).__str__() + "(n_div={}) : \n".format(self.n_div)
         for grid_face in self.grid_faces:
             s += grid_face.__str__() + "\n"
         return s
 
 
-class GridFace(object):
+class IcosahedronFace(object):
     def __init__(self, face_id, left_face, right_face, bottom_face,
                  vertices_idx=None):
         self.face_id = face_id

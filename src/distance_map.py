@@ -5,7 +5,7 @@ import struct
 import numpy as np
 from numpy import linalg
 from obj3d import _Obj3d
-from grid import Grid3d, GridFace
+from grid import IcosahedronGrid, IcosahedronFace
 
 
 class DistanceMap(object):
@@ -27,7 +27,7 @@ class DistanceMap(object):
         self.obj3d = _Obj3d.load(obj3d_path).center().normal()
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
-        self.grid = Grid3d.load(grd_path).center().scale(scale_grid) \
+        self.grid = IcosahedronGrid.load(grd_path).center().scale(scale_grid) \
             .divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
@@ -152,7 +152,7 @@ class DistanceMap(object):
 
         def dist_map_from_vertex_index_map(vertex_index_map):
             return [[distance[v_idx]
-                     if v_idx is not Grid3d.VERTEX_IDX_UNDEFINED
+                     if v_idx is not IcosahedronGrid.VERTEX_IDX_UNDEFINED
                      else DistanceMap.DIST_UNDEFINED
                      for v_idx in row]
                     for row in vertex_index_map]
