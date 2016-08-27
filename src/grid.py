@@ -4,7 +4,7 @@
 import os
 import numpy as np
 from collections import OrderedDict
-from src._obj3d import _Obj3d
+from src.obj3d import _Obj3d
 
 
 class Grid3d(_Obj3d):

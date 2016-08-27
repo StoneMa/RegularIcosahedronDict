@@ -4,7 +4,7 @@
 import struct
 import numpy as np
 from numpy import linalg
-from _obj3d import _Obj3d
+from obj3d import _Obj3d
 from grid import Grid3d, GridFace
 
 

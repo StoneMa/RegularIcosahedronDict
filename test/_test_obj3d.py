@@ -3,7 +3,7 @@
 
 import unittest
 import numpy as np
-from src._obj3d import _Obj3d
+from src.obj3d import _Obj3d
 
 
 class _TestObj3d(unittest.TestCase):
