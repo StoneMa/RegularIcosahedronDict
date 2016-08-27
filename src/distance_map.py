@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import struct
 import numpy as np
 from numpy import linalg
 from _obj3d import _Obj3d
@@ -164,14 +165,49 @@ class DistanceMap(object):
 
         return horizon_dist_map, to_lower_right_dist_map, to_upper_right_dist_map
 
+    @staticmethod
+    def save_map_as_dstm(horizon_distance_map, lower_distance_map,
+                         upper_distance_map, dstm_file_path, data_format='f'):
+        """
+
+        距離マップを.dstmファイル形式で保存する
+
+        """
+
+        maps = (("HORIZON", horizon_distance_map),
+                ("LOWER", lower_distance_map),
+                ("UPPER", upper_distance_map))
+
+        lines = []
+
+        with open(dstm_file_path, mode='wb') as f:
+
+            lines.append("#DSTM\n")
+
+            for name, distance_map in maps:
+                lines.append("#N_COLUMN {}\n".format(name))
+                for row in distance_map:
+                    lines.append(str(len(row)) + "\n")
+
+            lines.append("#DATA(DATA_FORMAT:{})\n".format(data_format))
+            f.writelines(lines)
+
+            for _, distance_map in maps:
+                for row in distance_map:
+                    for elem in row:
+                        f.write(struct.pack(data_format, elem))
+
 
 if __name__ == '__main__':
     map = DistanceMap(obj3d_path="../res/stanford_bunny.obj",
                       grd_path="../res/new_regular_ico.grd",
-                      n_div=3,
+                      n_div=2,
                       scale_grid=2)
 
     horizon_dist_map, to_lower_right_dist_map, to_upper_right_dist_map = map.distance_map()
-    print horizon_dist_map
-    print to_lower_right_dist_map
-    print to_upper_right_dist_map
+
+    for h_row in horizon_dist_map:
+        row = "["
+        for h in h_row:
+            row += "%4f " % h
+        print row + "]"

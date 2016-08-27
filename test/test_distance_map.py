@@ -10,9 +10,11 @@ class TestShapeMap(unittest.TestCase):
     def setUp(self):
         self.obj3d_path = "../res/stanford_bunny.obj"
         self.grid_path = "../res/new_regular_ico.grd"
+
+        self.dstm_path = "../res/saved_distance_map.dstm"
+
         self.n_div = 1
         self.scale_grid = 2
-        pass
 
     def tearDown(self):
         pass
@@ -55,6 +57,17 @@ class TestShapeMap(unittest.TestCase):
         assert_penetration([1., 1., 1.], [0.5, 0.5, 1.])
         assert_penetration([0., 1., 0.], [0., 0.5, 0.5])
         assert_penetration([1., 0., 0.], [0.5, 0, 0.5])
+
+    def test_save_map_as_dstm(self):
+        map = DistanceMap(obj3d_path=self.obj3d_path,
+                          grd_path=self.grid_path,
+                          n_div=self.n_div,
+                          scale_grid=self.scale_grid)
+
+        horizon_dist_map, lower_dist_map, upper_dist_map = map.distance_map()
+        print horizon_dist_map
+        DistanceMap.save_map_as_dstm(horizon_dist_map, lower_dist_map,
+                                     upper_dist_map, self.dstm_path)
 
 
 if __name__ == '__main__':
