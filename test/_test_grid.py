@@ -3,7 +3,7 @@
 
 import unittest
 import numpy as np
-from src._grid import Grid3d, GridFace
+from src.grid import Grid3d, GridFace
 
 
 class TestGrid3d(unittest.TestCase):
