@@ -99,6 +99,5 @@ class _TestObj3d(unittest.TestCase):
         obj3d_obj = _Obj3d.load(self.save_path_obj)
 
 
-
 if __name__ == '__main__':
     unittest.main()

@@ -22,9 +22,10 @@ class TestGrid3d(unittest.TestCase):
 
     def test_init(self):
         # list
-        Grid3d(self.vertices, self.grid_faces, n_div=1,traversed_order=None)
+        Grid3d(self.vertices, self.grid_faces, n_div=1, traversed_order=None)
         # numpy
-        Grid3d(np.array(self.vertices), np.array(self.grid_faces), n_div=1,traversed_order=None)
+        Grid3d(np.array(self.vertices), np.array(self.grid_faces), n_div=1,
+               traversed_order=None)
 
     def test_load(self):
         grid3d = Grid3d.load(self.grid_path)
@@ -68,6 +69,7 @@ class TestGrid3d(unittest.TestCase):
         grid3d = Grid3d.load(self.grid_path)
         if self.is_print_enabled:
             print grid3d.traverse()
+
 
 if __name__ == '__main__':
     unittest.main()
