@@ -174,31 +174,84 @@ class IcosahedronGrid(_Obj3d):
                 for grid_face in self.grid_faces}
 
     def center(self):
+        """
+
+        頂点群の重心が座標軸の原点となるように、全ての頂点座標を平行移動する
+
+        :rtype: IcosahedronGrid
+        :return: 平行移動後のIcosahedronGridオブジェクト
+
+        """
         obj3d = super(IcosahedronGrid, self).center()
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
                                self.n_div)
 
     def normal(self):
+        """
+
+        重心から頂点までの距離が最大1となるように、全ての頂点座標を正規化する
+
+        :rtype: IcosahedronGrid
+        :return: 正規化後のIcosahedronGridオブジェクト
+
+        """
         obj3d = super(IcosahedronGrid, self).normal()
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
                                self.n_div)
 
     def scale(self, r):
+        """
+
+        頂点群の重心から各頂点までの距離をr倍する
+
+        :type r: float
+        :param r: 距離倍率
+
+        :rtype: IcosahedronGrid
+        :return: スケーリングしたIcosahedronGridオブジェクト
+
+        """
         obj3d = super(IcosahedronGrid, self).scale(r)
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
                                self.n_div)
 
     def rotate(self, theta, axis_vector):
+        """
+
+        頂点群をaxis_vectorを軸として角度thetaだけ回転する
+
+        :type theta: float
+        :param theta: 回転角
+
+        :type axis_vector: np.ndarray
+        :param axis_vector: 軸ベクトル
+
+        :rtype: IcosahedronGrid
+        :return: 回転後IcosahedronGridオブジェクト
+        """
         obj3d = super(IcosahedronGrid, self).rotate(theta, axis_vector)
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
                                self.n_div)
 
     def grid_faces_as_copy(self):
+        """
+        IcosahedronGridオブジェクトの保持するIcosahedronFaceリストをコピーして返す
+
+        :rtype: list(IcosahedronFace)
+        :return: IcosahedronFaceのリストのコピー
+
+        """
         return [IcosahedronFace(gf.face_id,
                                 vertices_idx_dict=gf.vertices_idx_as_copy(),
                                 n_div=gf.n_div) for gf in self.grid_faces]
 
     def __str__(self):
+        """
+
+        :rtype: str
+        :return: str化した時のIcosahedronGridの文字列
+
+        """
         s = super(IcosahedronGrid, self).__str__() + "(n_div={}) : \n".format(
             self.n_div)
         for grid_face in self.grid_faces:
@@ -216,6 +269,20 @@ class IcosahedronFace(object):
     DIRECTION = enum.Enum('DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
 
     def __init__(self, face_id, vertices_idx_dict=None, n_div=1):
+
+        """
+
+        :type face_id: int
+        :param face_id: IcosahedronFaceを一意識別するためのID
+
+        :type vertices_idx_dict: dict
+        :param vertices_idx_dict: 頂点座標(alpha, beta)と頂点インデックスのペア
+
+        :type n_div: int
+        :param n_div: 面の分割数
+
+        """
+
         self.face_id = face_id
 
         if vertices_idx_dict is None:
@@ -225,24 +292,96 @@ class IcosahedronFace(object):
         self.n_div = n_div
 
     def set_vertex_idx(self, idx, alpha, beta):
+        """
+
+        頂点インデックスを登録する
+
+        :type idx: int
+        :param idx: 登録する頂点のインデックス
+
+        :type alpha: int
+        :param alpha: alpha座標
+
+        :type beta: int
+        :param beta: beta座標
+
+        """
+
         self.vertices_idx_dict[(alpha, beta)] = idx
 
     def get_vertex_idx(self, alpha, beta):
+        """
+
+        座標から頂点インデックスを取得する
+
+        :type alpha: int
+        :param alpha: alpha座標
+
+        :type beta: int
+        :param beta: beta座標
+
+        :rtype: int
+        :return: 頂点インデックス
+
+        """
         return self.vertices_idx_dict[(alpha, beta)]
 
     def top_vertex_idx(self):
+        """
+
+        面中のalpha=0,beta=0にある頂点インデックスを取得する
+
+        :rtype: int
+        :return: 頂点インデックス
+
+        """
         return self.get_vertex_idx(0, 0)
 
     def left_vertex_idx(self):
+        """
+
+        面中のalpha=1,beta=0にある頂点インデックスを取得する
+
+        :rtype: int
+        :return: 頂点インデックス
+
+        """
         return self.get_vertex_idx(1, 0)
 
     def right_vertex_idx(self):
+        """
+
+        面中のalpha=0,beta=1にある頂点インデックスを取得する
+
+        :rtype: int
+        :return: 頂点インデックス
+
+        """
         return self.get_vertex_idx(0, 1)
 
     def get_coordinates(self, vertex_idx):
+        """
+
+        頂点インデックスから座標を取得する
+
+        :type vertex_idx: int
+        :param vertex_idx: 頂点インデックス
+
+        :rtype: tuple(int, int)
+        :return: 面中における頂点座標
+
+        """
         return [k for k, v in self.vertices_idx_dict.items() if v == vertex_idx]
 
     def vertices_idx_as_copy(self):
+        """
+
+        IcosahedronFaceの持つvertices_idx_dictをコピーして返す
+
+        :rtype: dict
+        :return: 頂点座標(alpha, beta)と頂点インデックスのペア
+
+        """
         return dict(self.vertices_idx_dict)
 
     def traverse(self, direction):
@@ -268,21 +407,60 @@ class IcosahedronFace(object):
                 for row in xrange(self.n_div)]
 
     def __horizon_coordinates(self, row):
+        """
+
+        ある行で面上の頂点を水平にトラバースするときの順序に従った座標配列を返す
+
+        :type row: int
+        :param row: 現在注目している行
+
+        :rtype: list(list(int), list(int))
+        :return: alpha, betaの座標配列
+
+        """
         alpha = xrange(row, -1, -1)
         beta = xrange(row + 1)
         return alpha, beta
 
     def __upper_right_coordinates(self, row):
+        """
+
+        ある行で面上の頂点を右上にトラバースするときの順序に従った座標配列を返す
+
+        :type row: int
+        :param row: 現在注目している行
+
+        :rtype: list(list(int), list(int))
+        :return: alpha, betaの座標配列
+
+        """
         alpha = [self.n_div - row for i in xrange(row + 1)]
         beta = xrange(row, -1, -1)
         return alpha, beta
 
     def __upper_left_coordinates(self, row):
+        """
+
+        ある行で面上の頂点を左上にトラバースするときの順序に従った座標配列を返す
+
+        :type row: int
+        :param row: 現在注目している行
+
+        :rtype: list(list(int), list(int))
+        :return: alpha, betaの座標配列
+
+        """
         alpha = xrange(row + 1)
         beta = [self.n_div - row for i in xrange(row + 1)]
         return alpha, beta
 
     def __str__(self):
+        """
+
+        :rtype: str
+        :return: str化した時のIcosahedronFaceの文字列
+
+        """
         s = "[face ID : {}]\n".format(self.face_id) + \
             "left face : {}\nright face : {}\nbottom face : {}\n".format(
                 self.left_face.face_id, self.right_face.face_id,

@@ -76,6 +76,17 @@ class _Obj3d(object):
 
     @staticmethod
     def __as_immutable_array(array):
+        """
+
+        引数の配列からImmutableなnumpy配列を生成して返す
+
+        :type array: list or tuple or np.ndarray
+        :param array: 入力配列
+
+        :rtype: np.ndarray
+        :return: Immutableなnumpy配列
+
+        """
         if array is None:
             return None
 
@@ -89,6 +100,9 @@ class _Obj3d(object):
 
         頂点座標リストのコピーを返す
 
+        :rtype: np.ndarray
+        :return: 頂点座標リストのコピー
+
         """
 
         if self.vertices is None:
@@ -100,6 +114,9 @@ class _Obj3d(object):
         """
 
         法線ベクトルを定義する頂点座標リストのコピーを返す
+
+        :rtype: np.ndarray
+        :return: 法線ベクトルを定義する頂点座標リストのコピー
 
         """
 
@@ -113,6 +130,9 @@ class _Obj3d(object):
 
         面を定義する頂点座標リストのコピーを返す
 
+        :rtype: np.ndarray
+        :return: 面を定義する頂点座標リストのコピー
+
         """
 
         if self.face_vertices is None:
@@ -125,6 +145,9 @@ class _Obj3d(object):
 
         頂点群の重心が座標軸の原点となるように、全ての頂点座標を平行移動
 
+        :rtype: np.ndarray
+        :return: 座標を平行移動した_Obj3dオブジェクトのコピー
+
         """
 
         center_vertices = np.mean(self.vertices, axis=0)
@@ -136,6 +159,9 @@ class _Obj3d(object):
         """
 
         重心から頂点までの距離が最大1となるように、全ての頂点座標を正規化する
+
+        :rtype: np.ndarray
+        :return: 座標を正規化した_Obj3dオブジェクトのコピー
 
         """
 
@@ -159,6 +185,9 @@ class _Obj3d(object):
         :type r: float
         :param r: 距離倍率
 
+        :rtype: np.ndarray
+        :return: 座標を拡大縮小した_Obj3dオブジェクトのコピー
+
         """
 
         center_vertices = np.mean(self.vertices, axis=0)
@@ -180,7 +209,8 @@ class _Obj3d(object):
         :type axis_vector: np.ndarray
         :param axis_vector: 軸ベクトル
 
-        :return:
+        :rtype: _Obj3d
+        :return: 回転後_Obj3dオブジェクトのコピー
         """
 
         assert isinstance(theta, float)
@@ -221,6 +251,9 @@ class _Obj3d(object):
         :type file_path: str
         :param file_path: ファイルパス
 
+        :rtype: _Obj3d
+        :return: ファイル読み込みによって生成されたObj3dオブジェクト
+
         """
         ext = os.path.splitext(file_path)[1]
 
@@ -242,6 +275,9 @@ class _Obj3d(object):
 
         :type off_file_path: str
         :param off_file_path: .offファイル名
+
+        :rtype: _Obj3d
+        :return: .offファイル読み込みによって生成されたObj3dオブジェクト
 
         """
 
@@ -276,6 +312,9 @@ class _Obj3d(object):
 
         :type obj_file_path : str
         :param obj_file_path: ファイルパス
+
+        :rtype: _Obj3d
+        :return: .objファイル読み込みによって生成されたObj3dオブジェクト
 
         """
 

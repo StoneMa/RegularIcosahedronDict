@@ -20,6 +20,21 @@ class ShapeMap(object):
                    'int': 'i'}
 
     def __init__(self, face_ids, shape_maps, n_div, traverse_direction):
+        """
+
+        :type face_ids: list(int)
+        :param face_ids: FaceIDのリスト
+
+        :type shape_maps: list(np.ndarray)
+        :param shape_maps: 形状マップのリスト
+
+        :type n_div: int
+        :param n_div: 分割数
+
+        :type traverse_direction: IcosahedronGrid.DIRECTION
+        :param traverse_direction: 面を走査する方向
+
+        """
 
         assert len(face_ids) == len(shape_maps)
 
@@ -89,6 +104,22 @@ class ShapeMapCreator(object):
     DIST_UNDEFINED = -1
 
     def __init__(self, obj3d_path, grd_path, n_div, scale_grid):
+
+        """
+
+        :type obj3d_path: str
+        :param obj3d_path: 読み込み３Dオブジェクトのパス
+
+        :type grd_path: str
+        :param grd_path: 読み込むグリッドのパス
+
+        :type n_div: int
+        :param n_div: グリッドの分割数
+
+        :type scale_grid: float
+        :param scale_grid: グリッドのスケール率
+
+        """
 
         # 3Dモデル
         # モデルを座標系の中心に置き、正規化する
