@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
 import struct
 import numpy as np
 from numpy import linalg
@@ -42,44 +43,58 @@ class ShapeMap(object):
         self.n_div = n_div
         self.traverse_direction = traverse_direction
 
-    def save(self, shp_path, type_name='float'):
+    def save(self, shp_file_root, label, type_name='float'):
         """
 
-        距離マップを.shpファイル形式で保存する
+        形状マップを.shpファイル形式で保存する
 
-        :type shp_path: str
-        :param shp_path: .shpファイルパス
+        :type shp_file_path: str
+        :param shp_file_path: .shpファイルパス
+
+        :type label: str
+        :param label: 形状マップの所属するクラスラベル
 
         :type type_name: str
         :param type_name: データ部の型
 
         """
 
+        # 指定したクラスラベル・方向専用のディレクトリを作る
+        sub_root = os.path.join(shp_file_root, label,
+                                self.traverse_direction.name)
+        if not os.path.exists(sub_root):
+            os.makedirs(sub_root)
+
         # データ値をバイナリ保存する時のフォーマット
         data_format = ShapeMap.DATA_FORMAT[type_name]
 
-        lines = []
+        for face_id, shape_map in self.shape_map_dict.items():
 
-        with open(shp_path, mode='wb') as f:
+            path = os.path.join(sub_root, "{}.shp".format(face_id))
 
-            # .shpファイルであることを示す接頭辞
-            lines.append("#SHP\n")
-            # 面数
-            lines.append("#N_FACE {}\n".format(len(self.shape_map_dict)))
-            # 分割数
-            lines.append("#N_DIV {}\n".format(self.n_div))
-            # マップ型
-            lines.append("#TYPE {}\n".format(type_name))
+            lines = []
 
-            lines.append("#DATA\n")
+            with open(path, mode='wb') as f:
 
-            f.writelines(lines)
+                # .shpファイルであることを示す接頭辞
+                lines.append("#SHP\n")
+                # 走査方向
+                lines.append(
+                    "#DIRECTION {}".format(self.traverse_direction.name))
+                # 分割数
+                lines.append("#N_DIV {}\n".format(self.n_div))
+                # マップ型
+                lines.append("#TYPE {}\n".format(type_name))
 
-            # データ部の書き込み
-            for shape_map in self.shape_map_dict.values():
-                for row in shape_map:
-                    for elem in row:
-                        f.write(struct.pack(data_format, elem))
+                lines.append("#DATA\n")
+
+                f.writelines(lines)
+
+                # データ部の書き込み
+                for shape_map in self.shape_map_dict.values():
+                    for row in shape_map:
+                        for elem in row:
+                            f.write(struct.pack(data_format, elem))
 
     def __str__(self):
         s = super(ShapeMap, self).__str__() + " ( Direction : {} )\n".format(
@@ -235,6 +250,3 @@ class ShapeMapCreator(object):
 
         return ShapeMap(traversed_indices_dict.keys(), shape_maps,
                         self.grid.n_div, direction)
-
-
-
