@@ -465,9 +465,6 @@ class IcosahedronFace(object):
 
         """
         s = "[face ID : {}]\n".format(self.face_id) + \
-            "left face : {}\nright face : {}\nbottom face : {}\n".format(
-                self.left_face.face_id, self.right_face.face_id,
-                self.bottom_face.face_id) + \
             "vertex indices : (alpha, beta) -> [idx]\n"
         for key, idx in self.vertices_idx_dict.items():
             alpha, beta = key
