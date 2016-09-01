@@ -5,7 +5,7 @@ import struct
 import numpy as np
 from numpy import linalg
 from obj3d import Obj3d
-from icosahedron import IcosahedronGrid, IcosahedronFace
+from icosahedron import IcosahedronGrid
 
 
 class ShapeMap(object):
