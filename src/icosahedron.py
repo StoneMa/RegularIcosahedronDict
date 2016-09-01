@@ -349,7 +349,7 @@ class IcosahedronFace(object):
         :return: 頂点インデックス
 
         """
-        return self.get_vertex_idx(1, 0)
+        return self.get_vertex_idx(self.n_div, 0)
 
     def right_vertex_idx(self):
         """
@@ -360,7 +360,7 @@ class IcosahedronFace(object):
         :return: 頂点インデックス
 
         """
-        return self.get_vertex_idx(0, 1)
+        return self.get_vertex_idx(0, self.n_div)
 
     def get_coordinates(self, vertex_idx):
         """
