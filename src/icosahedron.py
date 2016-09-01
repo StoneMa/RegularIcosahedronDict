@@ -407,7 +407,7 @@ class IcosahedronFace(object):
 
         return [[self.get_vertex_idx(alpha, beta)
                  for alpha, beta in zip(*coordinates(row))]
-                for row in xrange(self.n_div)]
+                for row in xrange(self.n_div + 1)]
 
     def __horizon_coordinates(self, row):
         """
