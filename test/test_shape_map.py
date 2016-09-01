@@ -12,9 +12,11 @@ class TestShapeMap(unittest.TestCase):
         self.obj3d_path = "../res/stanford_bunny.obj"
         self.grid_path = "../res/new_regular_ico.grd"
 
-        self.shp_path = "../res/saved_shape_map_horizon.shp"
+        self.shp_file_root = "../res/shape_map"
 
+        self.cls = 0
         self.n_div = 3
+        self.is_train = True
         self.scale_grid = 2
 
     def tearDown(self):
@@ -31,7 +33,9 @@ class TestShapeMap(unittest.TestCase):
 
         map = ShapeMapCreator(obj3d_path=self.obj3d_path,
                               grd_path=self.grid_path,
-                              n_div=self.n_div, scale_grid=self.scale_grid)
+                              cls=self.cls,
+                              n_div=self.n_div,
+                              scale_grid=self.scale_grid)
 
         v0 = np.array([0., 0., 0.])
         v1 = np.array([1., 0., 1.])
@@ -63,12 +67,21 @@ class TestShapeMap(unittest.TestCase):
     def test_save_map_as_dstm(self):
         creator = ShapeMapCreator(obj3d_path=self.obj3d_path,
                                   grd_path=self.grid_path,
+                                  cls=self.cls,
                                   n_div=self.n_div,
                                   scale_grid=self.scale_grid)
 
         horizon_map = creator.create(
             direction=IcosahedronFace.DIRECTION.HORIZON)
-        horizon_map.save(self.shp_path)
+        horizon_map.save(self.shp_file_root, '0')
+
+        upper_left_map = creator.create(
+            direction=IcosahedronFace.DIRECTION.UPPER_LEFT)
+        upper_left_map.save(self.shp_file_root, '0')
+
+        upper_right_map = creator.create(
+            direction=IcosahedronFace.DIRECTION.UPPER_RIGHT)
+        upper_right_map.save(self.shp_file_root, '0')
 
 
 if __name__ == '__main__':

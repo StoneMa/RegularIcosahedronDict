@@ -20,7 +20,7 @@ class ShapeMap(object):
                    'double': 'd',
                    'int': 'i'}
 
-    def __init__(self, face_ids, shape_maps, n_div, traverse_direction):
+    def __init__(self, face_ids, shape_maps, cls, n_div, traverse_direction):
         """
 
         :type face_ids: list(int)
@@ -28,6 +28,9 @@ class ShapeMap(object):
 
         :type shape_maps: list(np.ndarray)
         :param shape_maps: 形状マップのリスト
+
+        :type cls: int
+        :param cls: クラスラベル
 
         :type n_div: int
         :param n_div: 分割数
@@ -40,6 +43,8 @@ class ShapeMap(object):
         assert len(face_ids) == len(shape_maps)
 
         self.shape_map_dict = dict(zip(face_ids, shape_maps))
+
+        self.cls = cls
         self.n_div = n_div
         self.traverse_direction = traverse_direction
 
@@ -48,8 +53,8 @@ class ShapeMap(object):
 
         形状マップを.shpファイル形式で保存する
 
-        :type shp_file_path: str
-        :param shp_file_path: .shpファイルパス
+        :type shp_file_root: str
+        :param shp_file_root: .shpファイルパス
 
         :type label: str
         :param label: 形状マップの所属するクラスラベル
@@ -78,13 +83,15 @@ class ShapeMap(object):
 
                 # .shpファイルであることを示す接頭辞
                 lines.append("#SHP\n")
+                # クラス情報
+                lines.append("#CLASS\n{}\n".format(self.cls))
                 # 走査方向
                 lines.append(
-                    "#DIRECTION {}".format(self.traverse_direction.name))
+                    "#DIRECTION\n{}\n".format(self.traverse_direction.name))
                 # 分割数
-                lines.append("#N_DIV {}\n".format(self.n_div))
+                lines.append("#N_DIV\n{}\n".format(self.n_div))
                 # マップ型
-                lines.append("#TYPE {}\n".format(type_name))
+                lines.append("#TYPE\n{}\n".format(type_name))
 
                 lines.append("#DATA\n")
 
@@ -118,7 +125,7 @@ class ShapeMapCreator(object):
 
     DIST_UNDEFINED = -1
 
-    def __init__(self, obj3d_path, grd_path, n_div, scale_grid):
+    def __init__(self, obj3d_path, grd_path, cls, n_div, scale_grid):
 
         """
 
@@ -127,6 +134,9 @@ class ShapeMapCreator(object):
 
         :type grd_path: str
         :param grd_path: 読み込むグリッドのパス
+
+        :type cls: int
+        :param cls: クラスラベル
 
         :type n_div: int
         :param n_div: グリッドの分割数
@@ -150,6 +160,8 @@ class ShapeMapCreator(object):
         if np.linalg.norm(self.grid.vertices, axis=1).min() < np.linalg.norm(
                 self.obj3d.vertices, axis=1).max():
             raise NotImplementedError()
+
+        self.cls = cls
 
     def tomas_moller(self, origin, end, v0, v1, v2):
         """
@@ -248,5 +260,5 @@ class ShapeMapCreator(object):
                        for row in indices_map]
                       for indices_map in traversed_indices_dict.values()]
 
-        return ShapeMap(traversed_indices_dict.keys(), shape_maps,
+        return ShapeMap(traversed_indices_dict.keys(), shape_maps, self.cls,
                         self.grid.n_div, direction)
