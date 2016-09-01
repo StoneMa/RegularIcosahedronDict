@@ -5,10 +5,10 @@ import os
 import numpy as np
 import enum
 from collections import OrderedDict
-from obj3d import _Obj3d
+from obj3d import Obj3d
 
 
-class IcosahedronGrid(_Obj3d):
+class IcosahedronGrid(Obj3d):
     """
     距離マップ生成用グリッドクラス
     face情報・normal情報は失われる

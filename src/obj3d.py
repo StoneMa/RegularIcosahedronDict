@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 
-class _Obj3d(object):
+class Obj3d(object):
     """
 
     ３次元空間上のモデル情報を保持するクラス
@@ -32,9 +32,9 @@ class _Obj3d(object):
         self.__check_array(face_vertices, is_nullable=True)
 
         # Immutableなnumpy配列として保持
-        self.vertices = _Obj3d.__as_immutable_array(vertices)
-        self.normal_vertices = _Obj3d.__as_immutable_array(normal_vertices)
-        self.face_vertices = _Obj3d.__as_immutable_array(face_vertices)
+        self.vertices = Obj3d.__as_immutable_array(vertices)
+        self.normal_vertices = Obj3d.__as_immutable_array(normal_vertices)
+        self.face_vertices = Obj3d.__as_immutable_array(face_vertices)
 
     @staticmethod
     def __check_array(list_mem, is_nullable=False):
@@ -146,14 +146,14 @@ class _Obj3d(object):
         頂点群の重心が座標軸の原点となるように、全ての頂点座標を平行移動
 
         :rtype: np.ndarray
-        :return: 座標を平行移動した_Obj3dオブジェクトのコピー
+        :return: 座標を平行移動したObj3dオブジェクトのコピー
 
         """
 
         center_vertices = np.mean(self.vertices, axis=0)
-        return _Obj3d(self.vertices - center_vertices,
-                      self.normals_as_copy(),
-                      self.faces_as_copy())
+        return Obj3d(self.vertices - center_vertices,
+                     self.normals_as_copy(),
+                     self.faces_as_copy())
 
     def normal(self):
         """
@@ -161,7 +161,7 @@ class _Obj3d(object):
         重心から頂点までの距離が最大1となるように、全ての頂点座標を正規化する
 
         :rtype: np.ndarray
-        :return: 座標を正規化した_Obj3dオブジェクトのコピー
+        :return: 座標を正規化したObj3dオブジェクトのコピー
 
         """
 
@@ -173,9 +173,9 @@ class _Obj3d(object):
 
         normalized_vertices = centered_obj3d.vertices / max_norm
 
-        return _Obj3d(normalized_vertices + center_vertices,
-                      self.normals_as_copy(),
-                      self.faces_as_copy())
+        return Obj3d(normalized_vertices + center_vertices,
+                     self.normals_as_copy(),
+                     self.faces_as_copy())
 
     def scale(self, r):
         """
@@ -186,7 +186,7 @@ class _Obj3d(object):
         :param r: 距離倍率
 
         :rtype: np.ndarray
-        :return: 座標を拡大縮小した_Obj3dオブジェクトのコピー
+        :return: 座標を拡大縮小したObj3dオブジェクトのコピー
 
         """
 
@@ -194,9 +194,9 @@ class _Obj3d(object):
 
         centered_obj3d = self.center()
 
-        return _Obj3d(centered_obj3d.vertices_as_copy() * r + center_vertices,
-                      self.normals_as_copy(),
-                      self.faces_as_copy())
+        return Obj3d(centered_obj3d.vertices_as_copy() * r + center_vertices,
+                     self.normals_as_copy(),
+                     self.faces_as_copy())
 
     def rotate(self, theta, axis_vector):
         """
@@ -209,8 +209,8 @@ class _Obj3d(object):
         :type axis_vector: np.ndarray
         :param axis_vector: 軸ベクトル
 
-        :rtype: _Obj3d
-        :return: 回転後_Obj3dオブジェクトのコピー
+        :rtype: Obj3d
+        :return: 回転後のObj3dオブジェクトのコピー
         """
 
         assert isinstance(theta, float)
@@ -239,8 +239,8 @@ class _Obj3d(object):
 
         centered_vertices = self.vertices - center
 
-        return _Obj3d(np.dot(centered_vertices, r_mtr.T) + center,
-                      self.normals_as_copy(), self.faces_as_copy())
+        return Obj3d(np.dot(centered_vertices, r_mtr.T) + center,
+                     self.normals_as_copy(), self.faces_as_copy())
 
     @staticmethod
     def load(file_path):
@@ -251,16 +251,16 @@ class _Obj3d(object):
         :type file_path: str
         :param file_path: ファイルパス
 
-        :rtype: _Obj3d
+        :rtype: Obj3d
         :return: ファイル読み込みによって生成されたObj3dオブジェクト
 
         """
         ext = os.path.splitext(file_path)[1]
 
         if ext == ".obj":
-            obj3d = _Obj3d.__load_obj(file_path)
+            obj3d = Obj3d.__load_obj(file_path)
         elif ext == ".off":
-            obj3d = _Obj3d.__load_off(file_path)
+            obj3d = Obj3d.__load_off(file_path)
         else:
             raise IOError(
                 "Obj3d::__init__() : failed to load {}.".format(file_path))
@@ -276,7 +276,7 @@ class _Obj3d(object):
         :type off_file_path: str
         :param off_file_path: .offファイル名
 
-        :rtype: _Obj3d
+        :rtype: Obj3d
         :return: .offファイル読み込みによって生成されたObj3dオブジェクト
 
         """
@@ -302,7 +302,7 @@ class _Obj3d(object):
                 [map(int, lines[n_vertices + i][3:].rstrip().split(' '))
                  for i in xrange(n_faces)])
 
-        return _Obj3d(vertices, None, faces)
+        return Obj3d(vertices, None, faces)
 
     @staticmethod
     def __load_obj(obj_file_path):
@@ -313,7 +313,7 @@ class _Obj3d(object):
         :type obj_file_path : str
         :param obj_file_path: ファイルパス
 
-        :rtype: _Obj3d
+        :rtype: Obj3d
         :return: .objファイル読み込みによって生成されたObj3dオブジェクト
 
         """
@@ -332,7 +332,7 @@ class _Obj3d(object):
                 [list(map(lambda x: x - 1, map(int, line[1:]))) for line in
                  lines if line[0] == 'f'])
 
-        return _Obj3d(vertices, normals, faces)
+        return Obj3d(vertices, normals, faces)
 
     def save(self, file_path):
         """

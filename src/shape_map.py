@@ -4,7 +4,7 @@
 import struct
 import numpy as np
 from numpy import linalg
-from obj3d import _Obj3d
+from obj3d import Obj3d
 from icosahedron import IcosahedronGrid, IcosahedronFace
 
 
@@ -123,7 +123,7 @@ class ShapeMapCreator(object):
 
         # 3Dモデル
         # モデルを座標系の中心に置き、正規化する
-        self.obj3d = _Obj3d.load(obj3d_path).center().normal()
+        self.obj3d = Obj3d.load(obj3d_path).center().normal()
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
         self.grid = IcosahedronGrid.load(grd_path).center().scale(scale_grid) \

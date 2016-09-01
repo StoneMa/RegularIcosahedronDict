@@ -3,7 +3,7 @@
 
 import unittest
 import numpy as np
-from src.obj3d import _Obj3d
+from src.obj3d import Obj3d
 
 
 class _TestObj3d(unittest.TestCase):
@@ -23,16 +23,16 @@ class _TestObj3d(unittest.TestCase):
         pass
 
     def test_init(self):
-        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+        obj3d = Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
 
         vertices = np.array(self.vertices)
         normal_vertices = np.array(self.normal_vertices)
         face_vertices = np.array(self.face_vertices)
 
-        obj3d_npy = _Obj3d(vertices, normal_vertices, face_vertices)
+        obj3d_npy = Obj3d(vertices, normal_vertices, face_vertices)
 
     def test_arrays_as_copy(self):
-        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+        obj3d = Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
 
         self.assertNotEqual(id(self.vertices), id(obj3d.vertices))
         self.assertNotEqual(id(self.normal_vertices), id(obj3d.normal_vertices))
@@ -45,7 +45,7 @@ class _TestObj3d(unittest.TestCase):
                             id(obj3d.faces_as_copy()))
 
     def test_center(self):
-        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+        obj3d = Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
 
         centered_obj3d = obj3d.center()
 
@@ -59,7 +59,7 @@ class _TestObj3d(unittest.TestCase):
         self.assertAlmostEqual(cz, epsilon)
 
     def test_normal(self):
-        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+        obj3d = Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
 
         center_vertices = np.mean(obj3d.vertices, axis=0)
 
@@ -72,7 +72,7 @@ class _TestObj3d(unittest.TestCase):
                            axis=1).max(), 1., delta=epsilon)
 
     def test_scale(self):
-        obj3d = _Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
+        obj3d = Obj3d(self.vertices, self.normal_vertices, self.face_vertices)
 
         scaled_obj3d = obj3d.scale(self.scale)
 
@@ -88,15 +88,15 @@ class _TestObj3d(unittest.TestCase):
             (before_vertices * self.scale < after_vertices + epsilon).all())
 
     def test_load(self):
-        obj3d_off = _Obj3d.load(self.load_path_off)
-        obj3d_obj = _Obj3d.load(self.load_path_obj)
+        obj3d_off = Obj3d.load(self.load_path_off)
+        obj3d_obj = Obj3d.load(self.load_path_obj)
 
     def test_save(self):
-        _Obj3d.load(self.load_path_off).save(self.save_path_off)
-        _Obj3d.load(self.load_path_obj).save(self.save_path_obj)
+        Obj3d.load(self.load_path_off).save(self.save_path_off)
+        Obj3d.load(self.load_path_obj).save(self.save_path_obj)
 
-        obj3d_off = _Obj3d.load(self.save_path_off)
-        obj3d_obj = _Obj3d.load(self.save_path_obj)
+        obj3d_off = Obj3d.load(self.save_path_off)
+        obj3d_obj = Obj3d.load(self.save_path_obj)
 
 
 if __name__ == '__main__':
