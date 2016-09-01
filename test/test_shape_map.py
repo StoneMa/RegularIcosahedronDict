@@ -14,7 +14,7 @@ class TestShapeMap(unittest.TestCase):
 
         self.shp_path = "../res/saved_shape_map_horizon.shp"
 
-        self.n_div = 1
+        self.n_div = 3
         self.scale_grid = 2
 
     def tearDown(self):
