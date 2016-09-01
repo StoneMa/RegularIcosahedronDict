@@ -237,12 +237,4 @@ class ShapeMapCreator(object):
                         self.grid.n_div, direction)
 
 
-if __name__ == '__main__':
-    map = ShapeMapCreator(obj3d_path="../res/stanford_bunny.obj",
-                          grd_path="../res/new_regular_ico.grd",
-                          n_div=3,
-                          scale_grid=2)
 
-    shape_map = map.create(direction=IcosahedronFace.DIRECTION.HORIZON)
-    print shape_map
-    shape_map.save("test.shp")
