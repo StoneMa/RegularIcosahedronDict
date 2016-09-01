@@ -307,6 +307,9 @@ class IcosahedronFace(object):
 
         """
 
+        assert isinstance(alpha, int)
+        assert isinstance(beta, int)
+
         self.vertices_idx_dict[(alpha, beta)] = idx
 
     def get_vertex_idx(self, alpha, beta):
