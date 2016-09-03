@@ -85,6 +85,8 @@ class ShapeMap(object):
                 lines.append("#SHP\n")
                 # クラス情報
                 lines.append("#CLASS\n{}\n".format(self.cls))
+                # FaceID
+                lines.append("#FACE_ID\n{}\n".format(face_id))
                 # 走査方向
                 lines.append(
                     "#DIRECTION\n{}\n".format(self.traverse_direction.name))
