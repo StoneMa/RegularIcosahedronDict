@@ -93,3 +93,6 @@ ENV/
 
 # .DS_Store
 .DS_Store
+
+# shrec
+res/shrec
