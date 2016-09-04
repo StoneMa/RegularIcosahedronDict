@@ -72,15 +72,15 @@ class TestShapeMap(unittest.TestCase):
                                   scale_grid=self.scale_grid)
 
         horizon_map = creator.create(
-            direction=IcosahedronFace.DIRECTION.HORIZON)
+            directions=(IcosahedronFace.DIRECTION.HORIZON,))
         horizon_map.save(self.shp_file_root, '0')
 
         upper_left_map = creator.create(
-            direction=IcosahedronFace.DIRECTION.UPPER_LEFT)
+            directions=(IcosahedronFace.DIRECTION.UPPER_LEFT,))
         upper_left_map.save(self.shp_file_root, '0')
 
         upper_right_map = creator.create(
-            direction=IcosahedronFace.DIRECTION.UPPER_RIGHT)
+            directions=(IcosahedronFace.DIRECTION.UPPER_RIGHT,))
         upper_right_map.save(self.shp_file_root, '0')
 
 

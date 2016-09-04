@@ -219,13 +219,13 @@ class ShapeMapCreator(object):
 
         return None
 
-    def create(self, direction):
+    def create(self, directions):
         """
 
         ShapeMapオブジェクトを生成する
 
-        :type direction: IcosahedronGrid.DIRECTION
-        :param direction: IcosahedronGridの頂点走査方向
+        :type directions: IcosahedronGrid.DIRECTION
+        :param directions: IcosahedronGridの頂点走査方向（複数指定可能）
 
         :rtype: ShapeMap
         :return: ShapeMapオブジェクト
@@ -254,15 +254,19 @@ class ShapeMapCreator(object):
                 distances[i] = ShapeMapCreator.DIST_UNDEFINED
 
         # FaceIDと頂点インデックスのマップの辞書を取得
-        traversed_indices_dict = self.grid.traverse(direction)
+        shape_maps = []
+        for direction in directions:
+            traversed_indices_dict = self.grid.traverse(direction)
 
-        # 形状マップ
-        shape_maps = [[[distances[idx]
-                        if idx != IcosahedronGrid.VERTEX_IDX_UNDEFINED
-                        else ShapeMapCreator.DIST_UNDEFINED
-                        for idx in row]
-                       for row in indices_map]
-                      for indices_map in traversed_indices_dict.values()]
+            distance_maps = [[[distances[idx]
+                               if idx != IcosahedronGrid.VERTEX_IDX_UNDEFINED
+                               else ShapeMapCreator.DIST_UNDEFINED
+                               for idx in row]
+                              for row in indices_map]
+                             for indices_map in traversed_indices_dict.values()]
 
-        return ShapeMap(traversed_indices_dict.keys(), shape_maps, self.cls,
-                        self.grid.n_div, direction)
+            shape_maps.append(ShapeMap(traversed_indices_dict.keys(),
+                                       distance_maps, self.cls, self.grid.n_div,
+                                       direction))
+        return shape_maps
+
