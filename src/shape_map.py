@@ -6,7 +6,7 @@ import struct
 import numpy as np
 from numpy import linalg
 from obj3d import Obj3d
-from icosahedron import IcosahedronGrid
+from icosahedron import IcosahedronGrid, IcosahedronFace
 
 
 class ShapeMap(object):
@@ -48,7 +48,7 @@ class ShapeMap(object):
         self.n_div = n_div
         self.traverse_direction = traverse_direction
 
-    def save(self, shp_file_root, label, type_name='float'):
+    def save(self, shp_file_root, data_id, type_name='float'):
         """
 
         形状マップを.shpファイル形式で保存する
@@ -56,8 +56,8 @@ class ShapeMap(object):
         :type shp_file_root: str
         :param shp_file_root: .shpファイルパス
 
-        :type label: str
-        :param label: 形状マップの所属するクラスラベル
+        :type data_id: str
+        :param data_id: 個々の形状データに付与されるID
 
         :type type_name: str
         :param type_name: データ部の型
@@ -65,7 +65,7 @@ class ShapeMap(object):
         """
 
         # 指定したクラスラベル・方向専用のディレクトリを作る
-        sub_root = os.path.join(shp_file_root, label,
+        sub_root = os.path.join(shp_file_root, data_id,
                                 self.traverse_direction.name)
         if not os.path.exists(sub_root):
             os.makedirs(sub_root)
@@ -83,6 +83,8 @@ class ShapeMap(object):
 
                 # .shpファイルであることを示す接頭辞
                 lines.append("#SHP\n")
+                # ID
+                lines.append("#ID\n{}\n".format(data_id))
                 # クラス情報
                 lines.append("#CLASS\n{}\n".format(self.cls))
                 # FaceID
