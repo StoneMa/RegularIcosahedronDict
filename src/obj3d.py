@@ -299,7 +299,7 @@ class Obj3d(object):
 
             # 面を構成する頂点のインデックス
             faces = np.array(
-                [map(int, lines[n_vertices + i][3:].rstrip().split(' '))
+                [map(int, lines[n_vertices + i].strip().split(' '))[1:]
                  for i in xrange(n_faces)])
 
         return Obj3d(vertices, None, faces)
