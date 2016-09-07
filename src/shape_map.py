@@ -7,7 +7,8 @@ import struct
 import numpy as np
 
 from obj3d import Obj3d
-from src.grid.icosahedron_grid import IcosahedronGrid ,TriangleFace
+from src.grid.icosahedron_grid import IcosahedronGrid, TriangleFace
+from src.util.debug_util import assert_type_in_container
 
 
 class ShapeMap(object):
@@ -24,19 +25,19 @@ class ShapeMap(object):
     def __init__(self, face_ids, shape_maps, cls, n_div, traverse_direction):
         """
 
-        :type face_ids: list(int)
+        :type face_ids: list(int or long)
         :param face_ids: FaceIDのリスト
 
-        :type shape_maps: list(np.ndarray)
+        :type shape_maps: list(list or np.ndarray)
         :param shape_maps: 形状マップのリスト
 
-        :type cls: int
+        :type cls: int or long
         :param cls: クラスラベル
 
-        :type n_div: int
+        :type n_div: int or long
         :param n_div: 分割数
 
-        :type traverse_direction: IcosahedronGrid.DIRECTION
+        :type traverse_direction: TriangleFace.DIRECTION
         :param traverse_direction: 面を走査する方向
 
         """
@@ -44,7 +45,6 @@ class ShapeMap(object):
         assert len(face_ids) == len(shape_maps)
 
         self.shape_map_dict = dict(zip(face_ids, shape_maps))
-
         self.cls = cls
         self.n_div = n_div
         self.traverse_direction = traverse_direction
@@ -140,10 +140,10 @@ class ShapeMapCreator(object):
         :type grd_path: str
         :param grd_path: 読み込むグリッドのパス
 
-        :type cls: int
+        :type cls: int or long
         :param cls: クラスラベル
 
-        :type n_div: int
+        :type n_div: int or long
         :param n_div: グリッドの分割数
 
         :type scale_grid: float
@@ -156,7 +156,7 @@ class ShapeMapCreator(object):
         self.obj3d = Obj3d.load(obj3d_path).center().normal()
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
-        self.grid = IcosahedronGrid.load(grd_path).center().scale(scale_grid)\
+        self.grid = IcosahedronGrid.load(grd_path).center().scale(scale_grid) \
             .divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
