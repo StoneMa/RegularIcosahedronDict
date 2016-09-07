@@ -40,6 +40,18 @@ class BaseGrid(Obj3d):
         self.base_faces = base_faces
         self.n_face = n_face
 
+    def __str__(self):
+        """
+
+        :rtype: str
+        :return: str化した時のIcosahedronGridの文字列
+
+        """
+        s = super(BaseGrid, self).__str__() + "\n"
+        for base_face in self.base_faces:
+            s += base_face.__str__() + "\n"
+        return s
+
 
 class BaseFace(object):
     """
@@ -83,5 +95,11 @@ class BaseFace(object):
         :return: str化した時のBaseFaceの文字列
 
         """
-        s = "face ID : {} (n_div = {})\n".format(self.face_id, self.n_div)
+        s = "face ID : {} (n_div = {})\n".format(self.face_id, self.n_div) + \
+            "vertex indices : ( coordinates ... ) -> [ idx ]\n"
+        for coordinates, idx in self.vidx_table.items():
+            s += "("
+            for coordinate in coordinates:
+                s += "{:^3},".format(coordinate)
+            s = s[:len(s)-2] + " ) -> {:^2}\n".format(idx)
         return s

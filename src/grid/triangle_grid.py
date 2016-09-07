@@ -215,16 +215,4 @@ class TriangleFace(BaseFace):
         beta = [self.n_div - row for i in xrange(row + 1)]
         return alpha, beta
 
-    def __str__(self):
-        """
 
-        :rtype: str
-        :return: str化した時のTriangleFaceの文字列
-
-        """
-        s = super(TriangleFace, self).__str__() + \
-            "vertex indices : (alpha, beta) -> [idx]\n"
-        for key, idx in self.vertices_idx_dict.items():
-            alpha, beta = key
-            s += "({0:^3},{1:^3}) -> {2:^2}\n".format(alpha, beta, idx)
-        return s

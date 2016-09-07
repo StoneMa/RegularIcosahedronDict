@@ -243,15 +243,4 @@ class IcosahedronGrid(TriangleGrid):
                              vidx_table=gf.vidx_table_as_copy()) for gf in
                 self.grid_faces]
 
-    def __str__(self):
-        """
 
-        :rtype: str
-        :return: str化した時のIcosahedronGridの文字列
-
-        """
-        s = super(IcosahedronGrid, self).__str__() + "(n_div={}) : \n".format(
-            self.n_div)
-        for grid_face in self.grid_faces:
-            s += grid_face.__str__() + "\n"
-        return s
