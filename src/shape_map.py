@@ -7,7 +7,7 @@ import struct
 import numpy as np
 
 from obj3d import Obj3d
-from src.grid.icosahedron_grid import IcosahedronGrid, IcosahedronFace
+from src.grid.icosahedron_grid import IcosahedronGrid ,TriangleFace
 
 
 class ShapeMap(object):
@@ -271,6 +271,6 @@ class ShapeMapCreator(object):
         return shape_maps
 
     def create_all_direction(self):
-        return self.create(directions=(IcosahedronFace.DIRECTION.HORIZON,
-                                       IcosahedronFace.DIRECTION.UPPER_RIGHT,
-                                       IcosahedronFace.DIRECTION.UPPER_LEFT))
+        return self.create(directions=(TriangleFace.DIRECTION.HORIZON,
+                                       TriangleFace.DIRECTION.UPPER_RIGHT,
+                                       TriangleFace.DIRECTION.UPPER_LEFT))

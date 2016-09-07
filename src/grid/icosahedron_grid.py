@@ -3,12 +3,10 @@
 
 import os
 import numpy as np
-import enum
-from collections import OrderedDict
-from src.obj3d import Obj3d
+from triangle_grid import TriangleGrid, TriangleFace
 
 
-class IcosahedronGrid(Obj3d):
+class IcosahedronGrid(TriangleGrid):
     """
     距離マップ生成用グリッドクラス
     face情報・normal情報は失われる
@@ -30,7 +28,7 @@ class IcosahedronGrid(Obj3d):
         :param n_div: Grid3dオブジェクトの各面の分割数
 
         """
-        super(IcosahedronGrid, self).__init__(vertices)
+        super(IcosahedronGrid, self).__init__(vertices,grid_faces, 20)
         self.grid_faces = tuple(grid_faces)
         self.n_div = n_div
 
@@ -73,9 +71,9 @@ class IcosahedronGrid(Obj3d):
 
         vertices = np.asarray(vertices)
 
-        grid_faces = [IcosahedronFace(face_id,
-                                      {(0, 0): fv[0], (1, 0): fv[1],
-                                       (0, 1): fv[2]})
+        grid_faces = [TriangleFace(face_id,
+                                   vidx_table={(0, 0): fv[0], (1, 0): fv[1],
+                                               (0, 1): fv[2]})
                       for face_id, fv in enumerate(face_vertices)]
 
         return IcosahedronGrid(vertices, grid_faces, 1)
@@ -111,7 +109,7 @@ class IcosahedronGrid(Obj3d):
             right_vector = right_vertex - top_vertex
 
             # 一旦GridFaceの頂点情報をクリア
-            new_face = IcosahedronFace(grid_face.face_id, n_div=n_div)
+            new_face = TriangleFace(grid_face.face_id, n_div=n_div)
 
             for sum_length in xrange(n_div + 1):
                 for i in xrange(sum_length + 1):
@@ -241,9 +239,9 @@ class IcosahedronGrid(Obj3d):
         :return: IcosahedronFaceのリストのコピー
 
         """
-        return [IcosahedronFace(gf.face_id,
-                                vertices_idx_dict=gf.vertices_idx_as_copy(),
-                                n_div=gf.n_div) for gf in self.grid_faces]
+        return [TriangleFace(gf.face_id, n_div=gf.n_div,
+                             vidx_table=gf.vidx_table_as_copy()) for gf in
+                self.grid_faces]
 
     def __str__(self):
         """
@@ -256,217 +254,4 @@ class IcosahedronGrid(Obj3d):
             self.n_div)
         for grid_face in self.grid_faces:
             s += grid_face.__str__() + "\n"
-        return s
-
-
-class IcosahedronFace(object):
-    """
-
-    正二十面体の単一面クラス
-
-    """
-
-    DIRECTION = enum.Enum('DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
-
-    def __init__(self, face_id, vertices_idx_dict=None, n_div=1):
-
-        """
-
-        :type face_id: int
-        :param face_id: IcosahedronFaceを一意識別するためのID
-
-        :type vertices_idx_dict: dict
-        :param vertices_idx_dict: 頂点座標(alpha, beta)と頂点インデックスのペア
-
-        :type n_div: int
-        :param n_div: 面の分割数
-
-        """
-
-        self.face_id = face_id
-
-        if vertices_idx_dict is None:
-            vertices_idx_dict = OrderedDict()
-        self.vertices_idx_dict = vertices_idx_dict
-
-        self.n_div = n_div
-
-    def set_vertex_idx(self, idx, alpha, beta):
-        """
-
-        頂点インデックスを登録する
-
-        :type idx: int
-        :param idx: 登録する頂点のインデックス
-
-        :type alpha: int
-        :param alpha: alpha座標
-
-        :type beta: int
-        :param beta: beta座標
-
-        """
-
-        assert isinstance(alpha, int)
-        assert isinstance(beta, int)
-
-        self.vertices_idx_dict[(alpha, beta)] = idx
-
-    def get_vertex_idx(self, alpha, beta):
-        """
-
-        座標から頂点インデックスを取得する
-
-        :type alpha: int
-        :param alpha: alpha座標
-
-        :type beta: int
-        :param beta: beta座標
-
-        :rtype: int
-        :return: 頂点インデックス
-
-        """
-        return self.vertices_idx_dict[(alpha, beta)]
-
-    def top_vertex_idx(self):
-        """
-
-        面中のalpha=0,beta=0にある頂点インデックスを取得する
-
-        :rtype: int
-        :return: 頂点インデックス
-
-        """
-        return self.get_vertex_idx(0, 0)
-
-    def left_vertex_idx(self):
-        """
-
-        面中のalpha=1,beta=0にある頂点インデックスを取得する
-
-        :rtype: int
-        :return: 頂点インデックス
-
-        """
-        return self.get_vertex_idx(self.n_div, 0)
-
-    def right_vertex_idx(self):
-        """
-
-        面中のalpha=0,beta=1にある頂点インデックスを取得する
-
-        :rtype: int
-        :return: 頂点インデックス
-
-        """
-        return self.get_vertex_idx(0, self.n_div)
-
-    def get_coordinates(self, vertex_idx):
-        """
-
-        頂点インデックスから座標を取得する
-
-        :type vertex_idx: int
-        :param vertex_idx: 頂点インデックス
-
-        :rtype: tuple(int, int)
-        :return: 面中における頂点座標
-
-        """
-        return [k for k, v in self.vertices_idx_dict.items() if v == vertex_idx]
-
-    def vertices_idx_as_copy(self):
-        """
-
-        IcosahedronFaceの持つvertices_idx_dictをコピーして返す
-
-        :rtype: dict
-        :return: 頂点座標(alpha, beta)と頂点インデックスのペア
-
-        """
-        return dict(self.vertices_idx_dict)
-
-    def traverse(self, direction):
-        """
-
-        単一面の頂点インデックスを指定方向に走査し、入れ子リストとして返す
-
-        :type direction: IcosahedronFace.DIRECTION
-        :param direction: 操作方向の指定
-
-        :rtype: list(list(int))
-        :return: 頂点インデックスの入れ子リスト
-
-        """
-
-        coordinates = {self.DIRECTION.HORIZON: self.__horizon_coordinates,
-                       self.DIRECTION.UPPER_RIGHT: self.__upper_right_coordinates,
-                       self.DIRECTION.UPPER_LEFT: self.__upper_left_coordinates}[
-            direction]
-
-        return [[self.get_vertex_idx(alpha, beta)
-                 for alpha, beta in zip(*coordinates(row))]
-                for row in xrange(self.n_div + 1)]
-
-    def __horizon_coordinates(self, row):
-        """
-
-        ある行で面上の頂点を水平にトラバースするときの順序に従った座標配列を返す
-
-        :type row: int
-        :param row: 現在注目している行
-
-        :rtype: list(list(int), list(int))
-        :return: alpha, betaの座標配列
-
-        """
-        alpha = xrange(row, -1, -1)
-        beta = xrange(row + 1)
-        return alpha, beta
-
-    def __upper_right_coordinates(self, row):
-        """
-
-        ある行で面上の頂点を右上にトラバースするときの順序に従った座標配列を返す
-
-        :type row: int
-        :param row: 現在注目している行
-
-        :rtype: list(list(int), list(int))
-        :return: alpha, betaの座標配列
-
-        """
-        alpha = [self.n_div - row for i in xrange(row + 1)]
-        beta = xrange(row, -1, -1)
-        return alpha, beta
-
-    def __upper_left_coordinates(self, row):
-        """
-
-        ある行で面上の頂点を左上にトラバースするときの順序に従った座標配列を返す
-
-        :type row: int
-        :param row: 現在注目している行
-
-        :rtype: list(list(int), list(int))
-        :return: alpha, betaの座標配列
-
-        """
-        alpha = xrange(row + 1)
-        beta = [self.n_div - row for i in xrange(row + 1)]
-        return alpha, beta
-
-    def __str__(self):
-        """
-
-        :rtype: str
-        :return: str化した時のIcosahedronFaceの文字列
-
-        """
-        s = "[face ID : {}]\n".format(self.face_id) + \
-            "vertex indices : (alpha, beta) -> [idx]\n"
-        for key, idx in self.vertices_idx_dict.items():
-            alpha, beta = key
-            s += "({0:^3},{1:^3}) -> {2:^2}\n".format(alpha, beta, idx)
         return s
