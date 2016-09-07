@@ -28,7 +28,7 @@ class IcosahedronGrid(TriangleGrid):
         :param n_div: Grid3dオブジェクトの各面の分割数
 
         """
-        super(IcosahedronGrid, self).__init__(vertices,grid_faces, 20)
+        super(IcosahedronGrid, self).__init__(vertices, grid_faces, 20)
         self.grid_faces = tuple(grid_faces)
         self.n_div = n_div
 
@@ -242,5 +242,3 @@ class IcosahedronGrid(TriangleGrid):
         return [TriangleFace(gf.face_id, n_div=gf.n_div,
                              vidx_table=gf.vidx_table_as_copy()) for gf in
                 self.grid_faces]
-
-

@@ -72,7 +72,7 @@ class BaseFace(object):
         :param n_div: 面の分割数
 
         :type vidx_table: dict((int or long, int or long), int or long)
-        :param vidx_table: 頂点座標(alpha, beta)と頂点インデックスのペア
+        :param vidx_table: 頂点座標と頂点インデックスのペア
 
         :type is_assertion_enabled: bool
         :param is_assertion_enabled: メンバのアサーションチェックを有効にするかどうか

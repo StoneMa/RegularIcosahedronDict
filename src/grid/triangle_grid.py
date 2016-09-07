@@ -36,13 +36,13 @@ class TriangleFace(BaseFace):
     def __init__(self, face_id, n_div=1, vidx_table=None):
         """
 
-        :type face_id: numbers.Integral
+        :type face_id: int or long
         :param face_id: 面を一意に識別するためのID
 
-        :type n_div: numbers.Integral
+        :type n_div: int or long
         :param n_div: 面の分割数
 
-        :type vidx_table: dict((float, float), numbers.Integral)
+        :type vidx_table: dict((int or long, int or long), int or long)
         :param vidx_table: 頂点座標(alpha, beta)と頂点インデックスのペア
 
         """
