@@ -42,6 +42,11 @@ class ShapeMap(object):
 
         """
 
+        assert_type_in_container(face_ids, (int, long))
+        assert_type_in_container(shape_maps, (list, np.ndarray))
+        assert isinstance(cls, (int, long))
+        assert isinstance(n_div, (int, long))
+        assert isinstance(traverse_direction, TriangleFace.DIRECTION)
         assert len(face_ids) == len(shape_maps)
 
         self.shape_map_dict = dict(zip(face_ids, shape_maps))
