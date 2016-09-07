@@ -2,8 +2,10 @@
 # coding: utf-8
 
 import unittest
+
 import numpy as np
-from src.icosahedron_grid import IcosahedronGrid, IcosahedronFace
+
+from src.grid.icosahedron_grid import IcosahedronGrid, IcosahedronFace
 
 
 class TestGrid3d(unittest.TestCase):

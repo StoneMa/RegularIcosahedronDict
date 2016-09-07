@@ -5,7 +5,7 @@ import os
 import numpy as np
 import enum
 from collections import OrderedDict
-from obj3d import Obj3d
+from src.obj3d import Obj3d
 
 
 class IcosahedronGrid(Obj3d):

@@ -3,9 +3,11 @@
 
 import os
 import struct
+
 import numpy as np
+
 from obj3d import Obj3d
-from icosahedron_grid import IcosahedronGrid, IcosahedronFace
+from src.grid.icosahedron_grid import IcosahedronGrid, IcosahedronFace
 
 
 class ShapeMap(object):

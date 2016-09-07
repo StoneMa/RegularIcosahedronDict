@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import numpy as np
 import unittest
-from src.icosahedron_grid import IcosahedronFace
+
+import numpy as np
+
+from src.grid.icosahedron_grid import IcosahedronFace
 from src.shape_map import ShapeMapCreator
 
 
