@@ -4,9 +4,8 @@
 import os
 import struct
 import numpy as np
-from numpy import linalg
 from obj3d import Obj3d
-from icosahedron import IcosahedronGrid, IcosahedronFace
+from icosahedron_grid import IcosahedronGrid, IcosahedronFace
 
 
 class ShapeMap(object):
@@ -155,7 +154,7 @@ class ShapeMapCreator(object):
         self.obj3d = Obj3d.load(obj3d_path).center().normal()
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
-        self.grid = IcosahedronGrid.load(grd_path).center().scale(scale_grid) \
+        self.grid = IcosahedronGrid.load(grd_path).center().scale(scale_grid)\
             .divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
@@ -202,9 +201,9 @@ class ShapeMapCreator(object):
         P = np.cross(ray, edge2)
 
         # 分母
-        denominator = linalg.det(np.vstack((edge1, edge2, -ray)))
+        denominator = np.dot(P, edge1)
 
-        if denominator > 0:
+        if denominator > np.finfo(float).eps:
             T = origin - v0
             u = np.dot(P, T)
 
@@ -235,23 +234,22 @@ class ShapeMapCreator(object):
         grid_center = np.zeros(shape=(3,))
 
         # 距離マップ インデックスはグリッドのverticesに対応する
-        distances = np.empty(shape=(len(self.grid.vertices)))
+        # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
+        distances = np.full(shape=(len(self.grid.vertices)),
+                            fill_value=ShapeMapCreator.DIST_UNDEFINED,
+                            dtype=np.float64)
 
         # 交点リスト
-        cps = [None for i in xrange(len(distances))]
+        cps = [None for _ in xrange(len(distances))]
 
-        for i, v_grid in enumerate(self.grid.vertices):
-            for fv_obj3d in self.obj3d.face_vertices:
-                f0, f1, f2 = self.obj3d.vertices[fv_obj3d]
-                p_cross = self.tomas_moller(grid_center, v_grid, f0, f1, f2)
+        for i, g_vertex in enumerate(self.grid.vertices):
+            for f0, f1, f2 in self.obj3d.vertices[self.obj3d.face_vertices]:
+                p_cross = self.tomas_moller(grid_center, g_vertex, f0, f1, f2)
                 if p_cross is not None:
                     dist = np.linalg.norm(p_cross - grid_center)
                     distances[i] = dist
                     cps[i] = p_cross
                     break
-            else:
-                # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
-                distances[i] = ShapeMapCreator.DIST_UNDEFINED
 
         # FaceIDと頂点インデックスのマップの辞書を取得
         shape_maps = []

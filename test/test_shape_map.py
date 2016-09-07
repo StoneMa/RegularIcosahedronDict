@@ -3,7 +3,7 @@
 
 import numpy as np
 import unittest
-from src.icosahedron import IcosahedronFace
+from src.icosahedron_grid import IcosahedronFace
 from src.shape_map import ShapeMapCreator
 
 
@@ -72,15 +72,15 @@ class TestShapeMap(unittest.TestCase):
                                   scale_grid=self.scale_grid)
 
         horizon_map = creator.create(
-            directions=(IcosahedronFace.DIRECTION.HORIZON,))
+            directions=(IcosahedronFace.DIRECTION.HORIZON,))[0]
         horizon_map.save(self.shp_file_root, '0')
 
         upper_left_map = creator.create(
-            directions=(IcosahedronFace.DIRECTION.UPPER_LEFT,))
+            directions=(IcosahedronFace.DIRECTION.UPPER_LEFT,))[0]
         upper_left_map.save(self.shp_file_root, '0')
 
         upper_right_map = creator.create(
-            directions=(IcosahedronFace.DIRECTION.UPPER_RIGHT,))
+            directions=(IcosahedronFace.DIRECTION.UPPER_RIGHT,))[0]
         upper_right_map.save(self.shp_file_root, '0')
 
 
