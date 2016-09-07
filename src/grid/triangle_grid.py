@@ -18,6 +18,7 @@ class TriangleGrid(BaseGrid):
         # assertion
         if is_assertion_enabled:
             assert_type_in_container(triangle_faces, TriangleFace)
+            assert len(triangle_faces) == n_face
 
         super(TriangleGrid, self).__init__(vertices, triangle_faces, n_face,
                                            is_assertion_enabled=False)

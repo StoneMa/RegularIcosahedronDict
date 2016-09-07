@@ -36,6 +36,7 @@ class BaseGrid(Obj3d):
         if is_assertion_enabled:
             assert_type_in_container(base_faces, BaseFace)
             assert isinstance(n_face, (int, long)) and n_face >= 0
+            assert len(base_faces) == n_face
 
         self.base_faces = base_faces
         self.n_face = n_face
