@@ -145,7 +145,7 @@ class Obj3d(object):
 
         頂点群の重心が座標軸の原点となるように、全ての頂点座標を平行移動
 
-        :rtype: np.ndarray
+        :rtype: Obj3d
         :return: 座標を平行移動したObj3dオブジェクトのコピー
 
         """
@@ -160,7 +160,7 @@ class Obj3d(object):
 
         重心から頂点までの距離が最大1となるように、全ての頂点座標を正規化する
 
-        :rtype: np.ndarray
+        :rtype: Obj3d
         :return: 座標を正規化したObj3dオブジェクトのコピー
 
         """
@@ -185,7 +185,7 @@ class Obj3d(object):
         :type r: float
         :param r: 距離倍率
 
-        :rtype: np.ndarray
+        :rtype: Obj3d
         :return: 座標を拡大縮小したObj3dオブジェクトのコピー
 
         """

@@ -3,15 +3,17 @@
 
 import os
 import time
+from src.obj3d import Obj3d
+from src.grid.icosahedron_grid import IcosahedronGrid
 from src.shape_map import ShapeMapCreator
 from collections import OrderedDict
 
 
 def create_shrec_maps(n_div, scale_grid,
-                      shrec_off_root="../res/shrec/off",
+                      shrec_off_root="../res/shrec3/off",
                       grd_path="../res/new_regular_ico.grd",
-                      cla_file="../res/shrec/test.cla",
-                      shp_file_root="../res/shrec/shape_map"):
+                      cla_file="../res/shrec3/test.cla",
+                      shp_file_root="../res/shrec3/shape_map3"):
     cla = parse_cla(cla_file)
 
     for shrec_name in os.listdir(shrec_off_root):
@@ -25,26 +27,35 @@ def create_shrec_maps(n_div, scale_grid,
 
         off_path = os.path.join(shrec_off_root, shrec_name)
         print "creator being generated..."
-        creator = ShapeMapCreator(off_path, grd_path, shrec_cls, n_div,
+        creator = ShapeMapCreator(Obj3d.load(off_path),
+                                  IcosahedronGrid.load(grd_path),
+                                  shrec_cls,
+                                  n_div,
                                   scale_grid)
 
         print "maps being created..."
         horizon, upper_right, upper_left = creator.create_all_direction()
-        horizon.save(shp_file_root, str(shrec_id))
-        upper_right.save(shp_file_root, str(shrec_id))
-        upper_left.save(shp_file_root, str(shrec_id))
+        print horizon
+        # horizon.save(shp_file_root, str(shrec_id))
+        # upper_right.save(shp_file_root, str(shrec_id))
+        # upper_left.save(shp_file_root, str(shrec_id))
 
         print (time.clock() - start), "s"
 
 
 def parse_cla(cla_file):
     """
+
     .claファイルを読み込み、所属クラスデータを返す
+
     :type cla_file: str
     :param cla_file: PATH含むファイル名
+
     :rtype collections.OrderedDict
     :return: クラスラベル:属するデータの辞書
+
     """
+
     # クラス階層情報を保持するツリー
     tree = ClaTree('0')
 

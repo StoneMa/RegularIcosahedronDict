@@ -7,7 +7,8 @@ import struct
 import numpy as np
 
 from obj3d import Obj3d
-from src.grid.icosahedron_grid import IcosahedronGrid, TriangleFace
+from src.grid.base_grid import BaseGrid
+from src.grid.icosahedron_grid import TriangleGrid, TriangleFace
 from src.util.debug_util import assert_type_in_container
 
 
@@ -135,15 +136,15 @@ class ShapeMapCreator(object):
 
     DIST_UNDEFINED = -1
 
-    def __init__(self, obj3d_path, grd_path, cls, n_div, scale_grid):
+    def __init__(self, obj3d, triangle_grid, cls, n_div, grid_scale):
 
         """
 
-        :type obj3d_path: str
-        :param obj3d_path: 読み込み３Dオブジェクトのパス
+        :type obj3d: Obj3d
+        :param obj3d: 形状マップ生成対象の３Dオブジェクト
 
-        :type grd_path: str
-        :param grd_path: 読み込むグリッドのパス
+        :type triangle_grid: TriangleGrid
+        :param triangle_grid: 形状マップを生成するための正三角形からなるグリッド
 
         :type cls: int or long
         :param cls: クラスラベル
@@ -151,18 +152,18 @@ class ShapeMapCreator(object):
         :type n_div: int or long
         :param n_div: グリッドの分割数
 
-        :type scale_grid: float
-        :param scale_grid: グリッドのスケール率
+        :type grid_scale: float
+        :param grid_scale: グリッドのスケール率
 
         """
 
         # 3Dモデル
         # モデルを座標系の中心に置き、正規化する
-        self.obj3d = Obj3d.load(obj3d_path).center().normal()
+        # self.obj3d = Obj3d.load(obj3d_path).center().normal()
+        self.obj3d = obj3d.center().normal()
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
-        self.grid = IcosahedronGrid.load(grd_path).center().scale(scale_grid) \
-            .divide_face(n_div)
+        self.grid = triangle_grid.center().scale(grid_scale).divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
         # グリッドの中心から最も近い点のより中心からの距離より大きい場合はサポート外
@@ -264,7 +265,7 @@ class ShapeMapCreator(object):
             traversed_indices_dict = self.grid.traverse(direction)
 
             distance_maps = [[[distances[idx]
-                               if idx != IcosahedronGrid.VERTEX_IDX_UNDEFINED
+                               if idx != BaseGrid.VERTEX_IDX_UNDEFINED
                                else ShapeMapCreator.DIST_UNDEFINED
                                for idx in row]
                               for row in indices_map]

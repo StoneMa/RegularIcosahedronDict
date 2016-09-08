@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import enum
+import numpy as np
 from src.util.debug_util import assert_type_in_container
 from base_grid import BaseGrid, BaseFace
 
@@ -13,15 +13,74 @@ class TriangleGrid(BaseGrid):
 
     """
 
-    def __init__(self, vertices, triangle_faces, n_face,
-                 is_assertion_enabled=True):
+    def __init__(self, vertices, triangle_faces, n_face, n_div,
+                 is_face_assertion_enabled=True):
         # assertion
-        if is_assertion_enabled:
+        if is_face_assertion_enabled:
             assert_type_in_container(triangle_faces, TriangleFace)
-            assert len(triangle_faces) == n_face
 
         super(TriangleGrid, self).__init__(vertices, triangle_faces, n_face,
-                                           is_assertion_enabled=False)
+                                           n_div,
+                                           is_face_assertion_enabled=False)
+
+    def divide_face(self, n_div, epsilon=np.finfo(float).eps):
+        """
+
+        指定数で面を分割したGrid3dオブジェクトを返す
+
+        :type n_div: int
+        :param n_div: 分割数
+
+        :type epsilon: float
+        :param epsilon: 浮動小数点座標を等号比較する時の許容誤差
+
+        :rtype : IcosahedronGrid
+        :return : 分割後のGrid3dオブジェクト
+
+        """
+
+        new_vertices = np.empty(shape=(0, 3))
+
+        new_grid_faces = []
+
+        for grid_face in self.grid_faces:
+
+            # グリッド面の三頂点
+            top_vertex = self.vertices[grid_face.top_vertex_idx()]
+            left_vertex = self.vertices[grid_face.left_vertex_idx()]
+            right_vertex = self.vertices[grid_face.right_vertex_idx()]
+
+            left_vector = left_vertex - top_vertex
+            right_vector = right_vertex - top_vertex
+
+            # 一旦GridFaceの頂点情報をクリア
+            new_face = TriangleFace(grid_face.face_id, n_div=n_div)
+
+            for sum_length in xrange(n_div + 1):
+                for i in xrange(sum_length + 1):
+                    alpha = sum_length - i
+                    beta = i
+                    new_vertex = left_vector * float(
+                        alpha) / n_div + right_vector * float(
+                        beta) / n_div + top_vertex
+
+                    # 重複チェック
+                    check_duplicate = (
+                        np.abs(new_vertex - new_vertices) < epsilon).all(axis=1)
+
+                    if len(new_vertices) > 0 and check_duplicate.any():
+                        v_idx = int(np.argwhere(check_duplicate))
+                    else:
+                        v_idx = len(new_vertices)
+                        new_vertices = np.vstack((new_vertices, new_vertex))
+
+                    # 新しく頂点情報を追加
+                    new_face.set_vertex_idx(v_idx, alpha, beta)
+
+            new_grid_faces.append(new_face)
+
+        return TriangleGrid(new_vertices, new_grid_faces, self.n_face,
+                            self.n_div)
 
 
 class TriangleFace(BaseFace):
@@ -30,8 +89,6 @@ class TriangleFace(BaseFace):
     TriangleGridの持つ面クラス
 
     """
-
-    DIRECTION = enum.Enum('DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
 
     def __init__(self, face_id, n_div=1, vidx_table=None):
         """
@@ -150,7 +207,7 @@ class TriangleFace(BaseFace):
 
         単一面の頂点インデックスを指定方向に走査し、入れ子リストとして返す
 
-        :type direction: IcosahedronFace.DIRECTION
+        :type direction: icosahedronface.direction
         :param direction: 操作方向の指定
 
         :rtype: list(list(int))
@@ -215,5 +272,3 @@ class TriangleFace(BaseFace):
         alpha = xrange(row + 1)
         beta = [self.n_div - row for i in xrange(row + 1)]
         return alpha, beta
-
-

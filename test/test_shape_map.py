@@ -37,7 +37,7 @@ class TestShapeMap(unittest.TestCase):
                               grd_path=self.grid_path,
                               cls=self.cls,
                               n_div=self.n_div,
-                              scale_grid=self.scale_grid)
+                              grid_scale=self.scale_grid)
 
         v0 = np.array([0., 0., 0.])
         v1 = np.array([1., 0., 1.])
@@ -71,7 +71,7 @@ class TestShapeMap(unittest.TestCase):
                                   grd_path=self.grid_path,
                                   cls=self.cls,
                                   n_div=self.n_div,
-                                  scale_grid=self.scale_grid)
+                                  grid_scale=self.scale_grid)
 
         horizon_map = creator.create(
             directions=(IcosahedronFace.DIRECTION.HORIZON,))[0]

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import enum
 from collections import OrderedDict
 from src.obj3d import Obj3d
 from src.util.debug_util import assert_type_in_container
@@ -13,7 +14,10 @@ class BaseGrid(Obj3d):
 
     """
 
-    def __init__(self, vertices, base_faces, n_face, is_assertion_enabled=True):
+    VERTEX_IDX_UNDEFINED = None
+
+    def __init__(self, vertices, base_faces, n_face, n_div,
+                 is_face_assertion_enabled=True):
         """
 
         :type vertices: np.ndarray
@@ -25,21 +29,61 @@ class BaseGrid(Obj3d):
         :type n_face: int or long
         :param n_face: 面の数
 
-        :type is_assertion_enabled: bool
-        :param is_assertion_enabled: メンバのアサーションチェックを有効にするかどうか
+        :type n_div: int or long
+        :param n_div: 面の分割数
+
+        :type is_face_assertion_enabled: bool
+        :param is_face_assertion_enabled: メンバのアサーションチェックを有効にするかどうか
 
         """
 
         super(BaseGrid, self).__init__(vertices)
 
         # assertion
-        if is_assertion_enabled:
+        if is_face_assertion_enabled:
             assert_type_in_container(base_faces, BaseFace)
-            assert isinstance(n_face, (int, long)) and n_face >= 0
-            assert len(base_faces) == n_face
+        assert isinstance(n_face, (int, long)) and n_face >= 0
+        assert isinstance(n_div, (int, long)) and n_div > 0
+        assert len(base_faces) == n_face
 
-        self.base_faces = base_faces
+        self.grid_faces = base_faces
         self.n_face = n_face
+        self.n_div = n_div
+
+    def traverse(self, direction):
+        """
+
+        正二十面体グリッドの各面の頂点インデックスを走査し、
+        結果をFaceIDとのペアで返す
+
+        :type direction: BaseFace.DIRECTION
+        :param direction: 走査方向
+
+        :rtype dict
+        :return FaceIDをキー、面の頂点インデックスリストをバリューとした辞書
+
+        """
+        return {grid_face.face_id: grid_face.traverse(direction)
+                for grid_face in self.grid_faces}
+
+    def find_face_from_id(self, face_id):
+        """
+
+        指定したface_idを持つBaseFaceを返す
+        指定したface_idを持つBaseFaceが見つからない場合、IndexErrorを投げる
+
+        :type face_id: int
+        :param face_id: 要求するBaseFaceのID
+
+        :rtype: BaseFace
+        :return: 指定したface_idを持つBaseFace
+
+        """
+        for grid_face in self.grid_faces:
+            if grid_face.face_id == face_id:
+                return grid_face
+        else:
+            raise IndexError
 
     def __str__(self):
         """
@@ -60,6 +104,8 @@ class BaseFace(object):
     グリッドが持つ面の基底クラス
 
     """
+
+    DIRECTION = enum.Enum('DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
 
     def __init__(self, face_id, n_div=1, vidx_table=None,
                  is_assertion_enabled=True):
@@ -102,5 +148,8 @@ class BaseFace(object):
             s += "("
             for coordinate in coordinates:
                 s += "{:^3},".format(coordinate)
-            s = s[:len(s)-2] + " ) -> {:^2}\n".format(idx)
+            s = s[:len(s) - 2] + " ) -> {:^2}\n".format(idx)
         return s
+
+    def traverse(self, direction):
+        raise NotImplementedError
