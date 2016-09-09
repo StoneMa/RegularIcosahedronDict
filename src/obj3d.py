@@ -280,6 +280,8 @@ class Obj3d(object):
         :return: .offファイル読み込みによって生成されたObj3dオブジェクト
 
         """
+        vertices = np.zeros(shape=(1,3))
+        faces = np.zeros(shape=(1,3))
 
         with open(off_file_path) as f:
             # コメント・空行を除去
@@ -302,7 +304,7 @@ class Obj3d(object):
                 [map(int, lines[n_vertices + i].strip().split(' '))[1:]
                  for i in xrange(n_faces)])
 
-        return Obj3d(vertices, None, faces)
+            return Obj3d(vertices, None, faces)
 
     @staticmethod
     def __load_obj(obj_file_path):
