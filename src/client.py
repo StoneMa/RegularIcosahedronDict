@@ -5,7 +5,7 @@ import os
 import sys
 import time
 import threading
-from src.view.qt_util import critical_message_box
+from PyQt4 import QtGui
 from src.view.qt_main import main, MainWindow
 from src.obj3d import Obj3d
 from src.grid.icosahedron_grid import IcosahedronGrid
@@ -33,7 +33,7 @@ def init(window):
         try:
             n_div = int(str(window.tb_n_div.text()))
             grid_scale = float(str(window.tb_grid_scale.text()))
-        except TypeError, e:
+        except (ValueError, TypeError), e:
             if "n_div" in e.message:
                 critical_message_box(window, "",
                                      "N-Division should be a number.")
