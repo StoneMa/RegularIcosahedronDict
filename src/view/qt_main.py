@@ -38,44 +38,14 @@ class MainWindow(QtGui.QMainWindow):
         self.tb_n_div = self.get_cached_line_edit("../cache", "n_div")
         self.tb_grid_scale = self.get_cached_line_edit("../cache", "grid_scale")
 
-        btn_fd_model_path = QtGui.QPushButton(self)
-        btn_fd_grid_path = QtGui.QPushButton(self)
-        btn_fd_cla_path = QtGui.QPushButton(self)
-        btn_fd_save_path = QtGui.QPushButton(self)
-
-        def open_file(parent, tb, key):
-            def handler():
-                path = QtGui.QFileDialog.getOpenFileName(
-                    parent, 'open file', '../res')
-                tb.setText(path)
-                save_cache("../.cache", key, path)
-
-            return handler
-
-        def open_folder(parent, tb, key):
-            def handler():
-                path = QtGui.QFileDialog.getExistingDirectory(
-                    parent, 'open folder', '../res')
-                tb.setText(path)
-                save_cache("../.cache", key, path)
-
-            return handler
-
-        self.connect(btn_fd_model_path,
-                     QtCore.SIGNAL('clicked()'),
-                     open_folder(self, self.tb_model_path, "model_path"))
-
-        self.connect(btn_fd_grid_path,
-                     QtCore.SIGNAL('clicked()'),
-                     open_file(self, self.tb_grid_path, "grid_path"))
-
-        self.connect(btn_fd_cla_path,
-                     QtCore.SIGNAL('clicked()'),
-                     open_file(self, self.tb_cla_path, "cla_path"))
-
-        self.connect(btn_fd_save_path,
-                     QtCore.SIGNAL('clicked()'),
-                     open_folder(self, self.tb_save_path, "save_path"))
+        btn_fd_model_path = self.get_file_dialog_button(self.tb_model_path,
+                                                        "model_path", False)
+        btn_fd_grid_path = self.get_file_dialog_button(self.tb_grid_path,
+                                                       "grid_path", True)
+        btn_fd_cla_path = self.get_file_dialog_button(self.tb_cla_path,
+                                                      "cla_path", True)
+        btn_fd_save_path = self.get_file_dialog_button(self.tb_save_path,
+                                                       "save_path", False)
 
         hl_model_path = QtGui.QHBoxLayout()
         hl_model_path.addWidget(self.tb_model_path)
@@ -146,6 +116,25 @@ class MainWindow(QtGui.QMainWindow):
         if cache is not None:
             line_edit.setText(cache)
         return line_edit
+
+    def get_file_dialog_button(self, text_box, key, is_file):
+
+        button = QtGui.QPushButton(self)
+        button.setText("...")
+
+        def handler():
+            if is_file:
+                f_dialog = QtGui.QFileDialog.getOpenFileName
+                title = 'open file'
+            else:
+                f_dialog = QtGui.QFileDialog.getOpenFileName
+                title = 'choice folder'
+            path = f_dialog(self, title, '../res')
+            text_box.setText(path)
+            save_cache("../.cache", key, path)
+
+        self.connect(button, QtCore.SIGNAL('clicked()'), handler)
+        return button
 
     def set_on_create_button_click_listener(self, on_create_button_clicked):
         self.connect(self.btn_create, QtCore.SIGNAL('clicked()'),
