@@ -41,16 +41,14 @@ def init(window):
                                      "Grid Scale should be a number.")
         else:
             create_shrec_maps(n_div, grid_scale, model_path, grid_path,
-                                  cla_path, save_path)
+                              cla_path, save_path)
 
     window.set_on_create_button_click_listener(on_create_button_click)
 
 
-def create_shrec_maps(n_div, scale_grid,
-                      shrec_off_root="../res/shrec3/off",
-                      grd_path="../res/new_regular_ico.grd",
-                      cla_file="../res/shrec3/test.cla",
-                      shp_file_root="../res/shrec3/shape_map3"):
+def create_shrec_maps(n_div, scale_grid, shrec_off_root, grd_path, cla_file,
+                      shp_file_root):
+
     def execute():
         cla = parse_cla(cla_file)
 
@@ -83,7 +81,6 @@ def create_shrec_maps(n_div, scale_grid,
             print (time.clock() - start), "s"
 
     threading.Thread(target=execute).start()
-
 
 
 if __name__ == '__main__':
