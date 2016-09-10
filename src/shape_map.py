@@ -136,15 +136,15 @@ class ShapeMapCreator(object):
 
     DIST_UNDEFINED = -1
 
-    def __init__(self, obj3d, triangle_grid, cls, n_div, grid_scale):
+    def __init__(self, obj3d, grid, cls, n_div, grid_scale):
 
         """
 
         :type obj3d: Obj3d
         :param obj3d: 形状マップ生成対象の３Dオブジェクト
 
-        :type triangle_grid: TriangleGrid
-        :param triangle_grid: 形状マップを生成するための正三角形からなるグリッド
+        :type grid: TriangleGrid
+        :param grid: 形状マップを生成するための正三角形からなるグリッド
 
         :type cls: int or long
         :param cls: クラスラベル
@@ -163,7 +163,7 @@ class ShapeMapCreator(object):
         self.obj3d = obj3d.center().normal()
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
-        self.grid = triangle_grid.center().scale(grid_scale).divide_face(n_div)
+        self.grid = grid.center().scale(grid_scale).divide_face(n_div)
 
         # 3Dモデルの中心から最も離れた点の中心からの距離が、
         # グリッドの中心から最も近い点のより中心からの距離より大きい場合はサポート外
