@@ -30,6 +30,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # path input layout #
 
+        # text box
         self.tb_model_path = self.get_cached_line_edit("../.cache",
                                                        "model_path")
         self.tb_grid_path = self.get_cached_line_edit("../.cache", "grid_path")
@@ -38,6 +39,7 @@ class MainWindow(QtGui.QMainWindow):
         self.tb_n_div = self.get_cached_line_edit("../cache", "n_div")
         self.tb_grid_scale = self.get_cached_line_edit("../cache", "grid_scale")
 
+        # button
         btn_fd_model_path = self.get_file_dialog_button(self.tb_model_path,
                                                         "model_path", False)
         btn_fd_grid_path = self.get_file_dialog_button(self.tb_grid_path,
@@ -47,21 +49,15 @@ class MainWindow(QtGui.QMainWindow):
         btn_fd_save_path = self.get_file_dialog_button(self.tb_save_path,
                                                        "save_path", False)
 
-        hl_model_path = QtGui.QHBoxLayout()
-        hl_model_path.addWidget(self.tb_model_path)
-        hl_model_path.addWidget(btn_fd_model_path)
-
-        hl_grid_path = QtGui.QHBoxLayout()
-        hl_grid_path.addWidget(self.tb_grid_path)
-        hl_grid_path.addWidget(btn_fd_grid_path)
-
-        hl_cla_path = QtGui.QHBoxLayout()
-        hl_cla_path.addWidget(self.tb_cla_path)
-        hl_cla_path.addWidget(btn_fd_cla_path)
-
-        hl_save_path = QtGui.QHBoxLayout()
-        hl_save_path.addWidget(self.tb_save_path)
-        hl_save_path.addWidget(btn_fd_save_path)
+        # path layout
+        hl_model_path = self.get_file_path_layout(self.tb_model_path,
+                                                  btn_fd_model_path)
+        hl_grid_path = self.get_file_path_layout(self.tb_grid_path,
+                                                 btn_fd_grid_path)
+        hl_cla_path = self.get_file_path_layout(self.tb_cla_path,
+                                                btn_fd_cla_path)
+        hl_save_path = self.get_file_path_layout(self.tb_save_path,
+                                                 btn_fd_save_path)
 
         vl_path = QtGui.QVBoxLayout()
         vl_path.addWidget(QtGui.QLabel("Model Path"))
@@ -135,6 +131,12 @@ class MainWindow(QtGui.QMainWindow):
 
         self.connect(button, QtCore.SIGNAL('clicked()'), handler)
         return button
+
+    def get_file_path_layout(self, text_box, button):
+        hl_model_path = QtGui.QHBoxLayout()
+        hl_model_path.addWidget(text_box)
+        hl_model_path.addWidget(button)
+        return hl_model_path
 
     def set_on_create_button_click_listener(self, on_create_button_clicked):
         self.connect(self.btn_create, QtCore.SIGNAL('clicked()'),
