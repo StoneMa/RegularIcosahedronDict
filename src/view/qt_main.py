@@ -10,6 +10,31 @@ from src.util.app_util import save_cache, load_cache
 
 
 class MainWindow(QtGui.QMainWindow):
+    LABEL_TEXT_MODEL_PATH = "Model File (.off or .obj) Path"
+    LABEL_TEXT_GRID_PATH = "Grid Path"
+    LABEL_TEXT_CLA_PATH = ".cla File Path"
+    LABEL_TEXT_SAVE_PATH = "Save Path"
+    LABEL_TEXT_N_DIV_PATH = "N-Division"
+    LABEL_TEXT_GRID_SCALE_PATH = "Grid Scale"
+
+    LABEL_TEXT_GROUP = "Settings"
+
+    BUTTON_TEXT_FILE_DIALOG = "..."
+    BUTTON_TEXT_CREATE = "create"
+
+    DIALOG_TITLE_FILE = "open file"
+    DIALOG_TITLE_FOLDER = "choice folder"
+
+    FILE_DIALOG_INIT_PATH = "../res"
+    CACHE_PATH = "../.cache"
+
+    KEY_MODEL_PATH = "model_path"
+    KEY_GRID_PATH = "grid_path"
+    KEY_CLA_PATH = "cla_path"
+    KEY_SAVE_PATH = "save_path"
+    KEY_N_DIV = "n_div"
+    KEY_GRID_SCALE = "grid_scale"
+
     class SygnalHost(QtCore.QObject):
         sygnal = QtCore.pyqtSignal()
 
@@ -21,35 +46,43 @@ class MainWindow(QtGui.QMainWindow):
 
         self.parent_widget = QtGui.QWidget()
 
-        # result layout #
+        ### result layout ###
 
         self.te_result = QtGui.QTextEdit(self)
-
         vl_result = QtGui.QVBoxLayout()
         vl_result.addWidget(self.te_result)
 
-        # path input layout #
+        ### path input layout ###
 
         # text box
-        self.tb_model_path = self.get_cached_line_edit("../.cache",
-                                                       "model_path")
-        self.tb_grid_path = self.get_cached_line_edit("../.cache", "grid_path")
-        self.tb_cla_path = self.get_cached_line_edit("../.cache", "cla_path")
-        self.tb_save_path = self.get_cached_line_edit("../.cache", "save_path")
-        self.tb_n_div = self.get_cached_line_edit("../cache", "n_div")
-        self.tb_grid_scale = self.get_cached_line_edit("../cache", "grid_scale")
+        self.tb_model_path = self.get_cached_line_edit(MainWindow.CACHE_PATH,
+                                                       MainWindow.KEY_MODEL_PATH)
+        self.tb_grid_path = self.get_cached_line_edit(MainWindow.CACHE_PATH,
+                                                      MainWindow.KEY_GRID_PATH)
+        self.tb_cla_path = self.get_cached_line_edit(MainWindow.CACHE_PATH,
+                                                     MainWindow.KEY_CLA_PATH)
+        self.tb_save_path = self.get_cached_line_edit(MainWindow.CACHE_PATH,
+                                                      MainWindow.KEY_SAVE_PATH)
+        self.tb_n_div = self.get_cached_line_edit(MainWindow.CACHE_PATH,
+                                                  MainWindow.KEY_N_DIV)
+        self.tb_grid_scale = self.get_cached_line_edit(MainWindow.CACHE_PATH,
+                                                       MainWindow.KEY_GRID_SCALE)
 
         # button
         btn_fd_model_path = self.get_file_dialog_button(self.tb_model_path,
-                                                        "model_path", False)
+                                                        MainWindow.KEY_MODEL_PATH,
+                                                        False)
         btn_fd_grid_path = self.get_file_dialog_button(self.tb_grid_path,
-                                                       "grid_path", True)
+                                                       MainWindow.KEY_GRID_PATH,
+                                                       True)
         btn_fd_cla_path = self.get_file_dialog_button(self.tb_cla_path,
-                                                      "cla_path", True)
+                                                      MainWindow.KEY_CLA_PATH,
+                                                      True)
         btn_fd_save_path = self.get_file_dialog_button(self.tb_save_path,
-                                                       "save_path", False)
+                                                       MainWindow.KEY_SAVE_PATH,
+                                                       False)
 
-        # path layout
+        # path layout row
         hl_model_path = self.get_file_path_layout(self.tb_model_path,
                                                   btn_fd_model_path)
         hl_grid_path = self.get_file_path_layout(self.tb_grid_path,
@@ -59,31 +92,31 @@ class MainWindow(QtGui.QMainWindow):
         hl_save_path = self.get_file_path_layout(self.tb_save_path,
                                                  btn_fd_save_path)
 
+        # path layout
         vl_path = QtGui.QVBoxLayout()
-        vl_path.addWidget(QtGui.QLabel("Model Path"))
+        vl_path.addWidget(QtGui.QLabel(MainWindow.LABEL_TEXT_MODEL_PATH))
         vl_path.addLayout(hl_model_path)
-        vl_path.addWidget(QtGui.QLabel("Grid Path"))
+        vl_path.addWidget(QtGui.QLabel(MainWindow.LABEL_TEXT_GRID_PATH))
         vl_path.addLayout(hl_grid_path)
-        vl_path.addWidget(QtGui.QLabel(".cla File Path"))
+        vl_path.addWidget(QtGui.QLabel(MainWindow.LABEL_TEXT_CLA_PATH))
         vl_path.addLayout(hl_cla_path)
-        vl_path.addWidget(QtGui.QLabel("Sava Path"))
+        vl_path.addWidget(QtGui.QLabel(MainWindow.LABEL_TEXT_SAVE_PATH))
         vl_path.addLayout(hl_save_path)
-        vl_path.addWidget(QtGui.QLabel("N-Division"))
+        vl_path.addWidget(QtGui.QLabel(MainWindow.LABEL_TEXT_N_DIV_PATH))
         vl_path.addWidget(self.tb_n_div)
-        vl_path.addWidget(QtGui.QLabel("Grid Scale"))
+        vl_path.addWidget(QtGui.QLabel(MainWindow.LABEL_TEXT_GRID_SCALE_PATH))
         vl_path.addWidget(self.tb_grid_scale)
 
-        gw_path = QtGui.QGroupBox("Settings")
+        gw_path = QtGui.QGroupBox(MainWindow.LABEL_TEXT_GROUP)
         gw_path.setLayout(vl_path)
 
         vl_path_group = QtGui.QVBoxLayout()
         vl_path_group.addWidget(gw_path)
 
-        # create button layout #
+        ### create button layout ###
 
         self.btn_create = QtGui.QPushButton(self)
-        self.btn_create.setText("create")
-
+        self.btn_create.setText(MainWindow.BUTTON_TEXT_CREATE)
         vl_button = QtGui.QVBoxLayout()
         vl_button.addWidget(self.btn_create)
 
@@ -103,7 +136,7 @@ class MainWindow(QtGui.QMainWindow):
 
         self.show()
 
-        #
+        # start std-output to tb_result.
         self.__show_stdout_as_result()
 
     def get_cached_line_edit(self, cache_path, cache_key):
@@ -116,18 +149,18 @@ class MainWindow(QtGui.QMainWindow):
     def get_file_dialog_button(self, text_box, key, is_file):
 
         button = QtGui.QPushButton(self)
-        button.setText("...")
+        button.setText(MainWindow.BUTTON_TEXT_FILE_DIALOG)
 
         def handler():
             if is_file:
                 f_dialog = QtGui.QFileDialog.getOpenFileName
-                title = 'open file'
+                title = MainWindow.DIALOG_TITLE_FILE
             else:
                 f_dialog = QtGui.QFileDialog.getOpenFileName
-                title = 'choice folder'
-            path = f_dialog(self, title, '../res')
+                title = MainWindow.DIALOG_TITLE_FOLDER
+            path = f_dialog(self, title, MainWindow.FILE_DIALOG_INIT_PATH)
             text_box.setText(path)
-            save_cache("../.cache", key, path)
+            save_cache(MainWindow.CACHE_PATH, key, path)
 
         self.connect(button, QtCore.SIGNAL('clicked()'), handler)
         return button
