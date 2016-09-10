@@ -277,6 +277,11 @@ class ShapeMapCreator(object):
         return shape_maps
 
     def create_all_direction(self):
+        """
+
+        全方向に関してShapeMapオブジェクトを生成する
+
+        """
         return self.create(directions=(TriangleFace.DIRECTION.HORIZON,
                                        TriangleFace.DIRECTION.UPPER_RIGHT,
                                        TriangleFace.DIRECTION.UPPER_LEFT))

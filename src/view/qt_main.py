@@ -10,6 +10,12 @@ from src.util.app_util import save_cache, load_cache
 
 
 class MainWindow(QtGui.QMainWindow):
+    """
+
+    プロジェクトをグラフィカルに操作するUIウィンドウ
+
+    """
+
     LABEL_TEXT_MODEL_PATH = "Model File (.off or .obj) Path"
     LABEL_TEXT_GRID_PATH = "Grid Path"
     LABEL_TEXT_CLA_PATH = ".cla File Path"
@@ -36,9 +42,32 @@ class MainWindow(QtGui.QMainWindow):
     KEY_GRID_SCALE = "grid_scale"
 
     class SygnalHost(QtCore.QObject):
+        """
+
+        単一シグナルを持つオブジェクト
+
+        """
         sygnal = QtCore.pyqtSignal()
 
     def __init__(self, title, x, y, width, height):
+        """
+
+        :type title: str
+        :param title: ウィンドウタイトル
+
+        :type x: int
+        :param x: ウィンドウのx座標
+
+        :type y: int
+        :param y: ウィンドウのy座標
+
+        :type width: int
+        :param width: ウィンドウの幅
+
+        :type height: int
+        :param height: ウィンドウの高さ
+
+        """
         super(MainWindow, self).__init__()
 
         self.setGeometry(x, y, width, height)
@@ -140,13 +169,46 @@ class MainWindow(QtGui.QMainWindow):
         self.__show_stdout_as_result()
 
     def get_cached_line_edit(self, cache_path, cache_key):
+        """
+
+        QLineEditを返す
+        QLineEditには前回最後に入力した内容が入る
+
+        :type cache_path: str
+        :param cache_path: キャッシュ保存パス
+
+        :type cache_key: str
+        :param cache_key: キャッシュされたデータのキー
+
+        :type: QtGui.QLineEdit
+        :return: キャッシュされたパスを読み込んだQLineEditオブジェクト
+
+        """
         line_edit = QtGui.QLineEdit(self)
         cache = load_cache(cache_path, cache_key)
         if cache is not None:
             line_edit.setText(cache)
         return line_edit
 
-    def get_file_dialog_button(self, text_box, key, is_file):
+    def get_file_dialog_button(self, line_edit, cache_key, is_file):
+        """
+
+        ファイルダイアログを開くQPushButtonを返す
+        ファイルダイアログで読み込まれたパスはキャッシュされる
+
+        :type line_edit: QtGui.QLineEdit
+        :param line_edit: パスを入力するQLineEditオブジェクト
+
+        :type cache_key: str
+        :param cache_key: キャッシュされたデータのキー
+
+        :type is_file: bool
+        :param is_file: ファイルパス読み込みかどうか（Falseの場合ディレクトリパス読み込み）
+
+        :rtype: QtGui.QPushButton
+        :return: ファイルダイアログを開くQPushButton
+
+        """
 
         button = QtGui.QPushButton(self)
         button.setText(MainWindow.BUTTON_TEXT_FILE_DIALOG)
@@ -159,23 +221,53 @@ class MainWindow(QtGui.QMainWindow):
                 f_dialog = QtGui.QFileDialog.getOpenFileName
                 title = MainWindow.DIALOG_TITLE_FOLDER
             path = f_dialog(self, title, MainWindow.FILE_DIALOG_INIT_PATH)
-            text_box.setText(path)
-            save_cache(MainWindow.CACHE_PATH, key, path)
+            line_edit.setText(path)
+            save_cache(MainWindow.CACHE_PATH, cache_key, path)
 
         self.connect(button, QtCore.SIGNAL('clicked()'), handler)
         return button
 
-    def get_file_path_layout(self, text_box, button):
+    def get_file_path_layout(self, line_edit, button):
+        """
+
+        ファイルパスを入力するQLineEditと
+        ファイルダイアログを開くQPushButtonを統合したレイアウトを返す
+
+        :type line_edit: QtGui.QLineEdit
+        :param line_edit: QLineEditオブジェクト
+
+        :type button: QtGui.QPushButton
+        :param button: QPushButtonオブジェクト
+
+        """
         hl_model_path = QtGui.QHBoxLayout()
-        hl_model_path.addWidget(text_box)
+        hl_model_path.addWidget(line_edit)
         hl_model_path.addWidget(button)
         return hl_model_path
 
-    def set_on_create_button_click_listener(self, on_create_button_clicked):
+    def set_on_create_button_click_handler(self, on_create_button_clicked):
+        """
+
+        createボタンが押された時の処理を記述した関数を
+        createボタンに設定する
+
+        :type on_create_button_clicked: func
+        :param on_create_button_clicked: createボタンに設定するハンドラ
+
+
+        """
+
         self.connect(self.btn_create, QtCore.SIGNAL('clicked()'),
                      on_create_button_clicked)
 
     def __show_stdout(self):
+
+        """
+
+        標準出力を文字列として逐次取得し、GUI上に表示する
+
+        """
+
         stdout_as_string_io = sys.stdout
         stderr_as_string_io = sys.stderr
 
@@ -227,6 +319,29 @@ class MainWindow(QtGui.QMainWindow):
 
 
 def main(init, title, x, y, width, height):
+    """
+
+    GUI Main関数
+
+    :type init: func(QtGui.QMainWindow)
+    :param init: 初期化関数
+
+    :type title: str
+    :param title: ウィンドウタイトル
+
+    :type x: int
+    :param x: ウィンドウのx座標
+
+    :type y: int
+    :param y: ウィンドウのy座標
+
+    :type width: int
+    :param width: ウィンドウの幅
+
+    :type height: int
+    :param height: ウィンドウの高さ
+
+    """
     app = QtGui.QApplication(sys.argv)
     window = MainWindow(title, x, y, width, height)
     init(window)

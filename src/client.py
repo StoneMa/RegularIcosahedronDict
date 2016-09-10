@@ -44,7 +44,7 @@ def init(window):
             create_shrec_maps(n_div, grid_scale, model_path, grid_path,
                               cla_path, save_path)
 
-    window.set_on_create_button_click_listener(on_create_button_click)
+    window.set_on_create_button_click_handler(on_create_button_click)
 
 
 def create_shrec_maps(n_div, scale_grid, shrec_off_root, grd_path, cla_file,
