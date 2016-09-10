@@ -226,8 +226,8 @@ class MainWindow(QtGui.QMainWindow):
         threading.Thread(target=emit_signal).start()
 
 
-def main(init):
+def main(init, title, x, y, width, height):
     app = QtGui.QApplication(sys.argv)
-    window = MainWindow("a", 0, 0, 800, 450)
+    window = MainWindow(title, x, y, width, height)
     init(window)
     sys.exit(app.exec_())

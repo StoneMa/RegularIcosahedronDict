@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import os
+import sys
 import time
 import threading
 from src.view.qt_util import critical_message_box
@@ -48,7 +49,6 @@ def init(window):
 
 def create_shrec_maps(n_div, scale_grid, shrec_off_root, grd_path, cla_file,
                       shp_file_root):
-
     def execute():
         cla = parse_cla(cla_file)
 
@@ -84,4 +84,5 @@ def create_shrec_maps(n_div, scale_grid, shrec_off_root, grd_path, cla_file,
 
 
 if __name__ == '__main__':
-    main(init)
+    title, x, y, width, height = sys.argv[1:]
+    main(init, title, int(x), int(y), int(width), int(height))
