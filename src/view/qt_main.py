@@ -30,26 +30,13 @@ class MainWindow(QtGui.QMainWindow):
 
         # path input layout #
 
-        self.tb_model_path = QtGui.QLineEdit(self)
-        self.tb_grid_path = QtGui.QLineEdit(self)
-        self.tb_cla_path = QtGui.QLineEdit(self)
-        self.tb_save_path = QtGui.QLineEdit(self)
-        self.tb_n_div = QtGui.QLineEdit(self)
-        self.tb_grid_scale = QtGui.QLineEdit(self)
-
-        # cache
-        model_path_cache = load_cache("../.cache", "model_path")
-        grid_path_cache = load_cache("../.cache", "grid_path")
-        cla_path_cache = load_cache("../.cache", "cla_path")
-        save_path_cache = load_cache("../.cache", "save_path")
-        self.tb_model_path.setText(
-            model_path_cache if model_path_cache is not None else "")
-        self.tb_grid_path.setText(
-            grid_path_cache if grid_path_cache is not None else "")
-        self.tb_cla_path.setText(
-            cla_path_cache if cla_path_cache is not None else "")
-        self.tb_save_path.setText(
-            save_path_cache if save_path_cache is not None else "")
+        self.tb_model_path = self.get_cached_line_edit("../.cache",
+                                                       "model_path")
+        self.tb_grid_path = self.get_cached_line_edit("../.cache", "grid_path")
+        self.tb_cla_path = self.get_cached_line_edit("../.cache", "cla_path")
+        self.tb_save_path = self.get_cached_line_edit("../.cache", "save_path")
+        self.tb_n_div = self.get_cached_line_edit("../cache", "n_div")
+        self.tb_grid_scale = self.get_cached_line_edit("../cache", "grid_scale")
 
         btn_fd_model_path = QtGui.QPushButton(self)
         btn_fd_grid_path = QtGui.QPushButton(self)
@@ -152,6 +139,13 @@ class MainWindow(QtGui.QMainWindow):
 
         #
         self.__show_stdout_as_result()
+
+    def get_cached_line_edit(self, cache_path, cache_key):
+        line_edit = QtGui.QLineEdit(self)
+        cache = load_cache(cache_path, cache_key)
+        if cache is not None:
+            line_edit.setText(cache)
+        return line_edit
 
     def set_on_create_button_click_listener(self, on_create_button_clicked):
         self.connect(self.btn_create, QtCore.SIGNAL('clicked()'),
