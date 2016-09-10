@@ -35,11 +35,11 @@ def init(window):
             grid_scale = float(str(window.tb_grid_scale.text()))
         except (ValueError, TypeError), e:
             if "n_div" in e.message:
-                critical_message_box(window, "",
-                                     "N-Division should be a number.")
+                QtGui.QMessageBox.critical(window, title,
+                                           "N-Division should be a number.")
             else:
-                critical_message_box(window, "",
-                                     "Grid Scale should be a number.")
+                QtGui.QMessageBox.critical(window, "",
+                                           "Grid Scale should be a number.")
         else:
             create_shrec_maps(n_div, grid_scale, model_path, grid_path,
                               cla_path, save_path)
