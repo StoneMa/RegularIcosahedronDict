@@ -7,6 +7,7 @@ import time
 import threading
 from PyQt4 import QtGui, QtCore
 from src.util.app_util import save_cache, load_cache
+from qt_gl import GLWidget
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -77,8 +78,11 @@ class MainWindow(QtGui.QMainWindow):
 
         ### result layout ###
 
+        self.gl_widget = GLWidget(None,self)
+
         self.te_result = QtGui.QTextEdit(self)
         vl_result = QtGui.QVBoxLayout()
+        vl_result.addWidget(self.gl_widget)
         vl_result.addWidget(self.te_result)
 
         ### path input layout ###

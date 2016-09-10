@@ -9,7 +9,7 @@ from triangle_grid import TriangleGrid, TriangleFace
 class IcosahedronGrid(TriangleGrid):
     """
     距離マップ生成用グリッドクラス
-    face情報・normal情報は失われる
+    face_vertex情報・normal_vertex情報は失われる
     代わりに各グリッド面の情報GridFaceが保持される
     """
 
