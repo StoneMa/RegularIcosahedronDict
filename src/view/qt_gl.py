@@ -131,6 +131,11 @@ class GLWidget(QtOpenGL.QGLWidget):
         # 光源のDiffuse/Specular設定
         for l in self.LIGHTS:
             GL.glLightfv(l.type, GL.GL_DIFFUSE, l.diffuse)
+        # 全ての光源を有効にする
+        GL.glEnable(GL.GL_LIGHT0)
+        GL.glEnable(GL.GL_LIGHT1)
+        GL.glEnable(GL.GL_LIGHT2)
+        GL.glEnable(GL.GL_LIGHT3)
 
     def set_light_enable(self, name, is_enabled):
         """
@@ -214,10 +219,8 @@ class GLWidget(QtOpenGL.QGLWidget):
         """
         genList = GL.glGenLists(1)
         GL.glNewList(genList, GL.GL_COMPILE)
-
         if self.renderer is not None:
             self.renderer.render()
-
         GL.glEndList()
 
         return genList

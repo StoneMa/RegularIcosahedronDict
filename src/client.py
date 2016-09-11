@@ -42,7 +42,7 @@ def init(window):
                                            "Grid Scale should be a number.")
         else:
             create_shrec_maps(n_div, grid_scale, model_path, grid_path,
-                              cla_path, save_path)
+                              cla_path, save_path, window.gl_widget)
 
     window.set_on_create_button_click_handler(on_create_button_click)
 

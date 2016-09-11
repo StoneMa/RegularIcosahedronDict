@@ -8,6 +8,7 @@ import threading
 from PyQt4 import QtGui, QtCore
 from src.util.app_util import save_cache, load_cache
 from qt_gl import GLWidget
+from renderer.point_renderer import PointRenderer
 
 
 class MainWindow(QtGui.QMainWindow):
@@ -77,8 +78,6 @@ class MainWindow(QtGui.QMainWindow):
         self.parent_widget = QtGui.QWidget()
 
         ### result layout ###
-
-        self.gl_widget = GLWidget(None,self)
 
         self.te_result = QtGui.QTextEdit(self)
         vl_result = QtGui.QVBoxLayout()
