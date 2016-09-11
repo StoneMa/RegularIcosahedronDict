@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-from src.grid.icosahedron_grid import IcosahedronGrid, IcosahedronFace
+from src.obj.grid.icosahedron_grid import IcosahedronGrid, IcosahedronFace
 
 
 class TestGrid3d(unittest.TestCase):

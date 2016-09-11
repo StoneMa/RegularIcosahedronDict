@@ -8,7 +8,7 @@ import time
 
 from PyQt4 import QtGui
 
-from src.grid.icosahedron_grid import IcosahedronGrid
+from src.obj.grid.icosahedron_grid import IcosahedronGrid
 from src.obj.obj3d import Obj3d
 from src.shape_map import ShapeMapCreator
 from src.util.parse_util import parse_cla

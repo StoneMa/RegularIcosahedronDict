@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-from src.grid.icosahedron_grid import IcosahedronFace
+from src.obj.grid.icosahedron_grid import IcosahedronFace
 from src.shape_map import ShapeMapCreator
 
 

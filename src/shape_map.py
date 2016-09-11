@@ -5,9 +5,9 @@ import os
 import struct
 
 import numpy as np
-
 from src.grid.base_grid import BaseGrid
-from src.grid.icosahedron_grid import TriangleGrid, TriangleFace
+
+from src.obj.grid.icosahedron_grid import TriangleGrid, TriangleFace
 from src.obj.obj3d import Obj3d
 from src.util.debug_util import assert_type_in_container
 
