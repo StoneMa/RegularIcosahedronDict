@@ -56,6 +56,7 @@ class IcosahedronGrid(TriangleGrid):
 
         vertices = []
         face_vertices = []
+        adjacent_face_ids = []
         upper_direction = None
 
         with open(grd_file) as f:
@@ -73,17 +74,26 @@ class IcosahedronGrid(TriangleGrid):
                 elif line[0] == 'f':
                     face_vertices.append(map(int, line[1:]))
 
+                elif line[0] == 'af':
+                    adjacent_face_ids.append(map(int, line[1:]))
+
                 elif line[0] == 'ud':
                     upper_direction = tuple(map(float, line[1:]))
 
-        vertices = np.asarray(vertices)
+        assert len(face_vertices) == len(adjacent_face_ids)
 
         grid_faces = [TriangleFace(face_id,
+                                   left_face_id=af[0],
+                                   right_face_id=af[1],
+                                   bottom_face_id=af[2],
                                    vidx_table={(0, 0): fv[0], (1, 0): fv[1],
                                                (0, 1): fv[2]})
-                      for face_id, fv in enumerate(face_vertices)]
+                      for face_id, fv, af in zip(xrange(len(face_vertices)),
+                                                 face_vertices,
+                                                 adjacent_face_ids)]
 
-        return IcosahedronGrid(vertices, grid_faces, 1, upper_direction)
+        return IcosahedronGrid(np.asarray(vertices), grid_faces, 1,
+                               upper_direction)
 
     def center(self):
         """
@@ -153,6 +163,10 @@ class IcosahedronGrid(TriangleGrid):
         :return: TriangleFaceのリストのコピー
 
         """
-        return [TriangleFace(gf.face_id, n_div=gf.n_div,
+        return [TriangleFace(gf.face_id,
+                             left_face_id=gf.left_face_id,
+                             right_face_id=gf.right_face_id,
+                             bottom_face_id=gf.bottom_face_id,
+                             n_div=gf.n_div,
                              vidx_table=gf.vidx_table_as_copy()) for gf in
                 self.grid_faces]

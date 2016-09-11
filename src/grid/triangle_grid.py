@@ -75,7 +75,11 @@ class TriangleGrid(BaseGrid):
             right_vector = right_vertex - top_vertex
 
             # 一旦GridFaceの頂点情報をクリア
-            new_face = TriangleFace(grid_face.face_id, n_div=n_div)
+            new_face = TriangleFace(grid_face.face_id,
+                                    left_face_id=grid_face.left_face_id,
+                                    right_face_id=grid_face.right_face_id,
+                                    bottom_face_id=grid_face.bottom_face_id,
+                                    n_div=n_div)
 
             for sum_length in xrange(n_div + 1):
                 for i in xrange(sum_length + 1):
@@ -111,11 +115,21 @@ class TriangleFace(BaseFace):
 
     """
 
-    def __init__(self, face_id, n_div=1, vidx_table=None):
+    def __init__(self, face_id, left_face_id, right_face_id, bottom_face_id,
+                 n_div=1, vidx_table=None):
         """
 
         :type face_id: int or long
         :param face_id: 面を一意に識別するためのID
+
+        :type left_face_id: int or long
+        :param left_face_id: 左辺に隣接するface_id
+
+        :type right_face_id: int or long
+        :param right_face_id: 右辺に隣接するface_id
+
+        :type bottom_face_id: int or long
+        :param bottom_face_id: 底辺に隣接するface_id
 
         :type n_div: int or long
         :param n_div: 面の分割数
@@ -125,6 +139,9 @@ class TriangleFace(BaseFace):
 
         """
         super(TriangleFace, self).__init__(face_id, n_div, vidx_table)
+        self.left_face_id = left_face_id
+        self.right_face_id = right_face_id
+        self.bottom_face_id = bottom_face_id
 
     def set_vertex_idx(self, idx, alpha, beta):
         """
