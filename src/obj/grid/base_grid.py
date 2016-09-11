@@ -15,6 +15,8 @@ class BaseGrid(Obj3d):
     形状マップを生成するために使う、３次元空間上グリッドの基底クラス
 
     """
+    BAND_DIRECTION = enum.Enum('BAND_DIRECTION',
+                               'HORIZON UPPER_RIGHT UPPER_LEFT')
 
     VERTEX_IDX_UNDEFINED = None
 
@@ -56,20 +58,20 @@ class BaseGrid(Obj3d):
         self.n_div = n_div
         self.upper_direction = upper_direction
 
-    def traverse(self, direction):
+    def traverse(self, uni_direction):
         """
 
         正二十面体グリッドの各面の頂点インデックスを走査し、
         結果をFaceIDとのペアで返す
 
-        :type direction: BaseFace.DIRECTION
-        :param direction: 走査方向
+        :type uni_direction: BaseFace.UNI_DIRECTION
+        :param uni_direction: 走査方向
 
         :rtype dict
         :return FaceIDをキー、面の頂点インデックスリストをバリューとした辞書
 
         """
-        return {grid_face.face_id: grid_face.traverse(direction)
+        return {grid_face.face_id: grid_face.traverse(uni_direction)
                 for grid_face in self.grid_faces}
 
     def find_face_from_id(self, face_id):
@@ -111,7 +113,7 @@ class BaseFace(object):
 
     """
 
-    UNI_DIRECTION = enum.Enum('UNI_DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
+    UNI_SCAN_DIRECTION = enum.Enum('UNI_DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
 
     def __init__(self, face_id, n_div=1, vidx_table=None,
                  is_assertion_enabled=True):

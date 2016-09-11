@@ -47,7 +47,7 @@ class ShapeMap(object):
         assert_type_in_container(shape_maps, (list, np.ndarray))
         assert isinstance(cls, (int, long))
         assert isinstance(n_div, (int, long))
-        assert isinstance(traverse_direction, TriangleFace.UNI_DIRECTION)
+        assert isinstance(traverse_direction, TriangleFace.UNI_SCAN_DIRECTION)
         assert len(face_ids) == len(shape_maps)
 
         self.shape_map_dict = dict(zip(face_ids, shape_maps))
@@ -282,6 +282,6 @@ class ShapeMapCreator(object):
         全方向に関してShapeMapオブジェクトを生成する
 
         """
-        return self.create(directions=(TriangleFace.UNI_DIRECTION.HORIZON,
-                                       TriangleFace.UNI_DIRECTION.UPPER_RIGHT,
-                                       TriangleFace.UNI_DIRECTION.UPPER_LEFT))
+        return self.create(directions=(TriangleFace.UNI_SCAN_DIRECTION.HORIZON,
+                                       TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,
+                                       TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT))

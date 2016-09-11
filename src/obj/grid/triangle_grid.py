@@ -254,14 +254,15 @@ class TriangleFace(BaseFace):
         """
 
         coordinates = \
-            {TriangleFace.UNI_DIRECTION.HORIZON: self.__horizon_coordinates,
-             TriangleFace.UNI_DIRECTION.UPPER_RIGHT: self.__upper_right_coordinates,
-             TriangleFace.UNI_DIRECTION.UPPER_LEFT: self.__upper_left_coordinates}[
+            {TriangleFace.UNI_SCAN_DIRECTION.HORIZON: self.__horizon_coordinates,
+             TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT: self.__upper_right_coordinates,
+             TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT: self.__upper_left_coordinates}[
                 direction]
 
         return [[self.get_vertex_idx(alpha, beta)
                  for alpha, beta in zip(*coordinates(row))]
                 for row in xrange(self.n_div + 1)]
+
 
 
     def __horizon_coordinates(self, row):
