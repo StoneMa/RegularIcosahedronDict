@@ -15,7 +15,7 @@ class IcosahedronGrid(TriangleGrid):
 
     N_FACE = 20
 
-    def __init__(self, vertices, grid_faces, n_div):
+    def __init__(self, vertices, grid_faces, n_div, upper_direction):
         """
 
         :type vertices: list or tuple or np.ndarray
@@ -27,9 +27,13 @@ class IcosahedronGrid(TriangleGrid):
         :type n_div: int
         :param n_div: Grid3dオブジェクトの各面の分割数
 
+        :type upper_direction: (float, float, float)
+        :param upper_direction: グリッドの上方向を表す単位ベクトル
+
         """
         super(IcosahedronGrid, self).__init__(vertices, grid_faces,
-                                              IcosahedronGrid.N_FACE, n_div)
+                                              IcosahedronGrid.N_FACE, n_div,
+                                              upper_direction)
 
     @staticmethod
     def load(grd_file):
@@ -52,6 +56,7 @@ class IcosahedronGrid(TriangleGrid):
 
         vertices = []
         face_vertices = []
+        upper_direction = None
 
         with open(grd_file) as f:
 
@@ -68,6 +73,9 @@ class IcosahedronGrid(TriangleGrid):
                 elif line[0] == 'f':
                     face_vertices.append(map(int, line[1:]))
 
+                elif line[0] == 'ud':
+                    upper_direction = tuple(map(float, line[1:]))
+
         vertices = np.asarray(vertices)
 
         grid_faces = [TriangleFace(face_id,
@@ -75,7 +83,7 @@ class IcosahedronGrid(TriangleGrid):
                                                (0, 1): fv[2]})
                       for face_id, fv in enumerate(face_vertices)]
 
-        return IcosahedronGrid(vertices, grid_faces, 1)
+        return IcosahedronGrid(vertices, grid_faces, 1, upper_direction)
 
     def center(self):
         """
@@ -88,7 +96,7 @@ class IcosahedronGrid(TriangleGrid):
         """
         obj3d = super(IcosahedronGrid, self).center()
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
-                               self.n_div)
+                               self.n_div, self.upper_direction)
 
     def normal(self):
         """
@@ -101,7 +109,7 @@ class IcosahedronGrid(TriangleGrid):
         """
         obj3d = super(IcosahedronGrid, self).normal()
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
-                               self.n_div)
+                               self.n_div, self.upper_direction)
 
     def scale(self, r):
         """
@@ -117,7 +125,7 @@ class IcosahedronGrid(TriangleGrid):
         """
         obj3d = super(IcosahedronGrid, self).scale(r)
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
-                               self.n_div)
+                               self.n_div, self.upper_direction)
 
     def rotate(self, theta, axis_vector):
         """
@@ -135,7 +143,7 @@ class IcosahedronGrid(TriangleGrid):
         """
         obj3d = super(IcosahedronGrid, self).rotate(theta, axis_vector)
         return IcosahedronGrid(obj3d.vertices, self.grid_faces_as_copy(),
-                               self.n_div)
+                               self.n_div, self.upper_direction)
 
     def grid_faces_as_copy(self):
         """

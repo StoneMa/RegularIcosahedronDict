@@ -62,3 +62,6 @@ to h 16 10 4 1 0 2 6 12 18 19
 to l 17 11 5 1 0 3 8 4
 # to upper right
 to u 15 9 3 0 2 7 13
+
+# upper direction
+ud 0 0 1

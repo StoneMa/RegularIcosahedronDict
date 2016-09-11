@@ -16,7 +16,7 @@ class BaseGrid(Obj3d):
 
     VERTEX_IDX_UNDEFINED = None
 
-    def __init__(self, vertices, base_faces, n_face, n_div,
+    def __init__(self, vertices, base_faces, n_face, n_div, upper_direction,
                  is_face_assertion_enabled=True):
         """
 
@@ -35,6 +35,9 @@ class BaseGrid(Obj3d):
         :type is_face_assertion_enabled: bool
         :param is_face_assertion_enabled: メンバのアサーションチェックを有効にするかどうか
 
+        :type upper_direction: (float, float, float)
+        :param upper_direction: グリッドの上方向を表す単位ベクトル
+
         """
 
         super(BaseGrid, self).__init__(vertices)
@@ -49,6 +52,7 @@ class BaseGrid(Obj3d):
         self.grid_faces = base_faces
         self.n_face = n_face
         self.n_div = n_div
+        self.upper_direction = upper_direction
 
     def traverse(self, direction):
         """

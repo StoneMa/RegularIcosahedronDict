@@ -13,14 +13,35 @@ class TriangleGrid(BaseGrid):
 
     """
 
-    def __init__(self, vertices, triangle_faces, n_face, n_div,
+    def __init__(self, vertices, triangle_faces, n_face, n_div, upper_direction,
                  is_face_assertion_enabled=True):
+        """
+
+        :type vertices: np.ndarray
+        :param vertices: 頂点座標配列
+
+        :type triangle_faces: list(TriangleFace) or tuple(TriangleFace)
+        :param triangle_faces: TriangleFaceの集合
+
+        :type n_face: int or long
+        :param n_face: 面の数
+
+        :type n_div: int or long
+        :param n_div: 面の分割数
+
+        :type is_face_assertion_enabled: bool
+        :param is_face_assertion_enabled: メンバのアサーションチェックを有効にするかどうか
+
+        :type upper_direction: (float, float, float)
+        :param upper_direction: グリッドの上方向を表す単位ベクトル
+
+        """
         # assertion
         if is_face_assertion_enabled:
             assert_type_in_container(triangle_faces, TriangleFace)
 
         super(TriangleGrid, self).__init__(vertices, triangle_faces, n_face,
-                                           n_div,
+                                           n_div, upper_direction,
                                            is_face_assertion_enabled=False)
 
     def divide_face(self, n_div, epsilon=np.finfo(float).eps):
@@ -80,7 +101,7 @@ class TriangleGrid(BaseGrid):
             new_grid_faces.append(new_face)
 
         return TriangleGrid(new_vertices, new_grid_faces, self.n_face,
-                            self.n_div)
+                            self.n_div, self.upper_direction)
 
 
 class TriangleFace(BaseFace):
