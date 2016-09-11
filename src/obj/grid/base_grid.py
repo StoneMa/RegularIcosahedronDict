@@ -111,7 +111,7 @@ class BaseFace(object):
 
     """
 
-    DIRECTION = enum.Enum('DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
+    UNI_DIRECTION = enum.Enum('UNI_DIRECTION', 'HORIZON UPPER_RIGHT UPPER_LEFT')
 
     def __init__(self, face_id, n_div=1, vidx_table=None,
                  is_assertion_enabled=True):
