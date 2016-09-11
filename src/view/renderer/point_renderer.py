@@ -2,8 +2,9 @@
 # coding: utf-8
 
 from OpenGL import GL
+
 from abstract_renderer import AbstractRenderer
-from src.obj3d import Obj3d
+from src.obj.obj3d import Obj3d
 
 
 class PointRenderer(AbstractRenderer):

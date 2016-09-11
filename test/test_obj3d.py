@@ -2,8 +2,10 @@
 # coding: utf-8
 
 import unittest
+
 import numpy as np
-from src.obj3d import Obj3d
+
+from src.obj.obj3d import Obj3d
 
 
 class _TestObj3d(unittest.TestCase):

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import enum
 from collections import OrderedDict
-from src.obj3d import Obj3d
+
+import enum
+
+from src.obj.obj3d import Obj3d
 from src.util.debug_util import assert_type_in_container
 
 
