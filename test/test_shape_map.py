@@ -5,8 +5,8 @@ import unittest
 
 import numpy as np
 
+from src.map.shape_map import ShapeMapCreator
 from src.obj.grid.icosahedron_grid import IcosahedronFace
-from src.shape_map import ShapeMapCreator
 
 
 class TestShapeMap(unittest.TestCase):

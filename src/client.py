@@ -8,9 +8,9 @@ import time
 
 from PyQt4 import QtGui
 
+from src.map.shape_map import ShapeMapCreator
 from src.obj.grid.icosahedron_grid import IcosahedronGrid
 from src.obj.obj3d import Obj3d
-from src.shape_map import ShapeMapCreator
 from src.util.parse_util import parse_cla
 from src.view.qt_main import main, MainWindow
 
