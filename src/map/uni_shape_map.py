@@ -69,7 +69,7 @@ class UniShapeMap(BaseShapeMap):
             # 分割数
             lines.append("#N_DIV\n{}\n".format(self.n_div))
             # マップ型
-            lines.append("#TYPE\n{}\n".format(type_name))
+            lines.append("#DATA_TYPE\n{}\n".format(type_name))
 
             lines.append("#DATA\n")
 
