@@ -281,6 +281,9 @@ class ShapeMapCreator(object):
 
         全方向に関してShapeMapオブジェクトを生成する
 
+        :rtype: list(ShapeMap)
+        :return: ShapeMapオブジェクト×3
+
         """
         return self.create(directions=(TriangleFace.UNI_SCAN_DIRECTION.HORIZON,
                                        TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,
