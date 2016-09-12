@@ -291,7 +291,7 @@ class TriangleFace(BaseFace):
         """
         return self.get_vertex_idx(0, self.n_div)
 
-    def traverse(self, direction, is_reversed):
+    def traverse(self, direction):
         """
 
         単一面の頂点インデックスを指定方向に走査し、入れ子リストとして返す
@@ -299,21 +299,30 @@ class TriangleFace(BaseFace):
         :type direction: icosahedronface.direction
         :param direction: 操作方向の指定
 
-        :type is_reversed: bool
-        :param is_reversed: 面が、グリッドの基準上方向ベクトルupper_direction
-                               に対して上下逆さまかどうか
-
         :rtype: list(list(int))
         :return: 頂点インデックスの入れ子リスト
 
         """
-
-        coordinates = \
-            {
-                TriangleFace.UNI_SCAN_DIRECTION.HORIZON: self.__horizon_row_coordinates,
-                TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT: self.__upper_right_row_coordinates,
-                TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT: self.__upper_left_row_coordinates}[
-                direction]
+        if direction == TriangleFace.UNI_SCAN_DIRECTION.HORIZON:
+            coordinates = self.__horizon_row_coordinates
+            is_reversed = False
+        elif direction == TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT:
+            coordinates = self.__upper_right_row_coordinates
+            is_reversed = False
+        elif direction == TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT:
+            coordinates = self.__upper_left_row_coordinates
+            is_reversed = False
+        elif direction == TriangleFace.UNI_SCAN_DIRECTION.HORIZON_REVERSED:
+            coordinates = self.__horizon_row_coordinates
+            is_reversed = True
+        elif direction == TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED:
+            coordinates = self.__upper_right_row_coordinates
+            is_reversed = True
+        elif direction == TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED:
+            coordinates = self.__upper_left_row_coordinates
+            is_reversed = True
+        else:
+            raise KeyError
 
         rows = xrange(self.n_div, -1, -1) if is_reversed \
             else xrange(self.n_div + 1)
@@ -338,12 +347,12 @@ class TriangleFace(BaseFace):
         :return: alpha, betaの座標配列
 
         """
+
+        alpha = xrange(row, -1, -1)
+        beta = xrange(row + 1)
         if is_reversed:
-            alpha = xrange(row + 1)
-            beta = xrange(row, -1, -1)
-        else:
-            alpha = xrange(row, -1, -1)
-            beta = xrange(row + 1)
+            alpha = reversed(list(alpha))
+            beta = reversed(list(beta))
         return alpha, beta
 
     def __upper_right_row_coordinates(self, row, is_reversed):
@@ -362,12 +371,12 @@ class TriangleFace(BaseFace):
         :return: alpha, betaの座標配列
 
         """
+
+        alpha = [self.n_div - row for i in xrange(row + 1)]
+        beta = xrange(row, -1, -1)
         if is_reversed:
-            alpha = [row for i in xrange(row + 1)]
-            beta = xrange(row + 1)
-        else:
-            alpha = [self.n_div - row for i in xrange(row + 1)]
-            beta = xrange(row, -1, -1)
+            alpha = reversed(alpha)
+            beta = reversed(list(beta))
         return alpha, beta
 
     def __upper_left_row_coordinates(self, row, is_reversed):
@@ -386,10 +395,9 @@ class TriangleFace(BaseFace):
         :return: alpha, betaの座標配列
 
         """
+        alpha = xrange(row + 1)
+        beta = [self.n_div - row for _ in xrange(row + 1)]
         if is_reversed:
-            alpha = xrange(row, -1, -1)
-            beta = [row for i in xrange(row + 1)]
-        else:
-            alpha = xrange(row + 1)
-            beta = [self.n_div - row for i in xrange(row + 1)]
+            alpha = reversed(list(alpha))
+            beta = reversed(beta)
         return alpha, beta

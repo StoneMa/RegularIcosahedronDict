@@ -46,12 +46,9 @@ def handler(kwargs):
             creator = ShapeMapCreator(obj3d, grid3d, cls, n_div, grid_scale)
 
             print "maps being created..."
-            horizon, upper_right, upper_left = creator.create_all_direction()
-
-            print horizon
-            horizon.save(save_root_path, str(model_id))
-            upper_right.save(save_root_path, str(model_id))
-            upper_left.save(save_root_path, str(model_id))
+            for shape_map in creator.create_all_direction():
+                print shape_map
+                shape_map.save(save_root_path, str(model_id))
 
             print (time.clock() - start), "s"
 

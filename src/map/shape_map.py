@@ -260,7 +260,7 @@ class ShapeMapCreator(object):
         # FaceIDと頂点インデックスのマップの辞書を取得
         shape_maps = []
         for direction in directions:
-            traversed_indices_dict = self.grid.traverse(direction, False)
+            traversed_indices_dict = self.grid.traverse(direction)
 
             distance_maps = [[[distances[idx]
                                if idx != BaseGrid.VERTEX_IDX_UNDEFINED
@@ -283,6 +283,4 @@ class ShapeMapCreator(object):
         :return: ShapeMapオブジェクト×3
 
         """
-        return self.create(directions=(TriangleFace.UNI_SCAN_DIRECTION.HORIZON,
-                                       TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,
-                                       TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT))
+        return self.create(directions=TriangleFace.UNI_SCAN_DIRECTION)

@@ -57,7 +57,7 @@ class BaseGrid(Obj3d):
         self.n_div = n_div
         self.upper_direction = upper_direction
 
-    def traverse(self, uni_direction, is_upside_down):
+    def traverse(self, uni_direction):
         """
 
         正二十面体グリッドの各面の頂点インデックスを走査し、
@@ -66,16 +66,12 @@ class BaseGrid(Obj3d):
         :type uni_direction: BaseFace.UNI_DIRECTION
         :param uni_direction: 走査方向
 
-        :type is_upside_down: bool
-        :param is_upside_down: 面が、グリッドの基準上方向ベクトルupper_direction
-                               に対して上下逆さまかどうか
-
         :rtype dict
         :return FaceIDをキー、面の頂点インデックスリストをバリューとした辞書
 
         """
         return {
-            grid_face.face_id: grid_face.traverse(uni_direction, is_upside_down)
+            grid_face.face_id: grid_face.traverse(uni_direction)
             for grid_face in self.grid_faces}
 
     def find_face_from_id(self, face_id):
@@ -118,7 +114,9 @@ class BaseFace(object):
     """
 
     UNI_SCAN_DIRECTION = enum.Enum('UNI_DIRECTION',
-                                   'HORIZON UPPER_RIGHT UPPER_LEFT')
+                                   'HORIZON UPPER_RIGHT UPPER_LEFT \
+                                    HORIZON_REVERSED UPPER_RIGHT_REVERSED \
+                                    UPPER_LEFT_REVERSED')
 
     def __init__(self, face_id, n_div=1, vidx_table=None,
                  is_assertion_enabled=True):
@@ -164,5 +162,5 @@ class BaseFace(object):
             s = s[:len(s) - 2] + " ) -> {:^2}\n".format(idx)
         return s
 
-    def traverse(self, direction, is_reversed):
+    def traverse(self, direction):
         raise NotImplementedError
