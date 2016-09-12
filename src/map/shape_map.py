@@ -141,7 +141,7 @@ class ShapeMapCreator(object):
         :type obj3d: Obj3d
         :param obj3d: 形状マップ生成対象の３Dオブジェクト
 
-        :type grid: TriangleGrid
+        :type grid: BaseGrid
         :param grid: 形状マップを生成するための正三角形からなるグリッド
 
         :type cls: int or long
@@ -157,7 +157,6 @@ class ShapeMapCreator(object):
 
         # 3Dモデル
         # モデルを座標系の中心に置き、正規化する
-        # self.obj3d = Obj3d.load(obj3d_path).center().normal()
         self.obj3d = obj3d.center().normal()
         # 正二十面体グリッド（頂点情報はz成分→xyのなす角でソートされる）
         # グリッドが３Dモデルを内部に完全に含むように拡張
@@ -229,8 +228,8 @@ class ShapeMapCreator(object):
 
         ShapeMapオブジェクトを生成する
 
-        :type directions: IcosahedronGrid.DIRECTION
-        :param directions: IcosahedronGridの頂点走査方向（複数指定可能）
+        :type directions: BaseGrid.DIRECTION
+        :param directions: BaseGridの頂点走査方向（複数指定可能）
 
         :rtype: ShapeMap
         :return: ShapeMapオブジェクト
