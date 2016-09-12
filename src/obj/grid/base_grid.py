@@ -66,6 +66,10 @@ class BaseGrid(Obj3d):
         :type uni_direction: BaseFace.UNI_DIRECTION
         :param uni_direction: 走査方向
 
+        :type is_upside_down: bool
+        :param is_upside_down: 面が、グリッドの基準上方向ベクトルupper_direction
+                               に対して上下逆さまかどうか
+
         :rtype dict
         :return FaceIDをキー、面の頂点インデックスリストをバリューとした辞書
 

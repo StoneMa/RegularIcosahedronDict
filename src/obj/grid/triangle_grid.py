@@ -125,29 +125,33 @@ class TriangleGrid(BaseGrid):
 
         """
         if band_type == BaseGrid.BAND_TYPE.HORIZON:
-            direction_loop = cycle((BaseFace.UNI_SCAN_DIRECTION.HORIZON,))
-            reverse_loop = cycle((False, True))
+            direction_loop = cycle(
+                (BaseFace.UNI_SCAN_DIRECTION.HORIZON,
+                 BaseFace.UNI_SCAN_DIRECTION.HORIZON_REVERSED))
             next_fid_func_loop = cycle((lambda face: face.right_face_id,
                                         lambda face: face.left_face_id))
         elif band_type == BaseGrid.BAND_TYPE.UPPER_RIGHT:
-            direction_loop = cycle((BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,))
-            reverse_loop = cycle((False, True))
+            direction_loop = cycle(
+                (BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED))
             next_fid_func_loop = cycle((lambda face: face.right_face_id,
                                         lambda face: face.bottom_face_id))
         elif band_type == BaseGrid.BAND_TYPE.LOWER_RIGHT:
-            direction_loop = cycle((BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,))
-            reverse_loop = cycle((True, False))
+            direction_loop = cycle(
+                (BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT))
             next_fid_func_loop = cycle((lambda face: face.bottom_face_id,
                                         lambda face: face.left_face_id))
+        else:
+            raise NotImplementedError
 
         result = [[] for _ in xrange(self.n_div + 1)]
 
         face_id = center_face_id
         while True:
             direction = direction_loop.next()
-            is_reversed = reverse_loop.next()
             face = self.find_face_from_id(face_id)
-            traversed_rows = face.traverse(direction, is_reversed)
+            traversed_rows = face.traverse(direction)
             for result_row, traversed_row in zip(result, traversed_rows):
                 # 重複を防ぐため、先頭要素は飛ばす
                 result_row += traversed_row[1:]

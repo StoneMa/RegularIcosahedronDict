@@ -6,7 +6,7 @@ import struct
 import numpy as np
 from src.obj.obj3d import Obj3d
 from src.obj.grid.base_grid import BaseGrid
-from src.obj.grid.icosahedron_grid import TriangleFace
+from src.obj.grid.icosahedron_grid import TriangleGrid, TriangleFace
 from src.util.debug_util import assert_type_in_container
 
 
@@ -141,7 +141,7 @@ class ShapeMapCreator(object):
         :type obj3d: Obj3d
         :param obj3d: 形状マップ生成対象の３Dオブジェクト
 
-        :type grid: BaseGrid
+        :type grid: TriangleGrid
         :param grid: 形状マップを生成するための正三角形からなるグリッド
 
         :type cls: int or long
