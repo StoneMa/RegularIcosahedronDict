@@ -7,11 +7,13 @@ from src.obj.grid.base_grid import BaseGrid
 
 
 class BaseShapeMapFactory(object):
-
     DIST_UNDEFINED = -1
 
-    def __init__(self, obj3d, grid, n_div, cls, grid_scale):
+    def __init__(self, model_id, obj3d, grid, n_div, cls, grid_scale):
         """
+
+        :type model_id: int or long:
+        :param model_id: 対象3DモデルID
 
         :type obj3d: Obj3d
         :param obj3d: 形状マップ生成対象の３Dオブジェクト
@@ -30,10 +32,13 @@ class BaseShapeMapFactory(object):
 
         """
 
+        assert isinstance(model_id, (int, long))
         assert isinstance(obj3d, Obj3d)
         assert isinstance(grid, BaseGrid)
         assert isinstance(cls, (int, long))
         assert isinstance(grid_scale, float)
+
+        self.model_id = model_id
 
         # 3Dモデル:座標系の中心に置き、正規化する
         self.obj3d = obj3d.center().normal()

@@ -7,9 +7,12 @@ from uni_shape_map import UniShapeMap
 
 
 class UniShapeMapFactory(BaseShapeMapFactory):
-    def __init__(self, map_id, obj3d, grid, n_div, cls, grid_scale,
+    def __init__(self, model_id, obj3d, grid, n_div, cls, grid_scale,
                  uni_scan_directions):
         """
+
+        :type model_id: int or long:
+        :param model_id: 対象3DモデルID
 
         :type obj3d: Obj3d
         :param obj3d: 形状マップ生成対象の３Dオブジェクト
@@ -28,13 +31,12 @@ class UniShapeMapFactory(BaseShapeMapFactory):
 
         :type uni_scan_direction: list(BaseFace.UNI_SCAN_DIRECTION)
         :param uni_scan_direction: 生成するマップの単一面の走査方向リスト
-                                   引数にとったパターン分マップを生成する
+                                   引数にとったパターン分のマップをcreate()で生成する
 
         """
-        super(UniShapeMapFactory, self).__init__(obj3d, grid, n_div, cls,
-                                                 grid_scale)
+        super(UniShapeMapFactory, self).__init__(model_id, obj3d, grid, n_div,
+                                                 cls, grid_scale)
         self.uni_scan_directions = uni_scan_directions
-        self.map_id = map_id
 
     def create(self):
         """
