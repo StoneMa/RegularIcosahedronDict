@@ -58,7 +58,8 @@ class BaseShapeMap(object):
 
     def __str__(self):
         s = super(BaseShapeMap, self).__str__() + \
-            "( Model-ID : {}, n-div : {}, )\n".format(self.model_id, self.n_div)
+            "\n( Model-ID : {}, n-div : {} )\n".format(self.model_id,
+                                                       self.n_div)
         for distance_row in self.distance_map:
             s += "[ "
             for distance in distance_row:

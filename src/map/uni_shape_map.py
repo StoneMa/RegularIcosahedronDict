@@ -79,3 +79,9 @@ class UniShapeMap(BaseShapeMap):
             for row in self.distance_map:
                 for elem in row:
                     f.write(struct.pack(data_format, elem))
+
+    def __str__(self):
+        s = super(UniShapeMap, self).__str__()
+        index = s.find('(')
+        new_s = " Face-ID : {},".format(self.face_id)
+        return s[:index+1] + new_s + s[index+1:]
