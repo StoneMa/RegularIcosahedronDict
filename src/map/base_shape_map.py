@@ -10,7 +10,23 @@ class BaseShapeMap(object):
                    'double': 'd',
                    'int': 'i'}
 
-    def __init__(self, distance_map, cls, n_div):
+    def __init__(self, map_id, distance_map, cls, n_div):
+        """
+
+        :type distance_map: list(list or np.ndarray)
+        :param distance_map: 3Dモデルの重心Gと、Gとグリッド頂点を結ぶ線分とモデルの交点Pの
+                             距離情報を含むマップ
+
+        :type cls: int or long
+        :param cls: クラスラベル
+
+        :type n_div: int or long
+        :param n_div: 分割数
+
+        """
+        assert isinstance(map_id, (int, long))
+        assert isinstance(cls, (int, long))
+        assert isinstance(n_div, (int, long))
         try:
             assert isinstance(distance_map, (list, tuple))
             assert_type_in_container(distance_map, (list, tuple))
@@ -18,17 +34,18 @@ class BaseShapeMap(object):
             assert isinstance(distance_map, np.ndarray)
             assert distance_map.ndim == 2
 
+        self.map_id = map_id
         self.distance_map = distance_map
         self.cls = cls
         self.n_div = n_div
 
-    def save(self, shp_file_root, data_id, type_name='float'):
+    def save(self, shp_path, type_name='float'):
         """
 
         形状マップを.shpファイル形式で保存する
 
-        :type shp_file_root: str
-        :param shp_file_root: .shpファイルパス
+        :type shp_path: str
+        :param shp_path: .shpファイルパス
 
         :type data_id: str
         :param data_id: 個々の形状データに付与されるID

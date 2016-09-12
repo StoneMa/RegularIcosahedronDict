@@ -4,11 +4,11 @@
 import os
 import struct
 import numpy as np
+from src.map.base_shape_map import BaseShapeMap
 from src.obj.obj3d import Obj3d
 from src.obj.grid.base_grid import BaseGrid
 from src.obj.grid.icosahedron_grid import TriangleGrid, TriangleFace
 from src.util.debug_util import assert_type_in_container
-
 
 class ShapeMap(object):
     """
@@ -16,10 +16,6 @@ class ShapeMap(object):
     三次元モデルの重心から表面までの距離を、グリッドの頂点単位で記録するマップのクラス
 
     """
-
-    DATA_FORMAT = {'float': 'f',
-                   'double': 'd',
-                   'int': 'i'}
 
     def __init__(self, face_ids, shape_maps, cls, n_div, traverse_direction):
         """
@@ -76,7 +72,7 @@ class ShapeMap(object):
             os.makedirs(sub_root)
 
         # データ値をバイナリ保存する時のフォーマット
-        data_format = ShapeMap.DATA_FORMAT[type_name]
+        data_format = BaseShapeMap.DATA_FORMAT[type_name]
 
         for face_id, shape_map in self.shape_map_dict.items():
 
@@ -223,10 +219,10 @@ class ShapeMapCreator(object):
 
         return None
 
-    def create(self, directions):
+    def create_uni_maps(self, directions):
         """
 
-        ShapeMapオブジェクトを生成する
+        Gridの単一面に対応するShapeMapオブジェクトを生成する
 
         :type directions: BaseGrid.DIRECTION
         :param directions: BaseGridの頂点走査方向（複数指定可能）
@@ -236,32 +232,14 @@ class ShapeMapCreator(object):
 
         """
 
-        grid_center = np.zeros(shape=(3,))
-
-        # 距離マップ インデックスはグリッドのverticesに対応する
-        # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
-        distances = np.full(shape=(len(self.grid.vertices)),
-                            fill_value=ShapeMapCreator.DIST_UNDEFINED,
-                            dtype=np.float64)
-
-        # 交点リスト
-        cps = [None for _ in xrange(len(distances))]
-
-        for i, g_vertex in enumerate(self.grid.vertices):
-            for f0, f1, f2 in self.obj3d.vertices[self.obj3d.face_vertices]:
-                p_cross = self.tomas_moller(grid_center, g_vertex, f0, f1, f2)
-                if p_cross is not None:
-                    dist = np.linalg.norm(p_cross - grid_center)
-                    distances[i] = dist
-                    cps[i] = p_cross
-                    break
+        distance_map = self.__distance_map()
 
         # FaceIDと頂点インデックスのマップの辞書を取得
         shape_maps = []
         for direction in directions:
             traversed_indices_dict = self.grid.traverse(direction)
 
-            distance_maps = [[[distances[idx]
+            distance_maps = [[[distance_map[idx]
                                if idx != BaseGrid.VERTEX_IDX_UNDEFINED
                                else ShapeMapCreator.DIST_UNDEFINED
                                for idx in row]
@@ -272,6 +250,49 @@ class ShapeMapCreator(object):
                                        distance_maps, self.cls, self.grid.n_div,
                                        direction))
         return shape_maps
+
+    def create_band_map(self, band_types):
+
+        distance_map = self.__distance_map()
+
+        shape_maps = []
+        for band_type in band_types:
+            traverse_band_indices = self.grid.traverse_band(band_type)
+
+            distance_maps = [[[distance_map[idx]
+                               if idx != BaseGrid.VERTEX_IDX_UNDEFINED
+                               else ShapeMapCreator.DIST_UNDEFINED
+                               for idx in row]
+                              for row in indices_map]
+                             for indices_map in traverse_band_indices]
+
+            shape_maps.append(ShapeMap(traversed_indices_dict.keys(),
+                                       distance_maps, self.cls, self.grid.n_div,
+                                       direction))
+        return shape_maps
+
+    def __distance_map(self):
+        grid_center = np.zeros(shape=(3,))
+
+        # 距離マップ インデックスはグリッドのverticesに対応する
+        # 空洞など、距離が未定義のところにはDIST_UNDEFINED値を入れる
+        distance_map = np.full(shape=(len(self.grid.vertices)),
+                               fill_value=ShapeMapCreator.DIST_UNDEFINED,
+                               dtype=np.float64)
+
+        # 交点リスト
+        cps = [None for _ in xrange(len(distance_map))]
+
+        for i, g_vertex in enumerate(self.grid.vertices):
+            for f0, f1, f2 in self.obj3d.vertices[self.obj3d.face_vertices]:
+                p_cross = self.tomas_moller(grid_center, g_vertex, f0, f1, f2)
+                if p_cross is not None:
+                    dist = np.linalg.norm(p_cross - grid_center)
+                    distance_map[i] = dist
+                    cps[i] = p_cross
+                    break
+
+        return distance_map
 
     def create_all_direction(self):
         """
