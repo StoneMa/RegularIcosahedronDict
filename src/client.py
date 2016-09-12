@@ -6,7 +6,7 @@ import sys
 import threading
 import time
 
-from map.uni_shape_map_factory import UniShapeMapFactory, UniShapeMap
+from map.uni_shape_map_factory import UniShapeMapFactory
 from src.obj.grid.base_grid import BaseFace
 from src.obj.grid.icosahedron_grid import IcosahedronGrid
 from src.obj.obj3d import Obj3d
@@ -59,7 +59,6 @@ def handler(kwargs):
             print (time.clock() - start), "s"
 
     threading.Thread(target=execute).start()
-
 
 if __name__ == '__main__':
     title, x, y, width, height = sys.argv[1:]

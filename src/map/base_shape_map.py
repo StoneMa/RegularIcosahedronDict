@@ -13,6 +13,9 @@ class BaseShapeMap(object):
     def __init__(self, model_id, distance_map, cls, n_div):
         """
 
+        :type model_id: int or long:
+        :param model_id: 対象3DモデルID
+
         :type distance_map: list(list or np.ndarray)
         :param distance_map: 3Dモデルの重心Gと、Gとグリッド頂点を結ぶ線分とモデルの交点Pの
                              距離情報を含むマップ
