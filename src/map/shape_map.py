@@ -262,7 +262,7 @@ class ShapeMapCreator(object):
         # FaceIDと頂点インデックスのマップの辞書を取得
         shape_maps = []
         for direction in directions:
-            traversed_indices_dict = self.grid.traverse(direction)
+            traversed_indices_dict = self.grid.traverse(direction, False)
 
             distance_maps = [[[distances[idx]
                                if idx != BaseGrid.VERTEX_IDX_UNDEFINED

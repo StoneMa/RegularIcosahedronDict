@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import numpy as np
+from itertools import cycle
 from src.util.debug_util import assert_type_in_container
 from base_grid import BaseGrid, BaseFace
 
@@ -105,7 +106,57 @@ class TriangleGrid(BaseGrid):
             new_grid_faces.append(new_face)
 
         return TriangleGrid(new_vertices, new_grid_faces, self.n_face,
-                            self.n_div, self.upper_direction)
+                            n_div, self.upper_direction)
+
+    def traverse_band(self, band_type, center_face_id):
+        """
+
+        帯状にグリッド上の頂点を走査し、走査順に頂点インデックスを返す
+        頂点インデックスはself.verticesに対応する
+
+        :type band_type: BaseGrid.BAND_TYPE
+        :param band_type: 帯の走査方向
+
+        :type center_face_id: int or long
+        :param center_face_id: 帯の中心となる面のID
+
+        :rtype: list(list)
+        :return: 走査順にソートされた頂点のインデックス
+
+        """
+        if band_type == BaseGrid.BAND_TYPE.HORIZON:
+            direction_loop = cycle((BaseFace.UNI_SCAN_DIRECTION.HORIZON,))
+            reverse_loop = cycle((False, True))
+            next_fid_func_loop = cycle((lambda face: face.right_face_id,
+                                        lambda face: face.left_face_id))
+        elif band_type == BaseGrid.BAND_TYPE.UPPER_RIGHT:
+            direction_loop = cycle((BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,))
+            reverse_loop = cycle((False, True))
+            next_fid_func_loop = cycle((lambda face: face.right_face_id,
+                                        lambda face: face.bottom_face_id))
+        elif band_type == BaseGrid.BAND_TYPE.LOWER_RIGHT:
+            direction_loop = cycle((BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,))
+            reverse_loop = cycle((True, False))
+            next_fid_func_loop = cycle((lambda face: face.bottom_face_id,
+                                        lambda face: face.left_face_id))
+
+        result = [[] for _ in xrange(self.n_div + 1)]
+
+        face_id = center_face_id
+        while True:
+            direction = direction_loop.next()
+            is_reversed = reverse_loop.next()
+            face = self.find_face_from_id(face_id)
+            traversed_rows = face.traverse(direction, is_reversed)
+            for result_row, traversed_row in zip(result, traversed_rows):
+                # 重複を防ぐため、先頭要素は飛ばす
+                result_row += traversed_row[1:]
+            face_id = next_fid_func_loop.next()(face)
+
+            if face_id == center_face_id:
+                break
+
+        return result
 
 
 class TriangleFace(BaseFace):
@@ -240,7 +291,7 @@ class TriangleFace(BaseFace):
         """
         return self.get_vertex_idx(0, self.n_div)
 
-    def traverse(self, direction):
+    def traverse(self, direction, is_reversed):
         """
 
         単一面の頂点インデックスを指定方向に走査し、入れ子リストとして返す
@@ -248,24 +299,30 @@ class TriangleFace(BaseFace):
         :type direction: icosahedronface.direction
         :param direction: 操作方向の指定
 
+        :type is_reversed: bool
+        :param is_reversed: 面が、グリッドの基準上方向ベクトルupper_direction
+                               に対して上下逆さまかどうか
+
         :rtype: list(list(int))
         :return: 頂点インデックスの入れ子リスト
 
         """
 
         coordinates = \
-            {TriangleFace.UNI_SCAN_DIRECTION.HORIZON: self.__horizon_coordinates,
-             TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT: self.__upper_right_coordinates,
-             TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT: self.__upper_left_coordinates}[
+            {
+                TriangleFace.UNI_SCAN_DIRECTION.HORIZON: self.__horizon_row_coordinates,
+                TriangleFace.UNI_SCAN_DIRECTION.UPPER_RIGHT: self.__upper_right_row_coordinates,
+                TriangleFace.UNI_SCAN_DIRECTION.UPPER_LEFT: self.__upper_left_row_coordinates}[
                 direction]
 
+        rows = xrange(self.n_div, -1, -1) if is_reversed \
+            else xrange(self.n_div + 1)
+
         return [[self.get_vertex_idx(alpha, beta)
-                 for alpha, beta in zip(*coordinates(row))]
-                for row in xrange(self.n_div + 1)]
+                 for alpha, beta in zip(*coordinates(row, is_reversed))]
+                for row in rows]
 
-
-
-    def __horizon_coordinates(self, row):
+    def __horizon_row_coordinates(self, row, is_reversed):
         """
 
         ある行で面上の頂点を水平にトラバースするときの順序に従った座標配列を返す
@@ -273,15 +330,23 @@ class TriangleFace(BaseFace):
         :type row: int
         :param row: 現在注目している行
 
+        :type is_reversed: bool
+        :param is_reversed: 面が、グリッドの基準上方向ベクトルupper_direction
+                               に対して上下逆さまかどうか
+
         :rtype: list(list(int), list(int))
         :return: alpha, betaの座標配列
 
         """
-        alpha = xrange(row, -1, -1)
-        beta = xrange(row + 1)
+        if is_reversed:
+            alpha = xrange(row + 1)
+            beta = xrange(row, -1, -1)
+        else:
+            alpha = xrange(row, -1, -1)
+            beta = xrange(row + 1)
         return alpha, beta
 
-    def __upper_right_coordinates(self, row):
+    def __upper_right_row_coordinates(self, row, is_reversed):
         """
 
         ある行で面上の頂点を右上にトラバースするときの順序に従った座標配列を返す
@@ -289,15 +354,23 @@ class TriangleFace(BaseFace):
         :type row: int
         :param row: 現在注目している行
 
+        :type is_reversed: bool
+        :param is_reversed: 面が、グリッドの基準上方向ベクトルupper_direction
+                               に対して上下逆さまかどうか
+
         :rtype: list(list(int), list(int))
         :return: alpha, betaの座標配列
 
         """
-        alpha = [self.n_div - row for i in xrange(row + 1)]
-        beta = xrange(row, -1, -1)
+        if is_reversed:
+            alpha = [row for i in xrange(row + 1)]
+            beta = xrange(row + 1)
+        else:
+            alpha = [self.n_div - row for i in xrange(row + 1)]
+            beta = xrange(row, -1, -1)
         return alpha, beta
 
-    def __upper_left_coordinates(self, row):
+    def __upper_left_row_coordinates(self, row, is_reversed):
         """
 
         ある行で面上の頂点を左上にトラバースするときの順序に従った座標配列を返す
@@ -305,10 +378,18 @@ class TriangleFace(BaseFace):
         :type row: int
         :param row: 現在注目している行
 
+        :type is_reversed: bool
+        :param is_reversed: 面が、グリッドの基準上方向ベクトルupper_direction
+                               に対して上下逆さまかどうか
+
         :rtype: list(list(int), list(int))
         :return: alpha, betaの座標配列
 
         """
-        alpha = xrange(row + 1)
-        beta = [self.n_div - row for i in xrange(row + 1)]
+        if is_reversed:
+            alpha = xrange(row, -1, -1)
+            beta = [row for i in xrange(row + 1)]
+        else:
+            alpha = xrange(row + 1)
+            beta = [self.n_div - row for i in xrange(row + 1)]
         return alpha, beta
