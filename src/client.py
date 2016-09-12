@@ -60,6 +60,7 @@ def handler(kwargs):
 
     threading.Thread(target=execute).start()
 
+
 if __name__ == '__main__':
     title, x, y, width, height = sys.argv[1:]
     main(title, int(x), int(y), int(width), int(height), handler)
