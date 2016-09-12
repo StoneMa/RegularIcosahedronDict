@@ -6,8 +6,6 @@ import sys
 import threading
 import time
 
-from PyQt4 import QtGui
-
 from src.map.shape_map import ShapeMapCreator
 from src.obj.grid.icosahedron_grid import IcosahedronGrid
 from src.obj.obj3d import Obj3d
@@ -15,70 +13,45 @@ from src.util.parse_util import parse_cla
 from src.view.qt_main import main, MainWindow
 
 
-def init(window):
+def handler(kwargs):
     """
 
-    client初期化処理
-
-    :type window: MainWindow
-    :param window: Qtメインウィンドウ
+    実行ハンドラ
 
     """
+    n_div = kwargs[MainWindow.KEY_N_DIV]
+    grid_scale = kwargs[MainWindow.KEY_GRID_SCALE]
+    model_root_path = kwargs[MainWindow.KEY_MODEL_PATH]
+    grid_path = kwargs[MainWindow.KEY_GRID_PATH]
+    cla_path = kwargs[MainWindow.KEY_CLA_PATH]
+    save_root_path = kwargs[MainWindow.KEY_SAVE_PATH]
 
-    def on_create_button_click():
-
-        model_path = str(window.tb_model_path.text())
-        grid_path = str(window.tb_grid_path.text())
-        cla_path = str(window.tb_cla_path.text())
-        save_path = str(window.tb_save_path.text())
-
-        try:
-            n_div = int(str(window.tb_n_div.text()))
-            grid_scale = float(str(window.tb_grid_scale.text()))
-        except (ValueError, TypeError), e:
-            if "n_div" in e.message:
-                QtGui.QMessageBox.critical(window, title,
-                                           "N-Division should be a number.")
-            else:
-                QtGui.QMessageBox.critical(window, "",
-                                           "Grid Scale should be a number.")
-        else:
-            create_shrec_maps(n_div, grid_scale, model_path, grid_path,
-                              cla_path, save_path)
-
-    window.set_on_create_button_click_handler(on_create_button_click)
-
-
-def create_shrec_maps(n_div, scale_grid, shrec_off_root, grd_path, cla_file,
-                      shp_file_root):
     def execute():
-        cla = parse_cla(cla_file)
+        cla = parse_cla(cla_path)
 
-        for shrec_name in os.listdir(shrec_off_root):
+        for model_name in os.listdir(model_root_path):
             start = time.clock()
 
-            print shrec_name, "..."
-            shrec_id = int(os.path.splitext(shrec_name[1:])[0])
-            shrec_label = [label for label, aff_ids in cla.items()
-                           if shrec_id in aff_ids][0]
-            shrec_cls = cla.keys().index(shrec_label)
+            print model_name, "..."
+            model_id = int(os.path.splitext(model_name[1:])[0])
+            model_label = [label for label, aff_ids in cla.items()
+                           if model_id in aff_ids][0]
+            cls = cla.keys().index(model_label)
 
-            off_path = os.path.join(shrec_off_root, shrec_name)
+            off_path = os.path.join(model_root_path, model_name)
+
             print "creator being generated..."
             obj3d = Obj3d.load(off_path)
-            grid3d = IcosahedronGrid.load(grd_path)
-            creator = ShapeMapCreator(obj3d,
-                                      grid3d,
-                                      shrec_cls,
-                                      n_div,
-                                      scale_grid)
+            grid3d = IcosahedronGrid.load(grid_path)
+            creator = ShapeMapCreator(obj3d, grid3d, cls, n_div, grid_scale)
 
             print "maps being created..."
             horizon, upper_right, upper_left = creator.create_all_direction()
+
             print horizon
-            horizon.save(shp_file_root, str(shrec_id))
-            upper_right.save(shp_file_root, str(shrec_id))
-            upper_left.save(shp_file_root, str(shrec_id))
+            horizon.save(save_root_path, str(model_id))
+            upper_right.save(save_root_path, str(model_id))
+            upper_left.save(save_root_path, str(model_id))
 
             print (time.clock() - start), "s"
 
@@ -87,4 +60,4 @@ def create_shrec_maps(n_div, scale_grid, shrec_off_root, grd_path, cla_file,
 
 if __name__ == '__main__':
     title, x, y, width, height = sys.argv[1:]
-    main(init, title, int(x), int(y), int(width), int(height))
+    main(title, int(x), int(y), int(width), int(height), handler)

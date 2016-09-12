@@ -49,7 +49,7 @@ class MainWindow(QtGui.QMainWindow):
         """
         sygnal = QtCore.pyqtSignal()
 
-    def __init__(self, title, x, y, width, height):
+    def __init__(self, title, x, y, width, height, create_button_click_handler):
         """
 
         :type title: str
@@ -74,6 +74,8 @@ class MainWindow(QtGui.QMainWindow):
         self.setWindowTitle(title)
 
         self.parent_widget = QtGui.QWidget()
+
+        self.create_button_click_handler = create_button_click_handler
 
         ### result layout ###
 
@@ -148,6 +150,8 @@ class MainWindow(QtGui.QMainWindow):
         self.btn_create.setText(MainWindow.BUTTON_TEXT_CREATE)
         vl_button = QtGui.QVBoxLayout()
         vl_button.addWidget(self.btn_create)
+        self.connect(self.btn_create, QtCore.SIGNAL('clicked()'),
+                     on_create_button_clicked)
 
         # combine path input layout and create button layout.
         vl_path_button = QtGui.QVBoxLayout()
@@ -245,20 +249,43 @@ class MainWindow(QtGui.QMainWindow):
         hl_model_path.addWidget(button)
         return hl_model_path
 
-    def set_on_create_button_click_handler(self, on_create_button_clicked):
+    def set_on_create_button_click_handler(self, handler):
         """
 
-        createボタンが押された時の処理を記述した関数を
-        createボタンに設定する
+        createボタンが押された時のサブハンドラを設定
 
-        :type on_create_button_clicked: func
-        :param on_create_button_clicked: createボタンに設定するハンドラ
-
+        :type handler: func(**kwarg)
+        :param handler: サブハンドラ関数
 
         """
+        self.create_button_click_handler = handler
 
-        self.connect(self.btn_create, QtCore.SIGNAL('clicked()'),
-                     on_create_button_clicked)
+    def on_create_button_clicked(self):
+        """
+
+        createボタンが押された時のメインハンドラ
+
+        """
+        try:
+            kwarg = {
+                MainWindow.KEY_MODEL_PATH: str(self.tb_model_path.text()),
+                MainWindow.KEY_GRID_PATH: str(self.tb_grid_path.text()),
+                MainWindow.KEY_CLA_PATH: str(self.tb_cla_path.text()),
+                MainWindow.KEY_SAVE_PATH: str(self.tb_save_path.text()),
+                MainWindow.KEY_N_DIV: int(str(self.tb_n_div.text())),
+                MainWindow.KEY_GRID_SCALE: float(
+                    str(self.tb_grid_scale.text()))}
+        except (ValueError, TypeError), e:
+            if "n_div" in e.message:
+                QtGui.QMessageBox.critical(self, "",
+                                           "N-Division should be a number.")
+            else:
+                QtGui.QMessageBox.critical(self, "",
+                                           "Grid Scale should be a number.")
+
+        # サブハンドラが非Noneの場合、GUI上の入力値を渡して呼ぶ
+        if self.create_button_click_handler is not None:
+            self.create_button_click_handler(kwarg)
 
     def __show_stdout(self):
 
@@ -318,7 +345,7 @@ class MainWindow(QtGui.QMainWindow):
         threading.Thread(target=emit_signal).start()
 
 
-def main(init, title, x, y, width, height):
+def main(title, x, y, width, height, create_button_click_handler):
     """
 
     GUI Main関数
@@ -343,6 +370,5 @@ def main(init, title, x, y, width, height):
 
     """
     app = QtGui.QApplication(sys.argv)
-    window = MainWindow(title, x, y, width, height)
-    init(window)
+    window = MainWindow(title, x, y, width, height, create_button_click_handler)
     sys.exit(app.exec_())
