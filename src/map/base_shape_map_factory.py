@@ -10,7 +10,7 @@ class BaseShapeMapFactory(object):
 
     DIST_UNDEFINED = -1
 
-    def __init__(self, obj3d, grid, cls, grid_scale):
+    def __init__(self, obj3d, grid, n_div, cls, grid_scale):
         """
 
         :type obj3d: Obj3d
@@ -18,6 +18,9 @@ class BaseShapeMapFactory(object):
 
         :type grid: TriangleGrid
         :param grid: 形状マップを生成するための正三角形からなるグリッド
+
+        :type n_div: int or long
+        :param n_div: グリッド分割数
 
         :type cls: int or long
         :param cls: クラスラベル
@@ -33,9 +36,17 @@ class BaseShapeMapFactory(object):
         assert isinstance(grid_scale, float)
 
         # 3Dモデル:座標系の中心に置き、正規化する
-        self.obj3d = obj3d
+        self.obj3d = obj3d.center().normal()
         # 正二十面体グリッド:３Dモデルを内部に完全に含むように拡張
-        self.grid = grid
+        self.grid = grid.center().scale(grid_scale).divide_face(n_div)
+
+        # 3Dモデルの中心から最も離れた点の中心からの距離が、
+        # グリッドの中心から最も近い点のより中心からの距離より大きい場合はサポート外
+        # （原則、scale_gridは1以上で設定する）
+        if np.linalg.norm(self.grid.vertices, axis=1).min() < np.linalg.norm(
+                self.obj3d.vertices, axis=1).max():
+            raise NotImplementedError()
+
         # クラスラベル
         self.cls = cls
 

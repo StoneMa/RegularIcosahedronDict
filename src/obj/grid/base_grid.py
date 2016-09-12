@@ -97,6 +97,9 @@ class BaseGrid(Obj3d):
         else:
             raise IndexError
 
+    def divide_face(self, n_div):
+        raise NotImplementedError
+
     def __str__(self):
         """
 

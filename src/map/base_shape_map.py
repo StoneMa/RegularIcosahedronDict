@@ -10,7 +10,7 @@ class BaseShapeMap(object):
                    'double': 'd',
                    'int': 'i'}
 
-    def __init__(self, map_id, distance_map, cls, n_div):
+    def __init__(self, model_id, distance_map, cls, n_div):
         """
 
         :type distance_map: list(list or np.ndarray)
@@ -24,7 +24,7 @@ class BaseShapeMap(object):
         :param n_div: 分割数
 
         """
-        assert isinstance(map_id, (int, long))
+        assert isinstance(model_id, (int, long))
         assert isinstance(cls, (int, long))
         assert isinstance(n_div, (int, long))
         try:
@@ -34,7 +34,7 @@ class BaseShapeMap(object):
             assert isinstance(distance_map, np.ndarray)
             assert distance_map.ndim == 2
 
-        self.map_id = map_id
+        self.model_id = model_id
         self.distance_map = distance_map
         self.cls = cls
         self.n_div = n_div
@@ -57,8 +57,11 @@ class BaseShapeMap(object):
         raise NotImplementedError
 
     def __str__(self):
-        s = super(BaseShapeMap, self).__str__() + "(n-div : {}, )"
+        s = super(BaseShapeMap, self).__str__() + \
+            "( Model-ID : {}, n-div : {}, )\n".format(self.model_id, self.n_div)
         for distance_row in self.distance_map:
+            s += "[ "
             for distance in distance_row:
-                s += "{}".format(distance)
+                s += "{} ".format(distance)
+            s += "]\n"
         return s

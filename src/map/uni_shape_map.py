@@ -7,7 +7,7 @@ from src.obj.grid.triangle_grid import BaseFace
 
 
 class UniShapeMap(BaseShapeMap):
-    def __init__(self, map_id, distance_map, cls, n_div, face_id,
+    def __init__(self, model_id, distance_map, cls, n_div, face_id,
                  traverse_direction):
         """
 
@@ -29,7 +29,7 @@ class UniShapeMap(BaseShapeMap):
 
         """
 
-        super(UniShapeMap, self).__init__(map_id, distance_map, cls, n_div)
+        super(UniShapeMap, self).__init__(model_id, distance_map, cls, n_div)
         assert isinstance(face_id, (int, long))
         assert isinstance(traverse_direction, BaseFace.UNI_SCAN_DIRECTION)
         self.face_id = face_id
@@ -58,7 +58,7 @@ class UniShapeMap(BaseShapeMap):
             # .shpファイルであることを示す接頭辞
             lines.append("#SHP\n")
             # ID
-            lines.append("#ID\n{}\n".format(self.map_id))
+            lines.append("#ID\n{}\n".format(self.model_id))
             # クラス情報
             lines.append("#CLASS\n{}\n".format(self.cls))
             # FaceID

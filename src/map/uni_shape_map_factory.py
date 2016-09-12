@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from src.obj.grid.base_grid import BaseGrid, BaseFace
+from src.obj.grid.base_grid import BaseGrid
 from base_shape_map_factory import BaseShapeMapFactory
 from uni_shape_map import UniShapeMap
 
 
 class UniShapeMapFactory(BaseShapeMapFactory):
-    def __init__(self, obj3d, grid, cls, grid_scale, uni_scan_directions):
+    def __init__(self, map_id, obj3d, grid, n_div, cls, grid_scale,
+                 uni_scan_directions):
         """
 
         :type obj3d: Obj3d
@@ -15,6 +16,9 @@ class UniShapeMapFactory(BaseShapeMapFactory):
 
         :type grid: TriangleGrid
         :param grid: 形状マップを生成するための正三角形からなるグリッド
+
+        :type n_div: int or long
+        :param n_div: グリッド分割数
 
         :type cls: int or long
         :param cls: クラスラベル
@@ -27,20 +31,18 @@ class UniShapeMapFactory(BaseShapeMapFactory):
                                    引数にとったパターン分マップを生成する
 
         """
-        super(UniShapeMapFactory, self).__init__(obj3d, grid, cls, grid_scale)
+        super(UniShapeMapFactory, self).__init__(obj3d, grid, n_div, cls,
+                                                 grid_scale)
         self.uni_scan_directions = uni_scan_directions
-        self.map_id = 0
+        self.map_id = map_id
 
     def create(self):
         """
 
         Gridの単一面に対応するShapeMapオブジェクトを生成する
 
-        :type directions: BaseGrid.DIRECTION
-        :param directions: BaseGridの頂点走査方向（複数指定可能）
-
-        :rtype: ShapeMap
-        :return: ShapeMapオブジェクト
+        :rtype: list(UniShapeMap)
+        :return: UniShapeMapオブジェクト
 
         """
 
