@@ -222,7 +222,7 @@ class MainWindow(QtGui.QMainWindow):
                 f_dialog = QtGui.QFileDialog.getOpenFileName
                 title = MainWindow.DIALOG_TITLE_FILE
             else:
-                f_dialog = QtGui.QFileDialog.getOpenFileName
+                f_dialog = QtGui.QFileDialog.getExistingDirectory
                 title = MainWindow.DIALOG_TITLE_FOLDER
             path = f_dialog(self, title, MainWindow.FILE_DIALOG_INIT_PATH)
             line_edit.setText(path)
