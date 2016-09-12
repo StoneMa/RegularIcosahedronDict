@@ -151,7 +151,7 @@ class MainWindow(QtGui.QMainWindow):
         vl_button = QtGui.QVBoxLayout()
         vl_button.addWidget(self.btn_create)
         self.connect(self.btn_create, QtCore.SIGNAL('clicked()'),
-                     on_create_button_clicked)
+                     self.on_create_button_clicked)
 
         # combine path input layout and create button layout.
         vl_path_button = QtGui.QVBoxLayout()
