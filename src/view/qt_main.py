@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import StringIO
 import sys
 import time
 import threading
+import StringIO
 from PyQt4 import QtGui, QtCore
 from src.util.app_util import save_cache, load_cache
 
