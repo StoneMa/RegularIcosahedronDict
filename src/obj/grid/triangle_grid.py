@@ -132,15 +132,47 @@ class TriangleGrid(BaseGrid):
                                         lambda face: face.left_face_id))
         elif band_type == BaseGrid.BAND_TYPE.UPPER_RIGHT:
             direction_loop = cycle(
-                (BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
-                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED))
+                (BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
+                 BaseFace.UNI_SCAN_DIRECTION.HORIZON_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.HORIZON_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT))
             next_fid_func_loop = cycle((lambda face: face.right_face_id,
+                                        lambda face: face.bottom_face_id,
+                                        lambda face: face.right_face_id,
+                                        lambda face: face.bottom_face_id,
+                                        lambda face: face.left_face_id,
+                                        lambda face: face.left_face_id,
+                                        lambda face: face.bottom_face_id,
+                                        lambda face: face.bottom_face_id,
+                                        lambda face: face.right_face_id,
                                         lambda face: face.bottom_face_id))
         elif band_type == BaseGrid.BAND_TYPE.LOWER_RIGHT:
             direction_loop = cycle(
                 (BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT))
             next_fid_func_loop = cycle((lambda face: face.bottom_face_id,
+                                        lambda face: face.left_face_id,
+                                        lambda face: face.bottom_face_id,
+                                        lambda face: face.left_face_id,
+                                        lambda face: face.right_face_id,
+                                        lambda face: face.bottom_face_id,
+                                        lambda face: face.bottom_face_id,
+                                        lambda face: face.left_face_id,
+                                        lambda face: face.bottom_face_id,
                                         lambda face: face.left_face_id))
         else:
             raise NotImplementedError

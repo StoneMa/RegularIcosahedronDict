@@ -59,15 +59,14 @@ class BandShapeMapFactory(BaseShapeMapFactory):
 
         shape_maps = []
         for band_type in self.band_types:
-            traversed_indices_dict = self.grid.traverse_band(band_type,
-                                                             self.center_face_id)
-            for face_id, vertex_indices_map in traversed_indices_dict.items():
-                distance_map = [[distances[idx]
-                                 if idx != BaseGrid.VERTEX_IDX_UNDEFINED
-                                 else BaseShapeMapFactory.DIST_UNDEFINED
-                                 for idx in row]
-                                for row in vertex_indices_map]
-                shape_maps.append(
-                    BandShapeMap(self.model_id, distance_map, self.cls,
-                                 self.grid.n_div, band_type))
+            band_vertex_indices_map = self.grid.traverse_band(band_type,
+                                                              self.center_face_id)
+            distance_map = [[distances[idx]
+                             if idx != BaseGrid.VERTEX_IDX_UNDEFINED
+                             else BaseShapeMapFactory.DIST_UNDEFINED
+                             for idx in row]
+                            for row in band_vertex_indices_map]
+            shape_maps.append(
+                BandShapeMap(self.model_id, distance_map, self.cls,
+                             self.grid.n_div, band_type))
         return shape_maps

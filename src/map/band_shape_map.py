@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
 import struct
 from src.obj.grid.base_grid import BaseGrid
 from base_shape_map import BaseShapeMap
@@ -32,6 +33,11 @@ class BandShapeMap(BaseShapeMap):
         self.band_type = band_type
 
     def save(self, shp_path, type_name='float'):
+
+        target_dir = os.path.dirname(shp_path)
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+
         # データ値をバイナリ保存する時のフォーマット
         data_format = BaseShapeMap.DATA_FORMAT[type_name]
 

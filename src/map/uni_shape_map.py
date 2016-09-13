@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import os
 import struct
 from base_shape_map import BaseShapeMap
 from src.obj.grid.triangle_grid import BaseFace
@@ -47,6 +48,9 @@ class UniShapeMap(BaseShapeMap):
         :param type_name: データ部の型
 
         """
+
+        if not os.path.exists(shp_path):
+            os.makedirs(shp_path)
 
         # データ値をバイナリ保存する時のフォーマット
         data_format = BaseShapeMap.DATA_FORMAT[type_name]
