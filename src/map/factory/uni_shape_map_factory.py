@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from src.map.factory.base_shape_map_factory import BaseShapeMapFactory
 from src.obj.grid.base_grid import BaseGrid
-from base_shape_map_factory import BaseShapeMapFactory
-from uni_shape_map import UniShapeMap
+from src.map.uni_shape_map import UniShapeMap
 
 
 class UniShapeMapFactory(BaseShapeMapFactory):

@@ -6,8 +6,8 @@ import sys
 import threading
 import time
 
-from map.uni_shape_map_factory import UniShapeMapFactory
-from map.band_shape_map_factory import BandShapeMapFactory
+from src.map.factory.band_shape_map_factory import BandShapeMapFactory
+from src.map.factory.uni_shape_map_factory import UniShapeMapFactory
 from src.obj.grid.base_grid import BaseGrid, BaseFace
 from src.obj.grid.icosahedron_grid import IcosahedronGrid
 from src.obj.obj3d import Obj3d

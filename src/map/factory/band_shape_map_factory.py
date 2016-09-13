@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+from src.map.band_shape_map import BandShapeMap
+from src.map.factory.base_shape_map_factory import BaseShapeMapFactory
 from src.obj.grid.base_grid import BaseGrid
-from base_shape_map_factory import BaseShapeMapFactory
-from band_shape_map import BandShapeMap
 from src.util.debug_util import assert_type_in_container
 
 
