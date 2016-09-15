@@ -95,7 +95,7 @@ class TriangleGrid(BaseGrid):
                         np.abs(new_vertex - new_vertices) < epsilon).all(axis=1)
 
                     if len(new_vertices) > 0 and check_duplicate.any():
-                        v_idx = int(np.argwhere(check_duplicate))
+                        v_idx = int(np.argwhere(check_duplicate)[0])
                     else:
                         v_idx = len(new_vertices)
                         new_vertices = np.vstack((new_vertices, new_vertex))
