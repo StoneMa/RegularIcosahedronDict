@@ -294,7 +294,7 @@ class Obj3d(object):
             n_vertices, n_faces, n_edges = map(int, lines.pop(0).split(' '))
 
             # 頂点座標を取得
-            vertices = np.array([map(float, lines[i].split(' '))
+            vertices = np.array([map(float, lines[i].strip().split(' '))
                                  for i in xrange(n_vertices)])
 
             # 面を構成する頂点のインデックス
