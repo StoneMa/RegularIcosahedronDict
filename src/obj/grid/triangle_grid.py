@@ -137,7 +137,7 @@ class TriangleGrid(BaseGrid):
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED,
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
                  BaseFace.UNI_SCAN_DIRECTION.HORIZON_REVERSED,
-                 BaseFace.UNI_SCAN_DIRECTION.HORIZON_REVERSED,
+                 BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED,
