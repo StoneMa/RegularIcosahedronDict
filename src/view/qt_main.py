@@ -279,9 +279,12 @@ class MainWindow(QtGui.QMainWindow):
             if "n_div" in e.message:
                 QtGui.QMessageBox.critical(self, "",
                                            "N-Division should be a number.")
-            else:
+            elif MainWindow.KEY_GRID_SCALE in e.message:
                 QtGui.QMessageBox.critical(self, "",
                                            "Grid Scale should be a number.")
+            else:
+                QtGui.QMessageBox.critical(self, "",
+                                           "Check paths in text boxes.")
 
         # サブハンドラが非Noneの場合、GUI上の入力値を渡して呼ぶ
         if self.create_button_click_handler is not None:
