@@ -3,6 +3,7 @@
 
 import os
 import sys
+import re
 import threading
 import time
 
@@ -33,10 +34,11 @@ def handler(kwargs):
         cla = parse_cla(cla_path)
 
         for model_name in os.listdir(model_root_path):
+
             start = time.clock()
 
             print model_name, "..."
-            model_id = int(os.path.splitext(model_name[1:])[0])
+            model_id = int(re.search('\d+', model_name).group())
             model_label = [label for label, aff_ids in cla.items()
                            if model_id in aff_ids][0]
             cls = cla.keys().index(model_label)
@@ -80,10 +82,11 @@ def band_map_handler(kwargs):
         cla = parse_cla(cla_path)
 
         for model_name in os.listdir(model_root_path):
+
             start = time.clock()
 
             print model_name, "..."
-            model_id = int(os.path.splitext(model_name[1:])[0])
+            model_id = int(re.search('\d+', model_name).group())
             model_label = [label for label, aff_ids in cla.items()
                            if model_id in aff_ids][0]
             cls = cla.keys().index(model_label)
