@@ -96,3 +96,6 @@ ENV/
 
 # res
 res/*
+
+# except for .grd
+!*.grd
