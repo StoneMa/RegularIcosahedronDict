@@ -5,19 +5,11 @@ import sys
 import time
 import threading
 import StringIO
-try:
-    from PyQt4 import QtGui, QtCore
-    from PyQt4.QtGui import QMainWindow
-except ImportError:
-    try:
-        from PyQt5 import QtGui, QtCore
-        from PyQt5.QtWidgets import QMainWindow
-    except:
-        raise ImportError
+from PyQt4 import QtGui, QtCore
 from src.util.app_util import save_cache, load_cache
 
 
-class MainWindow(QMainWindow):
+class MainWindow(QtGui.QMainWindow):
     """
 
     プロジェクトをグラフィカルに操作するUIウィンドウ
