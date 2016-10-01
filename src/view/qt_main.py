@@ -5,7 +5,13 @@ import sys
 import time
 import threading
 import StringIO
-from PyQt4 import QtGui, QtCore
+try:
+    from PyQt4 import QtGui, QtCore
+except ImportError:
+    try:
+        from PyQt5 import QtGui, QtCore
+    except:
+        raise ImportError
 from src.util.app_util import save_cache, load_cache
 
 
