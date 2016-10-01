@@ -7,15 +7,17 @@ import threading
 import StringIO
 try:
     from PyQt4 import QtGui, QtCore
+    from PyQt4.QtGui import QMainWindow
 except ImportError:
     try:
         from PyQt5 import QtGui, QtCore
+        from PyQt5.QtWidgets import QMainWindow
     except:
         raise ImportError
 from src.util.app_util import save_cache, load_cache
 
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QMainWindow):
     """
 
     プロジェクトをグラフィカルに操作するUIウィンドウ
