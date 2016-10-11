@@ -35,11 +35,11 @@ class BaseGrid(Obj3d):
         :type n_div: int or long
         :param n_div: 面の分割数
 
-        :type is_face_assertion_enabled: bool
-        :param is_face_assertion_enabled: メンバのアサーションチェックを有効にするかどうか
-
         :type upper_direction: (float, float, float)
         :param upper_direction: グリッドの上方向を表す単位ベクトル
+
+        :type is_face_assertion_enabled: bool
+        :param is_face_assertion_enabled: メンバのアサーションチェックを有効にするかどうか
 
         """
 
