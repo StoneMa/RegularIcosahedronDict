@@ -51,11 +51,10 @@ class SquareGrid(BaseGrid):
         :type n_div: int
         :param n_div: 分割する
 
-        :rtype:
-        :return:
+        :rtype: SquareGrid
+        :return: 面分割したSquareGridオブジェクト
 
         """
-        pass
 
 
 

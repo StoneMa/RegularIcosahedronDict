@@ -4,6 +4,7 @@
 from src.map.band_shape_map import BandShapeMap
 from src.map.factory.base_shape_map_factory import BaseShapeMapFactory
 from src.obj.grid.base_grid import BaseGrid
+from src.obj.grid.triangle_grid import TriangleGrid
 from src.util.debug_util import assert_type_in_container
 
 
@@ -40,7 +41,7 @@ class BandShapeMapFactory(BaseShapeMapFactory):
         """
         super(BandShapeMapFactory, self).__init__(model_id, obj3d, grid, n_div,
                                                   cls, grid_scale)
-        assert_type_in_container(band_types, BaseGrid.BAND_TYPE)
+        assert_type_in_container(band_types, TriangleGrid.BAND_TYPE)
         assert isinstance(center_face_id, (int, long))
         self.band_types = band_types
         self.center_face_id = center_face_id

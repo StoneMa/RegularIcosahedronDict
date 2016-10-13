@@ -9,7 +9,8 @@ import time
 
 from src.map.factory.band_shape_map_factory import BandShapeMapFactory
 from src.map.factory.uni_shape_map_factory import UniShapeMapFactory
-from src.obj.grid.base_grid import BaseGrid, BaseFace
+from src.obj.grid.base_grid import BaseFace
+from src.obj.grid.triangle_grid import TriangleGrid
 from src.obj.grid.icosahedron_grid import IcosahedronGrid
 from src.obj.obj3d import Obj3d
 from src.util.parse_util import parse_cla
@@ -97,7 +98,7 @@ def band_map_handler(kwargs):
             obj3d = Obj3d.load(off_path)
             grid3d = IcosahedronGrid.load(grid_path)
             factory = BandShapeMapFactory(model_id, obj3d, grid3d, n_div, cls,
-                                          grid_scale, BaseGrid.BAND_TYPE, 0)
+                                          grid_scale, TriangleGrid.BAND_TYPE, 0)
 
             for shape_map in factory.create():
                 print shape_map

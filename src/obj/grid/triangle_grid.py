@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import enum
 import numpy as np
 from itertools import cycle
 from src.util.debug_util import assert_type_in_container
@@ -13,6 +14,8 @@ class TriangleGrid(BaseGrid):
     正三角形の面を持つグリッドの基底クラス
 
     """
+
+    BAND_TYPE = enum.Enum('BAND_TYPE', 'HORIZON UPPER_RIGHT LOWER_RIGHT')
 
     def __init__(self, vertices, triangle_faces, n_face, n_div, upper_direction,
                  is_face_assertion_enabled=True):
@@ -124,13 +127,13 @@ class TriangleGrid(BaseGrid):
         :return: 走査順にソートされた頂点のインデックス
 
         """
-        if band_type == BaseGrid.BAND_TYPE.HORIZON:
+        if band_type == TriangleGrid.BAND_TYPE.HORIZON:
             direction_loop = cycle(
                 (BaseFace.UNI_SCAN_DIRECTION.HORIZON,
                  BaseFace.UNI_SCAN_DIRECTION.HORIZON_REVERSED))
             next_fid_func_loop = cycle((lambda face: face.right_face_id,
                                         lambda face: face.left_face_id))
-        elif band_type == BaseGrid.BAND_TYPE.UPPER_RIGHT:
+        elif band_type == TriangleGrid.BAND_TYPE.UPPER_RIGHT:
             direction_loop = cycle(
                 (BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT_REVERSED,
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_LEFT,
@@ -152,7 +155,7 @@ class TriangleGrid(BaseGrid):
                                         lambda face: face.bottom_face_id,
                                         lambda face: face.right_face_id,
                                         lambda face: face.bottom_face_id))
-        elif band_type == BaseGrid.BAND_TYPE.LOWER_RIGHT:
+        elif band_type == TriangleGrid.BAND_TYPE.LOWER_RIGHT:
             direction_loop = cycle(
                 (BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT_REVERSED,
                  BaseFace.UNI_SCAN_DIRECTION.UPPER_RIGHT,

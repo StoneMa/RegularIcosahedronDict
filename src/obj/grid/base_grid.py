@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from collections import OrderedDict
-
 import enum
+from collections import OrderedDict
 
 from src.obj.obj3d import Obj3d
 from src.util.debug_util import assert_type_in_container
@@ -15,7 +14,6 @@ class BaseGrid(Obj3d):
     形状マップを生成するために使う、３次元空間上グリッドの基底クラス
 
     """
-    BAND_TYPE = enum.Enum('BAND_TYPE', 'HORIZON UPPER_RIGHT LOWER_RIGHT')
 
     VERTEX_IDX_UNDEFINED = None
 
